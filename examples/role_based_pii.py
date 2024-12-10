@@ -3,12 +3,10 @@ from eunomia.orchestra import Orchestra
 
 eunomia = Orchestra(
     instruments=[
-        PiiInstrument(entities=["PERSON"], redact_mode="replace"),
+        PiiInstrument(entities=["EMAIL_ADDRESS"], redact_mode="replace"),
         RbacInstrument(
             role="specialist",
-            instruments=[
-                PiiInstrument(entities=["EMAIL_ADDRESS"], redact_mode="replace")
-            ],
+            instruments=[PiiInstrument(entities=["PERSON"], redact_mode="replace")],
         ),
     ]
 )

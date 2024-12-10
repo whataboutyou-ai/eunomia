@@ -1,7 +1,12 @@
 import pytest
 
-from eunomia.instruments import PiiInstrument, RbacInstrument
+from eunomia.instruments import *
 from eunomia.orchestra import Orchestra
+
+
+@pytest.fixture
+def orchestra() -> Orchestra:
+    return Orchestra()
 
 
 @pytest.fixture
@@ -40,5 +45,5 @@ def rbac_instrument(rbac_config: dict) -> RbacInstrument:
 
 
 @pytest.fixture
-def orchestra() -> Orchestra:
-    return Orchestra()
+def idbac_instrument(pii_instrument: PiiInstrument) -> IdbacInstrument:
+    return IdbacInstrument(instruments=[pii_instrument])
