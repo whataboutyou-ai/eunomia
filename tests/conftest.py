@@ -10,7 +10,7 @@ def orchestra() -> Orchestra:
 
 
 @pytest.fixture
-def sample_text() -> str:
+def pii_sample_text() -> str:
     return "Hello, my name is John Doe and my email is john.doe@example.com."
 
 
@@ -47,3 +47,21 @@ def rbac_instrument(rbac_config: dict) -> RbacInstrument:
 @pytest.fixture
 def idbac_instrument(pii_instrument: PiiInstrument) -> IdbacInstrument:
     return IdbacInstrument(instruments=[pii_instrument])
+
+
+@pytest.fixture
+def financial_config() -> dict:
+    return {
+        "entities": ["Advisors.GENERIC_CONSULTING_COMPANY", "Parties.BUYING_COMPANY"],
+        "redact_mode": "replace",
+    }
+
+
+@pytest.fixture
+def financial_instrument(financial_config: dict) -> FinancialsInstrument:
+    return FinancialsInstrument(**financial_config)
+
+
+@pytest.fixture
+def financial_sample_text() -> str:
+    return "Smithson Legal Advisors provided counsel to Bellcom Industries, the buying company, in their acquisition."

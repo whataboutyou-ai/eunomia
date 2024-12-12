@@ -7,8 +7,8 @@ def test_rbac_instrument_initialization(rbac_instrument: RbacInstrument) -> None
 
 
 def test_rbac_instrument_run(
-    rbac_instrument: RbacInstrument, sample_text: str, role: str
+    rbac_instrument: RbacInstrument, pii_sample_text: str, role: str
 ) -> None:
-    result = rbac_instrument.run(sample_text, role=role)
+    result = rbac_instrument.run(pii_sample_text, role=role)
     assert "john.doe@example.com" not in result
     assert "John Doe" in result

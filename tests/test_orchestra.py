@@ -14,9 +14,9 @@ def test_orchestra_add_instrument(
 
 
 def test_orchestra_run(
-    orchestra: Orchestra, pii_instrument: PiiInstrument, sample_text: str
+    orchestra: Orchestra, pii_instrument: PiiInstrument, pii_sample_text: str
 ) -> None:
     orchestra.add_instrument(pii_instrument)
-    result = orchestra.run(sample_text)
+    result = orchestra.run(pii_sample_text)
     assert "john.doe@example.com" not in result
     assert "John Doe" not in result
