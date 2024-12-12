@@ -1,3 +1,4 @@
+from eunomia.instruments.financials_instrument import FinancialsInstrument
 from eunomia.instruments.idbac_instrument import IdbacInstrument
 from eunomia.instruments.pii_instrument import PiiInstrument
 from eunomia.instruments.rbac_instrument import RbacInstrument
