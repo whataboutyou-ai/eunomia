@@ -4,13 +4,13 @@ from eunomia.instruments.financials_instrument import FinancialsInstrument
 def test_financials_instrument_initialization(
     financial_instrument: FinancialsInstrument,
 ) -> None:
-    assert financial_instrument._entities == [
+    assert financial_instrument._identifier._entities == [
         "Advisors.GENERIC_CONSULTING_COMPANY",
         "Parties.BUYING_COMPANY",
     ]
     assert financial_instrument._redactor._mode == "replace"
     assert isinstance(
-        financial_instrument._ner_pipeline, object
+        financial_instrument._identifier._pipeline, object
     )  # Verify pipeline exists
 
 

@@ -1,8 +1,6 @@
-from transformers import pipeline
-
 from eunomia.instrument import Instrument
-from eunomia.instruments.identification.base import IdentificationResult
-from eunomia.instruments.redaction.presidio import PresidioRedactor
+from eunomia.instruments.identification import TransformerIdentifier
+from eunomia.instruments.redaction import PresidioRedactor
 
 
 class FinancialsInstrument(Instrument):
@@ -13,52 +11,12 @@ class FinancialsInstrument(Instrument):
     Model information can be found at: https://huggingface.co/whataboutyou-ai/financial_bert.
     """
 
-    def __init__(self, entities: list[str], redact_mode: str, language: str = "en"):
+    _MODEL = "whataboutyou-ai/financial_bert"
+
+    def __init__(self, entities: list[str], redact_mode: str):
+        self._identifier = TransformerIdentifier(model=self._MODEL, entities=entities)
         self._redactor = PresidioRedactor(redact_mode=redact_mode)
-        self._entities = entities
-        self._ner_pipeline = pipeline(
-            "token-classification", model="whataboutyou-ai/financial_bert"
-        )
-
-    def _merge_entities(self, entities: list[dict]) -> list[IdentificationResult]:
-        merged_entities = []
-        current_entity = None
-
-        for entity in entities:
-            prefix, entity_type = entity["entity"].split("-", 1)
-
-            if (
-                prefix == "I"
-                and current_entity
-                and current_entity.entity_type == entity_type
-            ):
-                # Continuation of the same entity
-                current_entity.end = entity["end"]
-                # Update score if desired, here we take min as a simplistic approach
-                current_entity.score = min(current_entity.score, entity["score"].item())
-            else:
-                # Start of a new entity
-                if current_entity:
-                    merged_entities.append(current_entity)
-                current_entity = IdentificationResult(
-                    entity_type=entity_type,
-                    start=entity["start"],
-                    end=entity["end"],
-                    score=entity["score"].item(),
-                )
-
-        if current_entity:
-            merged_entities.append(current_entity)
-
-        return merged_entities
 
     def run(self, text: str, **kwargs) -> str:
-        # identification
-        splitted_entities = self._ner_pipeline(text)
-        merged_entities = self._merge_entities(splitted_entities)
-        identifications = [
-            entity for entity in merged_entities if entity.entity_type in self._entities
-        ]
-
-        # redaction
+        identifications = self._identifier.identify(text)
         return self._redactor.redact(text, identifications)
