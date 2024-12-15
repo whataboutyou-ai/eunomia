@@ -16,7 +16,7 @@ def pii_sample_text() -> str:
 
 @pytest.fixture
 def pii_config() -> dict:
-    return {"entities": ["EMAIL_ADDRESS", "PERSON"], "redact_mode": "replace"}
+    return {"entities": ["EMAIL_ADDRESS", "PERSON"], "edit_mode": "replace"}
 
 
 @pytest.fixture
@@ -33,9 +33,7 @@ def role() -> str:
 def rbac_config(role: str) -> dict:
     return {
         "role": role,
-        "instruments": [
-            PiiInstrument(entities=["EMAIL_ADDRESS"], redact_mode="replace")
-        ],
+        "instruments": [PiiInstrument(entities=["EMAIL_ADDRESS"], edit_mode="replace")],
     }
 
 
@@ -53,7 +51,7 @@ def idbac_instrument(pii_instrument: PiiInstrument) -> IdbacInstrument:
 def financial_config() -> dict:
     return {
         "entities": ["Advisors.GENERIC_CONSULTING_COMPANY", "Parties.BUYING_COMPANY"],
-        "redact_mode": "replace",
+        "edit_mode": "replace",
     }
 
 

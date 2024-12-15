@@ -3,18 +3,18 @@ from eunomia.orchestra import Orchestra
 
 eunomia = Orchestra(
     instruments=[
-        PiiInstrument(entities=["EMAIL_ADDRESS"], redact_mode="replace"),
+        PiiInstrument(entities=["EMAIL_ADDRESS"], edit_mode="replace"),
         RbacInstrument(
             role="specialist",
-            instruments=[PiiInstrument(entities=["PERSON"], redact_mode="replace")],
+            instruments=[PiiInstrument(entities=["PERSON"], edit_mode="replace")],
         ),
     ]
 )
 
 text_original = "Hello, my name is John Doe and my email is john.doe@example.com."
 
-text_redacted_specialist = eunomia.run(text_original, role="specialist")
-text_redacted_manager = eunomia.run(text_original, role="manager")
+text_edited_specialist = eunomia.run(text_original, role="specialist")
+text_edited_manager = eunomia.run(text_original, role="manager")
 
-print("Specialist:", text_redacted_specialist)
-print("Manager:", text_redacted_manager)
+print("Specialist:", text_edited_specialist)
+print("Manager:", text_edited_manager)

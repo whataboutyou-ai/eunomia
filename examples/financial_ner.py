@@ -9,7 +9,7 @@ eunomia = Orchestra(
                 "Parties.BUYING_COMPANY",
                 "Parties.ACQUIRED_COMPANY",
             ],
-            redact_mode="replace",
+            edit_mode="replace",
         )
     ]
 )
@@ -20,6 +20,6 @@ the buying company, in their acquisition of Hexatech Systems, \
 a prominent acquired company. The deal was supported by the consulting company Oper&Manson, \
 which provided strategic oversight.
 """
-text_redacted = eunomia.run(text_original)
+text_edited = eunomia.run(text_original)
 
-print(text_redacted)
+print(text_edited)

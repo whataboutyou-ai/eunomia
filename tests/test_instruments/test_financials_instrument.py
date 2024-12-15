@@ -8,7 +8,7 @@ def test_financials_instrument_initialization(
         "Advisors.GENERIC_CONSULTING_COMPANY",
         "Parties.BUYING_COMPANY",
     ]
-    assert financial_instrument._redactor._mode == "replace"
+    assert financial_instrument._editor._mode == "replace"
     assert isinstance(
         financial_instrument._identifier._pipeline, object
     )  # Verify pipeline exists
@@ -18,7 +18,7 @@ def test_financials_instrument_run(
     financial_instrument: FinancialsInstrument, financial_sample_text: str
 ) -> None:
     result = financial_instrument.run(financial_sample_text)
-    # Original company names should be redacted
+    # Original company names should be edited
     assert "Smithson Legal Advisors" not in result
     assert "Bellcom Industries" not in result
     # Other text should remain

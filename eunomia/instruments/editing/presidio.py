@@ -1,17 +1,17 @@
 from presidio_anonymizer import AnonymizerEngine, OperatorConfig, RecognizerResult
 
+from eunomia.instruments.editing.base import BaseEditor
 from eunomia.instruments.identification.base import IdentificationResult
-from eunomia.instruments.redaction.base import BaseRedactor
 
 
-class PresidioRedactor(BaseRedactor):
-    """Presidio-based redaction module."""
+class PresidioEditor(BaseEditor):
+    """Presidio-based editing module."""
 
-    def __init__(self, redact_mode: str) -> None:
+    def __init__(self, edit_mode: str) -> None:
         self._anonymizer = AnonymizerEngine()
-        self._mode = redact_mode
+        self._mode = edit_mode
 
-    def redact(self, text: str, identifications: list[IdentificationResult]) -> str:
+    def edit(self, text: str, identifications: list[IdentificationResult]) -> str:
         return self._anonymizer.anonymize(
             text=text,
             analyzer_results=[

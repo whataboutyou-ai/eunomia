@@ -3,7 +3,7 @@ from eunomia.instruments.pii_instrument import PiiInstrument
 
 def test_pii_instrument_initialization(pii_instrument: PiiInstrument) -> None:
     assert pii_instrument._identifier._entities == ["EMAIL_ADDRESS", "PERSON"]
-    assert pii_instrument._redactor._mode == "replace"
+    assert pii_instrument._editor._mode == "replace"
     assert pii_instrument._identifier._language == "en"
 
 
