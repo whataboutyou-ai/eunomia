@@ -15,10 +15,22 @@ torch = "^2.5.1"
 transformers = "^4.47.0"
 
 
+[tool.poetry.group.dev]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 black = "^24.10.0"
 isort = "^5.13.2"
+
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.48"
+
 
 [build-system]
 requires = ["poetry-core"]

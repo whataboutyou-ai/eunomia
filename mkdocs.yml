@@ -1,0 +1,48 @@
+site_name: eunomia
+
+repo_name: whataboutyou-ai/eunomia
+repo_url: https://github.com/whataboutyou-ai/eunomia
+
+copyright: Copyright &copy; 2024 - eunomia authors
+
+theme:
+  name: material
+  palette:
+    primary: white
+  font:
+    text: Inter
+    code: Source Code Pro
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.expand
+    - navigation.sections
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - announce.dismiss
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/whataboutyou-ai/eunomia
+      name: eunomia on GitHub
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/TODO
+      name: Community on Discord
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Welcome to eunomia: get_started/welcome.md
+    - Installation: get_started/installation.md
+    - Quickstart: get_started/quickstart.md
+  - Cookbook:
+    - cookbook/index.md
+  - API Reference:
+    - api/index.md
+  - Community:
+    - Feedback: community/feedback.md
+    - How to contribute: community/contribute.md
