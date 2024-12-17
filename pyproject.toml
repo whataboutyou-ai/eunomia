@@ -1,10 +1,13 @@
 [tool.poetry]
-name = "eunomia"
+name = "eunomia-ai"
 version = "0.1.0"
 description = "Open Source Data Governance for LLM-based Applications"
 authors = ["What About You team <info@whataboutyou.ai>"]
 license = "Apache License"
 readme = "README.md"
+packages = [
+    { include = "eunomia" },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
