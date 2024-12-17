@@ -36,7 +36,7 @@ extra:
 nav:
   - Home: index.md
   - Getting Started:
-    - Welcome to eunomia: get_started/welcome.md
+    - Welcome: get_started/welcome.md
     - Installation: get_started/installation.md
     - Quickstart: get_started/quickstart.md
   - Cookbook:
