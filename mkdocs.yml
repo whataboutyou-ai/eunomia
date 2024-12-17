@@ -20,6 +20,7 @@ theme:
     - navigation.tabs
     - navigation.expand
     - navigation.sections
+    - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
     - navigation.top
@@ -35,6 +36,7 @@ markdown_extensions:
       noclasses: true
   - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 extra:
   generator: false
@@ -52,13 +54,13 @@ extra:
 nav:
   - Home: index.md
   - Getting Started:
-    - Welcome: get_started/welcome.md
+    - get_started/index.md
     - Installation: get_started/installation.md
     - Quickstart: get_started/quickstart.md
-  - Cookbook:
-    - cookbook/index.md
   - API Reference:
     - api/index.md
+  - Cookbook:
+    - cookbook/index.md
   - Community:
-    - Join Discord: community/index.md
+    - community/index.md
     - How to Contribute: community/contribute.md
