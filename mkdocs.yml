@@ -21,7 +21,17 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.top
+    - content.code.copy
     - announce.dismiss
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      noclasses: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
 
 extra:
   generator: false
@@ -31,7 +41,10 @@ extra:
       name: eunomia on GitHub
     - icon: fontawesome/brands/discord
       link: https://discord.gg/TODO
-      name: Community on Discord
+      name: community on Discord
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/eunomia-ai/
+      name: eunomia on PyPi
 
 nav:
   - Home: index.md

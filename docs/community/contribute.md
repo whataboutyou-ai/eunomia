@@ -5,10 +5,10 @@ First, [fork][github-fork] the `eunomia` repository and then clone your forked r
 
 ```bash
 # HTTPS
-git clone https://github.com/<YOUR_GITHUB_USER>/eunomia.git
+git clone https://github.com/<YOUR_GITHUB_USERNAME>/eunomia.git
 
 # SSH
-git clone git@github.com:<YOUR_GITHUB_USER>/eunomia.git
+git clone git@github.com:<YOUR_GITHUB_USERNAME>/eunomia.git
 ```
 
 Once in the cloned repository directory, make a branch with your username and description of the pull request:
@@ -18,7 +18,7 @@ git checkout -B <YOUR_GITHUB_USERNAME>/<PR_DESCRIPTION>
 ```
 
 ### Python environment
-Install the required dependecies with `poetry` including the development dependencies:
+Install the required dependecies with [poetry][poetry-home] including the development dependencies:
 
 ```bash
 poetry install --with dev
@@ -37,7 +37,7 @@ poetry run isort --profile black .
 
 
 ## Improving the Documentation
-Install the required dependecies with `poetry` including the documentation dependencies:
+Install the required dependecies with [poetry][poetry-home] including the documentation dependencies:
 
 ```bash
 poetry install --with docs
@@ -59,5 +59,6 @@ We actively welcome your pull requests. The workflow is as follows:
 3. If you've changed APIs or you want to add examples, update the documentation [[*go to details*](#improving-the-documentation)].
 4. Open a [pull request][eunomia-pulls].
 
-[github-forks]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
+[github-fork]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
+[poetry-home]: https://python-poetry.org/
 [eunomia-pulls]: https://github.com/whataboutyou-ai/eunomia/pulls
