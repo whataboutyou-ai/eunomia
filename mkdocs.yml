@@ -8,6 +8,7 @@ copyright: Copyright &copy; 2024 - eunomia authors
 theme:
   name: material
   logo: assets/logo.svg
+  favicon: assets/icon.svg
   palette:
     primary: white
   font:
