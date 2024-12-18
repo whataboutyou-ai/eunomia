@@ -43,22 +43,25 @@ Install the required dependecies with [poetry][poetry-home] including the docume
 poetry install --with docs
 ```
 
-To build the documentation and serve it locally, run the following command in the repository's root folder:
+To build the documentation and serve it locally, run the following command in the repository's root folder; the documentation will update every time you make a change:
 
 ```bash
 mkdocs serve
 ```
 
-In this way, you will be able to view the documentation locally. It will update every time you make a change.
+The documentation is built with [Material for MkDocs][material-mkdocs-home], refer to their documentation for more information on how to use it.
 
 ## Open a Pull Request
-We actively welcome your pull requests. The workflow is as follows:
+We actively welcome your pull requests; this is the workflow you should follow:
 
-1. Create your new branch from main in your forked repo, with your username and a name describing the work you're completing, e.g., `user1/new-feature-x` [[*go to details*](#your-development-branch)].
-2. If you've added code that should be tested, add tests. Ensure all tests pass and your code lints [[*go to details*](#testing-and-formatting)].
-3. If you've changed APIs or you want to add examples, update the documentation [[*go to details*](#improving-the-documentation)].
-4. Open a [pull request][eunomia-pulls].
+| Step | Description | Jump to |
+| ---- | ----------- | ------- |
+| 1 | Create your new branch from main in your forked repo | [:material-arrow-up: Branch Setup](#your-development-branch) |
+| 2 | Add tests, if needed, and ensure all tests pass | [:material-arrow-up: Testing](#testing-and-formatting) |
+| 3 | Update documentation for API changes | [:material-arrow-up: Documentation](#improving-the-documentation) |
+| 4 | Open a pull request | [:material-arrow-top-right: GitHub PRs][eunomia-pulls] |
 
 [github-fork]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
 [poetry-home]: https://python-poetry.org/
 [eunomia-pulls]: https://github.com/whataboutyou-ai/eunomia/pulls
+[material-mkdocs-home]: https://squidfunk.github.io/mkdocs-material/
