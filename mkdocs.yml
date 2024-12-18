@@ -1,4 +1,4 @@
-site_name: eunomia
+site_name: Eunomia
 
 repo_name: whataboutyou-ai/eunomia
 repo_url: https://github.com/whataboutyou-ai/eunomia
@@ -66,6 +66,13 @@ nav:
     - Quickstart: get_started/quickstart.md
   - API Reference:
     - api/index.md
+    - Orchestra: api/orchestra.md
+    - Instruments:
+      - api/instruments/index.md
+      - PII Instrument: api/instruments/pii_instrument.md
+      - Financials Instrument: api/instruments/financials_instrument.md
+      - RBAC Instrument: api/instruments/rbac_instrument.md
+      - IDBAC Instrument: api/instruments/idbac_instrument.md
   - Cookbook:
     - cookbook/index.md
   - Community:
