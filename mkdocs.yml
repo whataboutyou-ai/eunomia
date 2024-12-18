@@ -64,7 +64,7 @@ nav:
     - get_started/index.md
     - Installation: get_started/installation.md
     - Quickstart: get_started/quickstart.md
-  - API Reference:
+  - Docs:
     - api/index.md
     - Orchestra: api/orchestra.md
     - Instruments:
