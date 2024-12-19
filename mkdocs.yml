@@ -53,7 +53,7 @@ extra:
       link: https://github.com/whataboutyou-ai/eunomia
       name: eunomia on GitHub
     - icon: fontawesome/brands/discord
-      link: https://discord.gg/TODO
+      link: https://discord.gg/CWjh5JQT
       name: community on Discord
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/eunomia-ai/
