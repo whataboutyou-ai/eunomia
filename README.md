@@ -11,7 +11,7 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 </div>
 
 ## Get Started
-`eunomia` is a framework for building LLM-based applications that are compliant with data governance policies.
+`eunomia` is a framework that makes it easy to enforce data governance policies in LLM-based applications by working at the token level.
 
 ### Installation
 Install the `eunomia` package via pip:
