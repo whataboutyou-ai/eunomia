@@ -77,7 +77,7 @@ nav:
       - IDBAC Instrument: api/instruments/idbac_instrument.md
   - Cookbook:
     - cookbook/index.md
-    - cookbook/pii_tutorial.md
+    - Managing Personally Identifiable Information: cookbook/pii_tutorial.md
   - Community:
     - community/index.md
     - How to Contribute: community/contribute.md

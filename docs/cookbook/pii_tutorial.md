@@ -1,7 +1,3 @@
----
-title: Managing Personally Identifiable Information
----
-
 In this tutorial, we’ll explore practical, real-world applications of Eunomia, focusing specifically on Personal Identifiable Information (PII). We’ll discuss how Eunomia’s capabilities and built-in tools for PII management enable new and innovative use cases.
 
 ## What You’ll Discover Today
