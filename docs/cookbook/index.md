@@ -8,7 +8,7 @@ This section contains practical examples and use cases to help you effectively u
 
 | Tutorial                                     | Jump to                                        |
 | -------------------------------------------- | ---------------------------------------------- |
-| Managing Personally Identifiable Information | [:material-arrow-right: Page](pii_tutorial.md) |
+| PII in an LLM-powered IT Service Desk        | [:material-arrow-right: Page](pii_tutorial.md) |
 | More coming soon...                          |                                                |
 
 Each tutorial provides detailed explanations and sample code snippets to guide you through the given use case.

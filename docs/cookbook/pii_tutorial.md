@@ -1,6 +1,6 @@
 In this tutorial, we’ll explore practical, real-world applications of Eunomia, focusing specifically on Personal Identifiable Information (PII). We’ll discuss how Eunomia’s capabilities and built-in tools for PII management enable new and innovative use cases.
 
-## What You’ll Discover in this tutorial\
+## What You’ll Discover in this tutorial
 
 1. **Leveraging Ticketing Data in RAG Systems**  
    How Eunomia enables ticketing data to be safely used as a knowledge source in Retrieval-Augmented Generation (RAG) systems.
@@ -71,10 +71,7 @@ To begin, ensure that Eunomia is installed by following the [installation guide]
 from eunomia.orchestra import Orchestra
 from eunomia.instruments import PiiInstrument
 ```
-You can find out more about the components used at:
-
-- [Orchestra docs](../api/orchestra.md)
-- [PiiInstrument docs](../api/instruments/pii_instrument.md)
+You can find out more about the components used at [Orchestra docs](../api/orchestra.md) and [PiiInstrument docs](../api/instruments/pii_instrument.md)
 
 #### Step 2: Configuring Eunomia
 
@@ -165,11 +162,7 @@ from eunomia.orchestra import Orchestra
 from eunomia.instruments import PiiInstrument, IdbacInstrument
 ```
 
-You can find out more about the components used at:
-
-- [Orchestra docs](../api/orchestra.md)
-- [PiiInstrument docs](../api/instruments/pii_instrument.md)
-- [IdbacInstrument docs](../api/instruments/idbac_instrument.md)
+You can find out more about the components used at [Orchestra docs](../api/orchestra.md), [PiiInstrument docs](../api/instruments/pii_instrument.md) and [IdbacInstrument docs](../api/instruments/idbac_instrument.md)
 
 #### Step 2: Configuring Eunomia
 
