@@ -21,12 +21,16 @@ eunomia = Orchestra(
 
 Now, we can run the orchestra with the `run` method on any given input text.
 
-```py
-text = "Hello, my name is John Doe and my email is john.doe@example.com."
+=== "Code"
+    ```py
+    text = "Hello, my name is John Doe and my email is john.doe@example.com."
 
-eunomia.run(text)
-# Output: "Hello, my name is <PERSON> and my email is <EMAIL_ADDRESS>."
-```
+    eunomia.run(text)
+    ```
+=== "Output"
+    ```bash
+    Hello, my name is <PERSON> and my email is <EMAIL_ADDRESS>.
+    ```
 
 ## Role-based PII Replacement
 Let's say that based on the role of the interacting user, the person names inside texts can be either seen or replaced. We can do this by adding the `RbacInstrument` to the orchestra, and enforcing the PII replacement only for users with a specific role.
@@ -47,16 +51,24 @@ eunomia = Orchestra(
 
 Now, we can run the orchestra while interacting with a `#!python "specialist"` user.
 
-```py
-eunomia.run(text, role="specialist")
-# Output: "Hello, my name is <PERSON> and my email is <EMAIL_ADDRESS>."
-```
+=== "Code"
+    ```py
+    eunomia.run(text, role="specialist")
+    ```
+=== "Output"
+    ```bash
+    Hello, my name is <PERSON> and my email is <EMAIL_ADDRESS>.
+    ```
 
 While, if we interact with a `#!python "manager"` user, the person names will not be replaced.
 
-```py
-eunomia.run(text, role="manager")
-# Output: "Hello, my name is John Doe and my email is <EMAIL_ADDRESS>."
-```
+=== "Code"
+    ```py
+    eunomia.run(text, role="manager")
+    ```
+=== "Output"
+    ```bash
+    Hello, my name is John Doe and my email is <EMAIL_ADDRESS>.
+    ```
 
 Congratulations! You've just made your first steps with Eunomia. You can continue to the detailed [documentation](../api/index.md) or explore [all available instruments](../api/instruments/index.md#available-instruments).
