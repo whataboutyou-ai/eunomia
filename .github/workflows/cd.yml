@@ -2,16 +2,16 @@ name: cd
 
 on:
   workflow_run:
-    workflows: [ 'ci' ]
-    types:
-      - completed
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   deploy-docs:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} && github.event_name == 'push'
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
