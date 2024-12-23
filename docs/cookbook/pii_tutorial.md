@@ -1,6 +1,6 @@
 In this tutorial, we’ll explore practical, real-world applications of Eunomia, focusing specifically on Personal Identifiable Information (PII). We’ll discuss how Eunomia’s capabilities and built-in tools for PII management enable new and innovative use cases.
 
-## What You’ll Discover in this tutorial
+## What You’ll Discover in this Tutorial
 
 1. **Leveraging Ticketing Data in RAG Systems**  
    How Eunomia enables ticketing data to be safely used as a knowledge source in Retrieval-Augmented Generation (RAG) systems.
@@ -65,13 +65,14 @@ Phone Number: <PHONE_NUMBER>
 
 #### Step 1: Setup
 
-To begin, ensure that Eunomia is installed by following the [installation guide](../get_started/installation.md). Then, import the necessary components in your script:
+To begin, ensure that Eunomia is installed by following the [installation documentation](../get_started/installation.md). Then, import the necessary components in your script:
 
 ```python
 from eunomia.orchestra import Orchestra
 from eunomia.instruments import PiiInstrument
 ```
-You can find out more about the components used at [Orchestra docs](../api/orchestra.md) and [PiiInstrument docs](../api/instruments/pii_instrument.md)
+
+You can find out more information on [`Orchestra`](../api/orchestra.md) and [`PiiInstrument`](../api/instruments/pii_instrument.md) usage in their documentation.
 
 #### Step 2: Configuring Eunomia
 
@@ -89,7 +90,7 @@ eunomia = Orchestra(
 )
 ```
 
-#### Step 3: Implementing the Final Solution
+#### Step 3: Using Eunomia on input texts
 
 Finally, use the following code to clean PII information from the tickets:
 === "Code"
@@ -148,7 +149,7 @@ Finally, use the following code to clean PII information from the tickets:
 
 Eunomia’s ID-Based Access Control (IDBAC) provides precise control over which information is accessible based on the identity of the requestor.
 
-#### Key Components of IDBAC
+#### Key components of IDBAC
 
 1. **ID-Based Mechanism**: Each user or entity is assigned a unique identifier.
 2. **Document Ownership**: Every document is linked to the unique ID of its owner.
@@ -162,7 +163,7 @@ from eunomia.orchestra import Orchestra
 from eunomia.instruments import PiiInstrument, IdbacInstrument
 ```
 
-You can find out more about the components used at [Orchestra docs](../api/orchestra.md), [PiiInstrument docs](../api/instruments/pii_instrument.md) and [IdbacInstrument docs](../api/instruments/idbac_instrument.md)
+You can find out more information on [`Orchestra`](../api/orchestra.md), [`PiiInstrument`](../api/instruments/pii_instrument.md) and [`IdbacInstrument`](../api/instruments/idbac_instrument.md) usage in their documentation.
 
 #### Step 2: Configuring Eunomia
 
@@ -178,8 +179,7 @@ eunomia = Orchestra(
 )
 ```
 
-#### Step 3: Implementing the Final Solution
-
+#### Step 3: Using Eunomia on input texts
 
 === "Code"
     ```python
