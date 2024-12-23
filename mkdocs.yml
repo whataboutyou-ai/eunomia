@@ -25,6 +25,7 @@ theme:
     - navigation.instant.progress
     - navigation.top
     - content.code.copy
+    - content.tabs.link
     - announce.dismiss
   custom_dir: docs/overrides
 
@@ -37,11 +38,13 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - attr_list
-  - md_in_html
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
 
 extra_css:
   - stylesheets/extra.css
@@ -77,6 +80,7 @@ nav:
       - IDBAC Instrument: api/instruments/idbac_instrument.md
   - Cookbook:
     - cookbook/index.md
+    - Managing PII in Support Tickets: cookbook/pii_tutorial.md
   - Community:
     - community/index.md
     - How to Contribute: community/contribute.md
