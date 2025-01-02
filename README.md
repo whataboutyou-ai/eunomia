@@ -44,4 +44,4 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 [whataboutyou-website]: https://whataboutyou.ai
 [docs]: https://whataboutyou-ai.github.io/eunomia/
-[discord]: https://discord.gg/CWjh5JQT
+[discord]: https://discord.gg/TyhGZtzg3G

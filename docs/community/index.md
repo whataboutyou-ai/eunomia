@@ -7,4 +7,4 @@ There you can ask questions, share feedback and ideas, and get help from other u
 
 [Join the Discord :fontawesome-brands-discord:][eunomia-discord]{ .md-button }
 
-[eunomia-discord]: https://discord.gg/CWjh5JQT
+[eunomia-discord]: https://discord.gg/TyhGZtzg3G
