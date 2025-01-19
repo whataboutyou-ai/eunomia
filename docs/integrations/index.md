@@ -6,7 +6,7 @@ Eunomia’s capabilities expand dramatically when it's integrated with various p
 
 ## Available Integrations
 
-| Integration                  | Jump to                                        |
-| ---------------------------- | ---------------------------------------------- |
-| Model Context Protocol (MCP) | [:material-arrow-right: Page](mcp_protocol.md) |
-| More coming soon...          |                                                |
+| Integration                  | Jump to                               |
+| ---------------------------- | ------------------------------------- |
+| Model Context Protocol (MCP) | [:material-arrow-right: Page](mcp.md) |
+| More coming soon...          |                                       |
