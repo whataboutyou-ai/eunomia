@@ -68,7 +68,6 @@ nav:
     - get_started/index.md
     - Installation: get_started/installation.md
     - Quickstart: get_started/quickstart.md
-    - Integrations: get_started/integrations.md
     - License: get_started/license.md
   - Docs:
     - api/index.md
@@ -79,12 +78,12 @@ nav:
       - Financials Instrument: api/instruments/financials_instrument.md
       - RBAC Instrument: api/instruments/rbac_instrument.md
       - IDBAC Instrument: api/instruments/idbac_instrument.md
-    - Integrations: 
-       - api/integrations/index.md
-       - Model Context Protocol Framework (MCP): api/integrations/mcp_protocol.md
   - Cookbook:
     - cookbook/index.md
     - Managing PII in Support Tickets: cookbook/pii_tutorial.md
+  - Integrations: 
+      - integrations/index.md
+      - Model Context Protocol (MCP) Framework: integrations/mcp_protocol.md
   - Community:
     - community/index.md
     - How to Contribute: community/contribute.md
