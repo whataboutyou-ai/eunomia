@@ -6,7 +6,7 @@ The [Eunomia MCP Server][eunomia-mcp-github] is a library developed by [What Abo
 ### Installation
 
 ```bash
-git clone https://github.com/whataboutyou-ai/eunomia-MCP-server.git
+git clone https://github.com/whataboutyou-ai/eunomia-mcp-server.git
 ```
 
 ### Basic Usage
@@ -81,7 +81,7 @@ This will:
 3. Apply Eunomia instruments (like `PiiInstrument`) to the incoming text, ensuring data governance policies are automatically enforced.
 
 
-[eunomia-mcp-github]: https://github.com/whataboutyou-ai/eunomia-MCP-server
+[eunomia-mcp-github]: https://github.com/whataboutyou-ai/eunomia-mcp-server
 [whataboutyou-website]: https://whataboutyou.ai
 [mcp-docs]: https://modelcontextprotocol.io/
 [uv-docs]: https://docs.astral.sh/uv/
