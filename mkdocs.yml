@@ -81,6 +81,9 @@ nav:
   - Cookbook:
     - cookbook/index.md
     - Managing PII in Support Tickets: cookbook/pii_tutorial.md
+  - Integrations: 
+      - integrations/index.md
+      - Model Context Protocol (MCP): integrations/mcp.md
   - Community:
     - community/index.md
     - How to Contribute: community/contribute.md
