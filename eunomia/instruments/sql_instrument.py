@@ -64,8 +64,6 @@ class SqlInstrument(Instrument):
                         return None
                     new_args.append(sub_sanitized)
                 else:
-                    # If it's a literal or something simple, it might be safe
-                    # but you could add more checks if you want to restrict certain literals
                     new_args.append(arg)
 
             # Rebuild the function expression with sanitized arguments
@@ -76,17 +74,13 @@ class SqlInstrument(Instrument):
 
         elif isinstance(expression, exp.Literal):
             # E.g. 'active', 123, etc. 
-            # Usually safe, but you could apply more restrictions
             return expression
 
         elif isinstance(expression, exp.Case):
-            # Possibly handle CASE expressions in a safe manner
-            # For safety, let's drop them in this example
+            # E.g. CASE expressions 
             return None
 
-        # Add more expression types as needed: Cast, If, Coalesce, etc.
-
-        # If we reach here, we don't recognize the expression => drop it
+        # Anything else => drop it
         return None
 
     def run(self, query: str, **kwargs) -> str:
@@ -94,13 +88,16 @@ class SqlInstrument(Instrument):
             statement = parse_one(query)
         except Exception as e:
             raise ValueError(f"Could not parse SQL: {e}")
+        
+        # -------------------------------------------------------
+        # ENFORCE COLUMN-LEVEL FILTERS
+        # -------------------------------------------------------
 
         # Find the (first) SELECT statement if it's not at the root
         select_expr = statement if isinstance(statement, exp.Select) else statement.find(exp.Select)
         if not select_expr or not isinstance(select_expr, exp.Select):
             raise ValueError("Rewrite currently only supports a single SELECT statement.")
 
-        # >>> Use select_expr.expressions (NOT select_expr.select.expressions) <<<
         sanitized_select_expressions = []
         for proj in select_expr.expressions:
             safe_proj = self.sanitize_expression(proj)
@@ -114,7 +111,7 @@ class SqlInstrument(Instrument):
         select_expr.set("expressions", sanitized_select_expressions)
 
         # -------------------------------------------------------
-        # 5) ENFORCE ROW-LEVEL FILTERS
+        # ENFORCE ROW-LEVEL FILTERS
         # -------------------------------------------------------
         combined_row_filters = None
         for rf_str in self._row_filter:
