@@ -1,19 +1,20 @@
 import sys
-from eunomia.instruments import SqlInstrument, RbacInstrument
+
+from eunomia.instruments import RbacInstrument, SqlInstrument
 from eunomia.orchestra import Orchestra
 
 # Define policy for "alice"
 instrument_alice = SqlInstrument(
     allowed_columns=["id", "email", "status", "first_name", "last_name", "total"],
     allowed_functions=["CONCAT", "COUNT"],  # Alice can use CONCAT and COUNT
-    row_filter=["tenant_id = 100", "first_name = 'Mario' "]  # multiple row filters
+    row_filter=["tenant_id = 100", "first_name = 'Mario' "],  # multiple row filters
 )
 
 # Define policy for "bob"
 instrument_bob = SqlInstrument(
-    allowed_columns=["id", "email","tenant_id" ],
+    allowed_columns=["id", "email", "tenant_id"],
     allowed_functions=["COUNT"],  # Bob can only use COUNT, not CONCAT
-    row_filter=["tenant_id = 200"]  # single row filter
+    row_filter=["tenant_id = 200"],  # single row filter
 )
 
 # Create the Orchestra with an RBAC layer:

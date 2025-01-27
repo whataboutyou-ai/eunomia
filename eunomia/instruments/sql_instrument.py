@@ -1,7 +1,8 @@
+from sqlglot import exp, parse_one
+
 from eunomia.instrument import Instrument
 from eunomia.instruments.editing import PresidioEditor
 from eunomia.instruments.identification import PresidioIdentifier
-from sqlglot import parse_one, exp
 
 
 class SqlInstrument(Instrument):
@@ -9,12 +10,17 @@ class SqlInstrument(Instrument):
     An instrument that edits SQL queries using SQLGlot.
     """
 
-    def __init__(self, allowed_columns: list[str],  allowed_functions: list[str], row_filter: list[str]):
+    def __init__(
+        self,
+        allowed_columns: list[str],
+        allowed_functions: list[str],
+        row_filter: list[str],
+    ):
         self._allowed_columns = set([c.lower() for c in allowed_columns])
         self._allowed_functions = set([f.lower() for f in allowed_functions])
         self._row_filter = row_filter
 
-    def sanitize_expression(self, expression: exp.Expression) -> exp.Expression | None:
+    def _sanitize_expression(self, expression: exp.Expression) -> exp.Expression | None:
         """
         Return a sanitized version of the expression if safe,
         or None if the expression references anything disallowed.
@@ -33,7 +39,7 @@ class SqlInstrument(Instrument):
         elif isinstance(expression, exp.Alias):
             # e.g.  email AS e
             # We'll sanitize the underlying expression
-            child = self.sanitize_expression(expression.this)
+            child = self._sanitize_expression(expression.this)
             if child is None:
                 return None
             # Clone the alias but replace its child with the sanitized child
@@ -53,13 +59,13 @@ class SqlInstrument(Instrument):
                     # Some functions have a list of expressions (e.g. CONCAT(x, y))
                     safe_args = []
                     for sub_arg in arg:
-                        sub_sanitized = self.sanitize_expression(sub_arg)
+                        sub_sanitized = self._sanitize_expression(sub_arg)
                         if sub_sanitized is None:
                             return None  # If any argument is disallowed, drop the entire function
                         safe_args.append(sub_sanitized)
                     new_args.append(safe_args)
                 elif isinstance(arg, exp.Expression):
-                    sub_sanitized = self.sanitize_expression(arg)
+                    sub_sanitized = self._sanitize_expression(arg)
                     if sub_sanitized is None:
                         return None
                     new_args.append(sub_sanitized)
@@ -73,11 +79,11 @@ class SqlInstrument(Instrument):
             return new_func
 
         elif isinstance(expression, exp.Literal):
-            # E.g. 'active', 123, etc. 
+            # E.g. 'active', 123, etc.
             return expression
 
         elif isinstance(expression, exp.Case):
-            # E.g. CASE expressions 
+            # E.g. CASE expressions
             return None
 
         # Anything else => drop it
@@ -88,24 +94,32 @@ class SqlInstrument(Instrument):
             statement = parse_one(query)
         except Exception as e:
             raise ValueError(f"Could not parse SQL: {e}")
-        
+
         # -------------------------------------------------------
         # ENFORCE COLUMN-LEVEL FILTERS
         # -------------------------------------------------------
 
         # Find the (first) SELECT statement if it's not at the root
-        select_expr = statement if isinstance(statement, exp.Select) else statement.find(exp.Select)
+        select_expr = (
+            statement
+            if isinstance(statement, exp.Select)
+            else statement.find(exp.Select)
+        )
         if not select_expr or not isinstance(select_expr, exp.Select):
-            raise ValueError("Rewrite currently only supports a single SELECT statement.")
+            raise ValueError(
+                "Rewrite currently only supports a single SELECT statement."
+            )
 
         sanitized_select_expressions = []
         for proj in select_expr.expressions:
-            safe_proj = self.sanitize_expression(proj)
+            safe_proj = self._sanitize_expression(proj)
             if safe_proj is not None:
                 sanitized_select_expressions.append(safe_proj)
 
         if not sanitized_select_expressions:
-            raise ValueError("No valid columns or expressions remain in the SELECT list after sanitization.")
+            raise ValueError(
+                "No valid columns or expressions remain in the SELECT list after sanitization."
+            )
 
         # Replace the original select list with the sanitized list
         select_expr.set("expressions", sanitized_select_expressions)
@@ -125,7 +139,9 @@ class SqlInstrument(Instrument):
             if combined_row_filters is None:
                 combined_row_filters = filter_exp
             else:
-                combined_row_filters = exp.And(this=combined_row_filters, expression=filter_exp)
+                combined_row_filters = exp.And(
+                    this=combined_row_filters, expression=filter_exp
+                )
 
         if combined_row_filters is not None:
             where_node = select_expr.args.get("where")
@@ -133,12 +149,13 @@ class SqlInstrument(Instrument):
             if where_node:
                 # existing WHERE, so combine
                 existing_where = where_node.this
-                new_where_condition = exp.And(this=existing_where, expression=combined_row_filters)
+                new_where_condition = exp.And(
+                    this=existing_where, expression=combined_row_filters
+                )
                 where_node.set("this", new_where_condition)
             else:
                 # create a new WHERE if none exists
                 select_expr.set("where", exp.Where(expression=combined_row_filters))
-
 
         # Return the modified SQL
         return statement.sql()

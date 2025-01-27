@@ -1,6 +1,7 @@
 from transformers import pipeline
 
-from eunomia.instruments.identification.base import BaseIdentifier, IdentificationResult
+from eunomia.instruments.identification.base import (BaseIdentifier,
+                                                     IdentificationResult)
 
 
 class TransformerIdentifier(BaseIdentifier):

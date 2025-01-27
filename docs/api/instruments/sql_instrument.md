@@ -18,33 +18,10 @@ The SQL Instrument uses [SQLGlot][sql-glot-website].
 
 ## Usage Example
 
-```py title="examples/sql_instrument_usage.py"
-from eunomia.instruments import SqlInstrument
-
-# Example: Alice can view only certain columns and use CONCAT, COUNT
-instrument_alice = SqlInstrument(
-    allowed_columns=["id", "email", "tenant_id", "first_name", "last_name"],
-    allowed_functions=["CONCAT", "COUNT"],
-    row_filter=["tenant_id = 100", "deleted_at IS NULL"]
-)
-
-# Example SQL query that references both allowed and disallowed items
-original_query = """
-    SELECT
-        id,
-        email,
-        secret_col,
-        CONCAT(first_name, ' ', last_name) AS full_name,
-        COUNT(*) AS total,
-        SUBSTR(email, 1, 5) AS partial_email
-    FROM users
-    WHERE status = 'active' OR is_test = 1
-"""
-
-rewritten_query = instrument_alice.run(original_query)
-print("Rewritten query for Alice:")
-print(rewritten_query)
+```py title="examples/sql_queries.py"
+--8<-- "examples/sql_queries.py"
 ```
+
 
 This snippet will:
 
