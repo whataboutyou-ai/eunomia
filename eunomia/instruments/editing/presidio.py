@@ -1,5 +1,4 @@
-from presidio_anonymizer import (AnonymizerEngine, OperatorConfig,
-                                 RecognizerResult)
+from presidio_anonymizer import AnonymizerEngine, OperatorConfig, RecognizerResult
 
 from eunomia.instruments.editing.base import BaseEditor
 from eunomia.instruments.identification.base import IdentificationResult

@@ -1,7 +1,6 @@
 from presidio_analyzer import AnalyzerEngine
 
-from eunomia.instruments.identification.base import (BaseIdentifier,
-                                                     IdentificationResult)
+from eunomia.instruments.identification.base import BaseIdentifier, IdentificationResult
 
 
 class PresidioIdentifier(BaseIdentifier):
