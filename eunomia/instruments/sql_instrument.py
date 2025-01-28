@@ -1,8 +1,6 @@
 from sqlglot import exp, parse_one
 
 from eunomia.instrument import Instrument
-from eunomia.instruments.editing import PresidioEditor
-from eunomia.instruments.identification import PresidioIdentifier
 
 
 class SqlInstrument(Instrument):

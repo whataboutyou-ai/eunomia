@@ -63,3 +63,31 @@ def financial_instrument(financial_config: dict) -> FinancialsInstrument:
 @pytest.fixture
 def financial_sample_text() -> str:
     return "Smithson Legal Advisors provided counsel to Bellcom Industries, the buying company, in their acquisition."
+
+
+@pytest.fixture
+def sql_config() -> dict:
+    return {
+        "allowed_columns": ["id", "email", "status", "tenant_id"],
+        "allowed_functions": ["CONCAT", "COUNT"],
+        "row_filter": ["tenant_id = 100", "first_name = 'Mario'"],
+    }
+
+
+@pytest.fixture
+def sql_instrument(sql_config: dict) -> SqlInstrument:
+    return SqlInstrument(**sql_config)
+
+
+@pytest.fixture
+def sql_sample_query() -> str:
+    return """
+        SELECT
+            id,
+            email,
+            secret_col,
+            CONCAT(first_name, ' ', last_name) AS full_name,
+            COUNT(*) AS total
+        FROM users
+        WHERE status = 'active'
+    """
