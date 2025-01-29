@@ -78,6 +78,7 @@ nav:
       - Financials Instrument: api/instruments/financials_instrument.md
       - RBAC Instrument: api/instruments/rbac_instrument.md
       - IDBAC Instrument: api/instruments/idbac_instrument.md
+      - SQL Instrument: api/instruments/sql_instrument.md
   - Cookbook:
     - cookbook/index.md
     - Managing PII in Support Tickets: cookbook/pii_tutorial.md

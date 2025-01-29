@@ -16,3 +16,4 @@ Multiple instruments can be combined in an [`Orchestra`](../orchestra.md), allow
 | `FinancialsInstrument` | Identify and edit financial data from text       | [:material-arrow-right: Page](financials_instrument.md) |
 | `RbacInstrument`       | Apply instruments with Role-Based Access Control | [:material-arrow-right: Page](rbac_instrument.md)       |
 | `IdbacInstrument`      | Apply instruments with ID-Based Access Control   | [:material-arrow-right: Page](idbac_instrument.md)      |
+| `SqlInstrument`        | Sanitize SQL queries                             | [:material-arrow-right: Page](sql_instrument.md)      |
