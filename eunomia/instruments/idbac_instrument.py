@@ -1,5 +1,6 @@
-from eunomia.instrument import Instrument
+from eunomia.instrument import Instrument, InstrumentConfig
 from eunomia.orchestra import Orchestra
+from eunomia.utils.enums import RetrievalStage
 
 
 class IdbacInstrument(Instrument):
@@ -10,6 +11,10 @@ class IdbacInstrument(Instrument):
     """
 
     def __init__(self, instruments: Instrument) -> None:
+        self.config = InstrumentConfig(
+            id="idbac",
+            retrieval_stage=RetrievalStage.POST,
+        )
         self._orchestra = Orchestra(instruments=instruments)
 
     def run(self, text: str, **kwargs) -> str:

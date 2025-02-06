@@ -1,5 +1,6 @@
-from eunomia.instrument import Instrument
+from eunomia.instrument import Instrument, InstrumentConfig
 from eunomia.orchestra import Orchestra
+from eunomia.utils.enums import RetrievalStage
 
 
 class RbacInstrument(Instrument):
@@ -9,6 +10,10 @@ class RbacInstrument(Instrument):
     """
 
     def __init__(self, role: str, instruments: Instrument) -> None:
+        self.config = InstrumentConfig(
+            id="rbac",
+            retrieval_stage=RetrievalStage.POST,
+        )
         self._role = role
         self._orchestra = Orchestra(instruments=instruments)
 

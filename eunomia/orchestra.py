@@ -16,5 +16,10 @@ class Orchestra:
     def run(self, text: str, **kwargs) -> str:
         """Run the orchestra in sequence on an input text."""
         for instrument in self._instruments:
-            text = instrument.run(text, **kwargs)
+            retrieval_stage = kwargs.get("retrieval_stage")
+            if (
+                retrieval_stage is None
+                or instrument.config.retrieval_stage == retrieval_stage
+            ):
+                text = instrument.run(text, **kwargs)
         return text

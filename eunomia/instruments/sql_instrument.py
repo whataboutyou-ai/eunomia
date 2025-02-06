@@ -1,6 +1,7 @@
 from sqlglot import exp, parse_one
 
-from eunomia.instrument import Instrument
+from eunomia.instrument import Instrument, InstrumentConfig
+from eunomia.utils.enums import RetrievalStage
 
 
 class SqlInstrument(Instrument):
@@ -14,6 +15,10 @@ class SqlInstrument(Instrument):
         allowed_functions: list[str],
         row_filter: list[str],
     ):
+        self.config = InstrumentConfig(
+            id="sql",
+            retrieval_stage=RetrievalStage.PRE,
+        )
         self._allowed_columns = set([c.lower() for c in allowed_columns])
         self._allowed_functions = set([f.lower() for f in allowed_functions])
         self._row_filter = row_filter
