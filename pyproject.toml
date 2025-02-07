@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "eunomia-ai"
-version = "0.1.1"
+version = "0.1.2"
 description = "Open Source Data Governance for LLM-based Applications"
 authors = ["What About You team <info@whataboutyou.ai>"]
 license = "Apache License"

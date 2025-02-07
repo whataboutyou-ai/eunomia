@@ -129,7 +129,6 @@ class SqlInstrument(Instrument):
         for rf_str in self._row_filter:
             try:
                 row_filter_stmt = parse_one(f"SELECT * FROM dummy WHERE {rf_str}")
-                where_stmt = row_filter_stmt.find(exp.Where)
                 filter_exp = row_filter_stmt.find(exp.Where).this
             except Exception as e:
                 raise ValueError(f"Could not parse row filter '{rf_str}': {e}")
@@ -153,7 +152,9 @@ class SqlInstrument(Instrument):
                 where_node.set("this", new_where_condition)
             else:
                 # create a new WHERE if none exists
-                select_expr.set("where", exp.Where(expression=combined_row_filters))
+                new_where_node = exp.Where()
+                new_where_node.set("this", combined_row_filters)
+                select_expr.set("where", new_where_node)
 
         # Return the modified SQL
         return statement.sql()
