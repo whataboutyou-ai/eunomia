@@ -89,5 +89,9 @@ def sql_sample_query() -> str:
             CONCAT(first_name, ' ', last_name) AS full_name,
             COUNT(*) AS total
         FROM users
-        WHERE status = 'active'
     """
+
+
+@pytest.fixture
+def sql_sample_query_with_where(sql_sample_query: str) -> str:
+    return f"{sql_sample_query} WHERE status = 'active'"
