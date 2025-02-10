@@ -158,23 +158,70 @@ class SqlInstrument(Instrument):
 
         return
 
+    def _run_insert_statement(self, insert_expression: exp.Insert) -> None:
+        """
+        Run the instrument's logic on an INSERT statement.
+        """
+        if not isinstance(insert_expression.expression, exp.Values):
+            raise ValueError("Expected a VALUES expression in INSERT statements")
+
+        # prepare row filters in a dict for easier retrieval
+        row_filters_dict = {}
+        for row_filter in self._row_filters:
+            if not isinstance(row_filter, exp.EQ):
+                raise ValueError(
+                    "Expected only EQ expressions in the row filters for INSERT statements"
+                )
+            row_filters_dict[row_filter.this.this] = row_filter.expression
+
+        sanitized_insert_expressions, sanitized_insert_values = [], []
+        for expression, value in zip(
+            insert_expression.this.expressions,
+            insert_expression.expression.expressions[0].expressions,
+        ):
+            sanitized_expression = self._sanitize_expression(expression)
+            if sanitized_expression is not None:
+                sanitized_insert_expressions.append(sanitized_expression)
+
+                sanitized_value = row_filters_dict.get(sanitized_expression) or value
+                sanitized_insert_values.append(sanitized_value)
+
+        if not sanitized_insert_expressions:
+            raise ValueError(
+                "No valid columns or expressions remain in the INSERT list after sanitization."
+            )
+
+        insert_expression.this.set("expressions", sanitized_insert_expressions)
+        insert_expression.expression.expressions[0].set(
+            "expressions", sanitized_insert_values
+        )
+        return
+
     def run(self, query: str, **kwargs) -> str:
         try:
             statement = parse_one(query)
         except Exception as e:
             raise ValueError(f"Could not parse SQL: {e}")
 
-        # Find the (first) SELECT statement if it's not at the root
         select_expression = (
             statement
             if isinstance(statement, exp.Select)
             else statement.find(exp.Select)
         )
-        if not select_expression or not isinstance(select_expression, exp.Select):
+        insert_expression = (
+            statement
+            if isinstance(statement, exp.Insert)
+            else statement.find(exp.Insert)
+        )
+        if not select_expression and not insert_expression:
             raise ValueError(
-                "Rewrite currently only supports a single SELECT statement."
+                "SQL instrument only supports a single SELECT or INSERT statement."
             )
 
-        self._run_select_statement(select_expression)
+        if select_expression:
+            self._run_select_statement(select_expression)
+
+        if insert_expression:
+            self._run_insert_statement(insert_expression)
 
         return statement.sql()
