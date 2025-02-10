@@ -87,27 +87,13 @@ class SqlInstrument(Instrument):
         # Anything else => drop it
         return None
 
-    def run(self, query: str, **kwargs) -> str:
-        try:
-            statement = parse_one(query)
-        except Exception as e:
-            raise ValueError(f"Could not parse SQL: {e}")
-
+    def _run_select_statement(self, select_expr: exp.Select) -> None:
+        """
+        Run the instrument's logic on a SELECT statement.
+        """
         # -------------------------------------------------------
         # ENFORCE COLUMN-LEVEL FILTERS
         # -------------------------------------------------------
-
-        # Find the (first) SELECT statement if it's not at the root
-        select_expr = (
-            statement
-            if isinstance(statement, exp.Select)
-            else statement.find(exp.Select)
-        )
-        if not select_expr or not isinstance(select_expr, exp.Select):
-            raise ValueError(
-                "Rewrite currently only supports a single SELECT statement."
-            )
-
         sanitized_select_expressions = []
         for proj in select_expr.expressions:
             safe_proj = self._sanitize_expression(proj)
@@ -156,5 +142,25 @@ class SqlInstrument(Instrument):
                 new_where_node.set("this", combined_row_filters)
                 select_expr.set("where", new_where_node)
 
-        # Return the modified SQL
+        return
+
+    def run(self, query: str, **kwargs) -> str:
+        try:
+            statement = parse_one(query)
+        except Exception as e:
+            raise ValueError(f"Could not parse SQL: {e}")
+
+        # Find the (first) SELECT statement if it's not at the root
+        select_expr = (
+            statement
+            if isinstance(statement, exp.Select)
+            else statement.find(exp.Select)
+        )
+        if not select_expr or not isinstance(select_expr, exp.Select):
+            raise ValueError(
+                "Rewrite currently only supports a single SELECT statement."
+            )
+
+        self._run_select_statement(select_expr)
+
         return statement.sql()
