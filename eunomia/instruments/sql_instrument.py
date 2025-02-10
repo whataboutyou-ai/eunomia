@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlglot import exp, parse_one
 
 from eunomia.instrument import Instrument
@@ -12,11 +14,27 @@ class SqlInstrument(Instrument):
         self,
         allowed_columns: list[str],
         allowed_functions: list[str],
-        row_filters: list[str],
+        row_filters: Optional[list[str]],
     ):
         self._allowed_columns = set([c.lower() for c in allowed_columns])
         self._allowed_functions = set([f.lower() for f in allowed_functions])
-        self._row_filters = row_filters
+        self._row_filters = self._parse_filters(row_filters or [])
+
+    def _parse_filters(self, str_filters: list[str]) -> list[exp.Expression]:
+        """Parse string filters into a list of expressions."""
+        parsed_filters = []
+        for filter_str in str_filters:
+            try:
+                row_filter_statement = parse_one(
+                    f"SELECT * FROM dummy WHERE {filter_str}"
+                )
+                filter_expression = row_filter_statement.find(exp.Where).this
+            except Exception as e:
+                raise ValueError(f"Could not parse row filter '{filter_str}': {e}")
+
+            parsed_filters.append(filter_expression)
+
+        return parsed_filters
 
     def _sanitize_expression(self, expression: exp.Expression) -> exp.Expression | None:
         """
@@ -94,6 +112,7 @@ class SqlInstrument(Instrument):
         # -------------------------------------------------------
         # ENFORCE COLUMN-LEVEL FILTERS
         # -------------------------------------------------------
+
         sanitized_select_expressions = []
         for expression in select_expression.expressions:
             safe_proj = self._sanitize_expression(expression)
@@ -111,22 +130,15 @@ class SqlInstrument(Instrument):
         # -------------------------------------------------------
         # ENFORCE ROW-LEVEL FILTERS
         # -------------------------------------------------------
-        combined_row_filters = None
-        for row_filter_str in self._row_filters:
-            try:
-                row_filter_statement = parse_one(
-                    f"SELECT * FROM dummy WHERE {row_filter_str}"
-                )
-                filter_exp = row_filter_statement.find(exp.Where).this
-            except Exception as e:
-                raise ValueError(f"Could not parse row filter '{row_filter_str}': {e}")
 
-            if combined_row_filters is None:
-                combined_row_filters = filter_exp
-            else:
-                combined_row_filters = exp.And(
-                    this=combined_row_filters, expression=filter_exp
-                )
+        # for now, all filters are combined with an AND expression
+        combined_row_filters = None
+        for row_filter in self._row_filters:
+            combined_row_filters = (
+                row_filter
+                if combined_row_filters is None
+                else exp.And(this=combined_row_filters, expression=row_filter)
+            )
 
         if combined_row_filters is not None:
             where_node = select_expression.args.get("where")
