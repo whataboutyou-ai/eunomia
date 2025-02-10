@@ -12,11 +12,11 @@ class SqlInstrument(Instrument):
         self,
         allowed_columns: list[str],
         allowed_functions: list[str],
-        row_filter: list[str],
+        row_filters: list[str],
     ):
         self._allowed_columns = set([c.lower() for c in allowed_columns])
         self._allowed_functions = set([f.lower() for f in allowed_functions])
-        self._row_filter = row_filter
+        self._row_filters = row_filters
 
     def _sanitize_expression(self, expression: exp.Expression) -> exp.Expression | None:
         """
@@ -87,7 +87,7 @@ class SqlInstrument(Instrument):
         # Anything else => drop it
         return None
 
-    def _run_select_statement(self, select_expr: exp.Select) -> None:
+    def _run_select_statement(self, select_expression: exp.Select) -> None:
         """
         Run the instrument's logic on a SELECT statement.
         """
@@ -95,8 +95,8 @@ class SqlInstrument(Instrument):
         # ENFORCE COLUMN-LEVEL FILTERS
         # -------------------------------------------------------
         sanitized_select_expressions = []
-        for proj in select_expr.expressions:
-            safe_proj = self._sanitize_expression(proj)
+        for expression in select_expression.expressions:
+            safe_proj = self._sanitize_expression(expression)
             if safe_proj is not None:
                 sanitized_select_expressions.append(safe_proj)
 
@@ -106,18 +106,20 @@ class SqlInstrument(Instrument):
             )
 
         # Replace the original select list with the sanitized list
-        select_expr.set("expressions", sanitized_select_expressions)
+        select_expression.set("expressions", sanitized_select_expressions)
 
         # -------------------------------------------------------
         # ENFORCE ROW-LEVEL FILTERS
         # -------------------------------------------------------
         combined_row_filters = None
-        for rf_str in self._row_filter:
+        for row_filter_str in self._row_filters:
             try:
-                row_filter_stmt = parse_one(f"SELECT * FROM dummy WHERE {rf_str}")
-                filter_exp = row_filter_stmt.find(exp.Where).this
+                row_filter_statement = parse_one(
+                    f"SELECT * FROM dummy WHERE {row_filter_str}"
+                )
+                filter_exp = row_filter_statement.find(exp.Where).this
             except Exception as e:
-                raise ValueError(f"Could not parse row filter '{rf_str}': {e}")
+                raise ValueError(f"Could not parse row filter '{row_filter_str}': {e}")
 
             if combined_row_filters is None:
                 combined_row_filters = filter_exp
@@ -127,7 +129,7 @@ class SqlInstrument(Instrument):
                 )
 
         if combined_row_filters is not None:
-            where_node = select_expr.args.get("where")
+            where_node = select_expression.args.get("where")
 
             if where_node:
                 # existing WHERE, so combine
@@ -140,7 +142,7 @@ class SqlInstrument(Instrument):
                 # create a new WHERE if none exists
                 new_where_node = exp.Where()
                 new_where_node.set("this", combined_row_filters)
-                select_expr.set("where", new_where_node)
+                select_expression.set("where", new_where_node)
 
         return
 
@@ -151,16 +153,16 @@ class SqlInstrument(Instrument):
             raise ValueError(f"Could not parse SQL: {e}")
 
         # Find the (first) SELECT statement if it's not at the root
-        select_expr = (
+        select_expression = (
             statement
             if isinstance(statement, exp.Select)
             else statement.find(exp.Select)
         )
-        if not select_expr or not isinstance(select_expr, exp.Select):
+        if not select_expression or not isinstance(select_expression, exp.Select):
             raise ValueError(
                 "Rewrite currently only supports a single SELECT statement."
             )
 
-        self._run_select_statement(select_expr)
+        self._run_select_statement(select_expression)
 
         return statement.sql()

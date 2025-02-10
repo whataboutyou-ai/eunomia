@@ -70,7 +70,7 @@ def sql_config() -> dict:
     return {
         "allowed_columns": ["id", "email", "status", "tenant_id"],
         "allowed_functions": ["CONCAT", "COUNT"],
-        "row_filter": ["tenant_id = 100", "first_name = 'Mario'"],
+        "row_filters": ["tenant_id = 100", "first_name = 'Mario'"],
     }
 
 
