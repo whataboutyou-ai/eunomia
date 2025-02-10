@@ -1,4 +1,4 @@
-import sys
+from sqlglot import exp
 
 from eunomia.instruments.sql_instrument import SqlInstrument
 
@@ -6,7 +6,16 @@ from eunomia.instruments.sql_instrument import SqlInstrument
 def test_sql_instrument_initialization(sql_instrument: SqlInstrument) -> None:
     assert sql_instrument._allowed_columns == {"id", "email", "status", "tenant_id"}
     assert sql_instrument._allowed_functions == {"concat", "count"}
-    assert sql_instrument._row_filters == ["tenant_id = 100", "first_name = 'Mario'"]
+    assert sql_instrument._row_filters == [
+        exp.EQ(
+            this=exp.Column(this=exp.Identifier(this="tenant_id", quoted=False)),
+            expression=exp.Literal(this="100", is_string=False),
+        ),
+        exp.EQ(
+            this=exp.Column(this=exp.Identifier(this="first_name")),
+            expression=exp.Literal(this="Mario", is_string=True),
+        ),
+    ]
 
 
 def test_sql_instrument_run(
