@@ -18,10 +18,10 @@ def test_sql_instrument_initialization(sql_instrument: SqlInstrument) -> None:
     ]
 
 
-def test_sql_instrument_run(
-    sql_instrument: SqlInstrument, sql_sample_query: str
+def test_sql_instrument_select_run(
+    sql_instrument: SqlInstrument, sql_select_query: str
 ) -> None:
-    rewritten_query = sql_instrument.run(sql_sample_query)
+    rewritten_query = sql_instrument.run(sql_select_query)
 
     # Check that 'secret_col' was dropped
     assert "secret_col" not in rewritten_query
@@ -36,10 +36,10 @@ def test_sql_instrument_run(
     assert "first_name = 'Mario'" in rewritten_query
 
 
-def test_sql_instrument_run_with_where(
-    sql_instrument: SqlInstrument, sql_sample_query_with_where: str
+def test_sql_instrument_select_run_with_where(
+    sql_instrument: SqlInstrument, sql_select_query_with_where: str
 ) -> None:
-    rewritten_query = sql_instrument.run(sql_sample_query_with_where)
+    rewritten_query = sql_instrument.run(sql_select_query_with_where)
 
     # Check that 'secret_col' was dropped
     assert "secret_col" not in rewritten_query
@@ -53,3 +53,17 @@ def test_sql_instrument_run_with_where(
     assert "status = 'active'" in rewritten_query
     assert "tenant_id = 100" in rewritten_query
     assert "first_name = 'Mario'" in rewritten_query
+
+
+def test_sql_instrument_insert_run(
+    sql_instrument: SqlInstrument, sql_insert_query: str
+) -> None:
+    rewritten_query = sql_instrument.run(sql_insert_query)
+
+    assert "email" in rewritten_query
+    assert "secret_col" not in rewritten_query
+    assert "tenant_id" in rewritten_query
+
+    # row filters
+    assert "100" in rewritten_query
+    assert "200" not in rewritten_query
