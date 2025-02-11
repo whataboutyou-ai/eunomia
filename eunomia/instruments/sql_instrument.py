@@ -36,7 +36,9 @@ class SqlInstrument(Instrument):
 
         return parsed_filters
 
-    def _sanitize_expression(self, expression: exp.Expression) -> exp.Expression | None:
+    def _sanitize_column_expression(
+        self, expression: exp.Expression
+    ) -> exp.Expression | None:
         """
         Return a sanitized version of the expression if safe,
         or None if the expression references anything disallowed.
@@ -55,7 +57,7 @@ class SqlInstrument(Instrument):
         elif isinstance(expression, exp.Alias):
             # e.g.  email AS e
             # We'll sanitize the underlying expression
-            child = self._sanitize_expression(expression.this)
+            child = self._sanitize_column_expression(expression.this)
             if child is None:
                 return None
             # Clone the alias but replace its child with the sanitized child
@@ -75,13 +77,13 @@ class SqlInstrument(Instrument):
                     # Some functions have a list of expressions (e.g. CONCAT(x, y))
                     safe_args = []
                     for sub_arg in arg:
-                        sub_sanitized = self._sanitize_expression(sub_arg)
+                        sub_sanitized = self._sanitize_column_expression(sub_arg)
                         if sub_sanitized is None:
                             return None  # If any argument is disallowed, drop the entire function
                         safe_args.append(sub_sanitized)
                     new_args.append(safe_args)
                 elif isinstance(arg, exp.Expression):
-                    sub_sanitized = self._sanitize_expression(arg)
+                    sub_sanitized = self._sanitize_column_expression(arg)
                     if sub_sanitized is None:
                         return None
                     new_args.append(sub_sanitized)
@@ -105,43 +107,26 @@ class SqlInstrument(Instrument):
         # Anything else => drop it
         return None
 
-    def _run_select_statement(self, select_expression: exp.Select) -> None:
+    def _add_where_clause(
+        self, main_expression: exp.Expression, connector: type[exp.Connector] = exp.And
+    ) -> None:
         """
-        Run the instrument's logic on a SELECT statement.
+        Add a WHERE clause or combine existing WHERE clause with new filters.
+
+        Args:
+            main_expression: The main expression to add the WHERE clause to.
+            connector: Multiple filters are combined using this connector. Defaults to AND.
         """
-        # -------------------------------------------------------
-        # ENFORCE COLUMN-LEVEL FILTERS
-        # -------------------------------------------------------
-
-        sanitized_select_expressions = []
-        for expression in select_expression.expressions:
-            safe_proj = self._sanitize_expression(expression)
-            if safe_proj is not None:
-                sanitized_select_expressions.append(safe_proj)
-
-        if not sanitized_select_expressions:
-            raise ValueError(
-                "No valid columns or expressions remain in the SELECT list after sanitization."
-            )
-
-        # Replace the original select list with the sanitized list
-        select_expression.set("expressions", sanitized_select_expressions)
-
-        # -------------------------------------------------------
-        # ENFORCE ROW-LEVEL FILTERS
-        # -------------------------------------------------------
-
-        # for now, all filters are combined with an AND expression
         combined_row_filters = None
         for row_filter in self._row_filters:
             combined_row_filters = (
                 row_filter
                 if combined_row_filters is None
-                else exp.And(this=combined_row_filters, expression=row_filter)
+                else connector(this=combined_row_filters, expression=row_filter)
             )
 
         if combined_row_filters is not None:
-            where_node = select_expression.args.get("where")
+            where_node = main_expression.args.get("where")
 
             if where_node:
                 # existing WHERE, so combine
@@ -154,7 +139,57 @@ class SqlInstrument(Instrument):
                 # create a new WHERE if none exists
                 new_where_node = exp.Where()
                 new_where_node.set("this", combined_row_filters)
-                select_expression.set("where", new_where_node)
+                main_expression.set("where", new_where_node)
+        return
+
+    def _run_select_statement(self, select_expression: exp.Select) -> None:
+        """
+        Run the instrument's logic on a SELECT statement.
+        """
+        # enforce column-level filters
+        sanitized_select_expressions = []
+        for expression in select_expression.expressions:
+            sanitized_expression = self._sanitize_column_expression(expression)
+            if sanitized_expression is not None:
+                sanitized_select_expressions.append(sanitized_expression)
+
+        if not sanitized_select_expressions:
+            raise ValueError(
+                "No valid columns or expressions remain in the SELECT list after sanitization."
+            )
+
+        select_expression.set("expressions", sanitized_select_expressions)
+
+        # enforce row-level filters
+        self._add_where_clause(select_expression)
+
+        return
+
+    def _run_update_statement(self, update_expression: exp.Update) -> None:
+        """
+        Run the instrument's logic on an UPDATE statement.
+        """
+        # enforce column-level filters
+        sanitized_update_expressions = []
+        for expression in update_expression.expressions:
+            # expression is exp.EQ, so we sanitize its child
+            sanitized_child_expression = self._sanitize_column_expression(
+                expression.this
+            )
+            if sanitized_child_expression is not None:
+                sanitized_expression = expression.copy()
+                sanitized_expression.set("this", sanitized_child_expression)
+                sanitized_update_expressions.append(sanitized_expression)
+
+        if not sanitized_update_expressions:
+            raise ValueError(
+                "No valid columns or expressions remain in the UPDATE list after sanitization."
+            )
+
+        update_expression.set("expressions", sanitized_update_expressions)
+
+        # enforce row-level filters
+        self._add_where_clause(update_expression)
 
         return
 
@@ -179,7 +214,7 @@ class SqlInstrument(Instrument):
             insert_expression.this.expressions,
             insert_expression.expression.expressions[0].expressions,
         ):
-            sanitized_expression = self._sanitize_expression(expression)
+            sanitized_expression = self._sanitize_column_expression(expression)
             if sanitized_expression is not None:
                 sanitized_insert_expressions.append(sanitized_expression)
 
@@ -208,18 +243,26 @@ class SqlInstrument(Instrument):
             if isinstance(statement, exp.Select)
             else statement.find(exp.Select)
         )
+        update_expression = (
+            statement
+            if isinstance(statement, exp.Update)
+            else statement.find(exp.Update)
+        )
         insert_expression = (
             statement
             if isinstance(statement, exp.Insert)
             else statement.find(exp.Insert)
         )
-        if not select_expression and not insert_expression:
+        if not select_expression and not update_expression and not insert_expression:
             raise ValueError(
-                "SQL instrument only supports a single SELECT or INSERT statement."
+                "SQL instrument only supports SELECT, UPDATE, or INSERT statements."
             )
 
         if select_expression:
             self._run_select_statement(select_expression)
+
+        if update_expression:
+            self._run_update_statement(update_expression)
 
         if insert_expression:
             self._run_insert_statement(insert_expression)
