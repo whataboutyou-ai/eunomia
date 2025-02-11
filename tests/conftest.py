@@ -98,5 +98,14 @@ def sql_select_query_with_where(sql_select_query: str) -> str:
 
 
 @pytest.fixture
+def sql_update_query() -> str:
+    return """
+    UPDATE users SET email = 'example@example,com', secret_col = 'key' WHERE status = 'active';
+    """
+
+
+@pytest.fixture
 def sql_insert_query() -> str:
-    return "INSERT INTO users (email, secret_col, tenant_id) VALUES ('example@example.com', 'key', '200')"
+    return """
+    INSERT INTO users (email, secret_col, tenant_id) VALUES ('example@example.com', 'key', '200');
+    """

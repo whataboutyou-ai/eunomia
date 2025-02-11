@@ -55,6 +55,19 @@ def test_sql_instrument_select_run_with_where(
     assert "first_name = 'Mario'" in rewritten_query
 
 
+def test_sql_instrument_update_run(
+    sql_instrument: SqlInstrument, sql_update_query: str
+) -> None:
+    rewritten_query = sql_instrument.run(sql_update_query)
+
+    assert "email = 'example@example,com'" in rewritten_query
+    assert "secret_col" not in rewritten_query
+
+    assert "status = 'active'" in rewritten_query
+    assert "tenant_id = 100" in rewritten_query
+    assert "first_name = 'Mario'" in rewritten_query
+
+
 def test_sql_instrument_insert_run(
     sql_instrument: SqlInstrument, sql_insert_query: str
 ) -> None:
