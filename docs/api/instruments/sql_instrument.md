@@ -2,19 +2,21 @@
 
 `SqlInstrument` is an instrument that sanitizes SQL queries by:
 
-1. **Whitelisting** only certain columns and SQL functions in the `SELECT` clause.  
-2. **Enforcing** row-level filters by appending specific `WHERE` conditions (e.g., tenant or user-based).  
-3. **Discarding** any disallowed columns or functions from the final SQL.
+1.  **Whitelisting** only certain columns and SQL functions in the `SELECT`, `UPDATE`, and `INSERT` clauses. 
+2.  **Enforcing** row-level filters by:
+    -  appending specific `WHERE` conditions to `SELECT` and `UPDATE` clauses.
+    -  enforcing specific values for certain columns in `INSERT` clauses.
+3.  **Discarding** any disallowed columns or functions from the final SQL statement.
 
 The SQL Instrument uses [SQLGlot][sql-glot-website].
 
 ## Configuration
 
-| Argument           | Type           | Description                                                                                                                                                                                                                                                                                                                                               |
-| ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `allowed_columns`  | `list[str]`   | List of columns that are permitted to appear in the final `SELECT` or `WHERE`. Any column reference **not** in this list will be removed from the query.                                                                                                                                                                                                 |
-| `allowed_functions`| `list[str]`   | List of SQL function names allowed in the `SELECT` expressions. For example, `["COUNT", "CONCAT", "SUBSTR"]`. Any function call **not** in this list will be removed from the final query.                                                                                                                                                                  |
-| `row_filter`       | `list[str]`   | One or more SQL boolean expressions (without the `WHERE` keyword) that will be appended to the existing `WHERE` clause. Multiple filters get combined with an `AND`. For example, `["tenant_id = 100", "deleted_at IS NULL"]`. If these filters reference columns **not** in `allowed_columns`, they may also be sanitized away or cause the filter to be dropped. |
+| Argument | Type | Description |
+| -------- | ---- | ----------- |
+| `allowed_columns` | `list[str]` | List of columns that are permitted to appear in the final `SELECT`, `UPDATE`, or `INSERT` clauses. Any column reference **not** in this list will be removed from the query. |
+| `allowed_functions`| `list[str]` | List of SQL function names allowed in the `SELECT`, `UPDATE`, or `INSERT` clauses. For example, `["COUNT", "CONCAT", "SUBSTR"]`. Any function call **not** in this list will be removed from the final query. |
+| `row_filters` | `list[str] | None` | One or more SQL boolean expressions (without the `WHERE` keyword). <br/> - In `SELECT` and `UPDATE` queries, these will be appended to the existing `WHERE` clause or create a new one if it doesn't exist. Multiple filters get combined with an `AND`; for example, `["tenant_id = 100", "deleted_at IS NULL"]`. <br/> - In `INSERT` queries, these will be used to enforce specific values for certain columns. |
 
 ## Usage Example
 
