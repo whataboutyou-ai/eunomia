@@ -1,0 +1,11 @@
+.md-button {
+    color: black !important;
+    border-color: black !important;
+    transition: background-color 0.3s ease-in-out;
+    border-radius: 6px !important;
+    padding: 0.4rem 0.8rem !important;
+}
+.md-button:hover {
+    background-color: black !important;
+    color: white !important;
+}
