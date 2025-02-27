@@ -34,7 +34,7 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     Eunomia is designed to be modular and easy to extend.
 
-    [:material-arrow-right: Explore Instruments](../api/instruments/index.md#available-instruments)
+    [:material-arrow-right: Explore Docs](../api/index.md)
 
 
 -   :material-scale-balance:{ .lg .middle } __Open Source__
