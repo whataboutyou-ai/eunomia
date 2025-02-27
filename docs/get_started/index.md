@@ -50,19 +50,11 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
 ## Why Eunomia?
 
-### Data Governance for LLMs
-LLMs are only as useful as the knowledge and data they have access to.
+As AI-driven applications evolve, the necessity of separating authorization concerns from core logic becomes more apparent. By implementing policy enforcement as a distinct service, developers can ensure that AI Agents operate efficiently while maintaining the flexibility needed to adapt to changing security landscapes.
 
-At the same time, users need to be able to control which data those LLMs can access, which seems doable at first. However, the more interconnected and integrated a data stack becomes, the more difficult it is to control.
+This library aims to provide a structured approach to **decoupling authorization policies from AI Agent architectures**, enabling developers to focus on agents' performance while ensuring robust and scalable security mechanisms.
 
-We firmly believe data governance will be one of the biggest blockers to wider AI adoption, and we aim to reduce this barrier through Eunomia.
-
-### A Modular Framework for Data Governance
-Eunomia aims to leverage the opportunities presented by the same LLMs and different ML models to address the key challenges of data governance.
-
-Specifically, this framework applies data governance at a token level, thanks to a modular set of instruments, particularly built to address certain issues. These instruments can be combined to accomodate a wide range of use cases.
-
-Get more details on Eunomia's architecture on [Docs](../api/index.md).
+![schema](../assets/schema.png)
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [whataboutyou-website]: https://whataboutyou.ai
