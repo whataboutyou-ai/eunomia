@@ -18,35 +18,35 @@ git checkout -B <YOUR_GITHUB_USERNAME>/<PR_DESCRIPTION>
 ```
 
 ### Python environment
-Install the required dependecies with [poetry][poetry-home] including the development dependencies:
+Install the required dependecies with [uv][uv-home]:
 
 ```bash
-poetry install --with dev
+uv sync
 ```
 
 ### Testing and formatting
 Before pushing your changes, ensure the tests pass and the code style aligns:
 
 ```bash
-poetry run pytest
-poetry run black .
-poetry run isort --profile black .
+uv run pytest
+uv run black .
+uv run isort --profile black .
 ```
 
 *Note: a GitHub workflow will check the tests and formatting and reject the PR if it doesn't pass, so please make sure it passes locally.*
 
 
 ## Improving the Documentation
-Install the required dependecies with [poetry][poetry-home] including the documentation dependencies:
+Install the required dependecies with [uv][uv-home] including the documentation dependencies:
 
 ```bash
-poetry install --with docs
+uv sync --group docs
 ```
 
 To build the documentation and serve it locally, run the following command in the repository's root folder; the documentation will update every time you make a change:
 
 ```bash
-mkdocs serve
+uv run mkdocs serve
 ```
 
 The documentation is built with [Material for MkDocs][material-mkdocs-home], refer to their documentation for more information on how to use it.
@@ -62,6 +62,6 @@ We actively welcome your pull requests; this is the workflow you should follow:
 | 4 | Open a pull request | [:material-arrow-top-right: GitHub PRs][eunomia-pulls] |
 
 [github-fork]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
-[poetry-home]: https://python-poetry.org/
+[uv-home]: https://docs.astral.sh/uv/
 [eunomia-pulls]: https://github.com/whataboutyou-ai/eunomia/pulls
 [material-mkdocs-home]: https://squidfunk.github.io/mkdocs-material/
