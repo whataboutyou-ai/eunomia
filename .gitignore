@@ -4,3 +4,4 @@
 .vscode/
 .venv/
 dist/
+example.rego

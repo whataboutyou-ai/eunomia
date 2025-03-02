@@ -14,6 +14,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard]>=0.115.9",
     "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.1",
 ]
 
 [dependency-groups]
