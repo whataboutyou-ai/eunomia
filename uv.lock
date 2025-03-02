@@ -1,6 +1,12 @@
 version = 1
 requires-python = ">=3.10"
 
+[manifest]
+members = [
+    "eunomia-ai",
+    "eunomia-sdk-python",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -184,7 +190,7 @@ wheels = [
 [[package]]
 name = "eunomia-ai"
 version = "0.2.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "pydantic" },
@@ -219,6 +225,17 @@ docs = [
     { name = "mkdocs", specifier = ">=1.6.1" },
     { name = "mkdocs-material", specifier = ">=9.6.5" },
 ]
+
+[[package]]
+name = "eunomia-sdk-python"
+version = "0.1.0"
+source = { virtual = "sdks/python" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "httpx", specifier = ">=0.28.1" }]
 
 [[package]]
 name = "exceptiongroup"
