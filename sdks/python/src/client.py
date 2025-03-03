@@ -21,7 +21,7 @@ class EunomiaClient:
     def check_access(self, principal_id: str, resource_id: str) -> bool:
         """Check access of the principal specified by the principal_id to the resource specified by the resource_id"""
         params = {"principal_id": principal_id, "resource_id": resource_id}
-        response = self.client.get("/check_access/", params=params)
+        response = self.client.get("/check-access/", params=params)
         response.raise_for_status()
         return response.json()
 
@@ -31,6 +31,6 @@ class EunomiaClient:
         params = {
             "principal_id": principal_id,
         }
-        response = self.client.get("/allowed_resources/", params=params)
+        response = self.client.get("/allowed-resources/", params=params)
         response.raise_for_status()
         return response.json()

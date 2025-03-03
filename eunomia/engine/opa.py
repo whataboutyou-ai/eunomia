@@ -10,12 +10,11 @@ from eunomia.config import settings
 
 class OpaPolicyEngine:
     def __init__(self) -> None:
-        self._opa_binary = self._check_installation()
         self._server_address = f"{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}"
         self._policy_path = settings.OPA_POLICY_PATH
-
         # Global variable to store the OPA process
-        self.process: subprocess.Popen[bytes] | None = None
+        self._process: subprocess.Popen[bytes] | None = None
+        self.url = f"http://{self._server_address}/v1/data/eunomia"
 
     def _check_installation(self) -> str:
         """
@@ -55,8 +54,9 @@ class OpaPolicyEngine:
         return opa_path
 
     def start(self) -> None:
+        opa_binary = self._check_installation()
         opa_cmd = [
-            self._opa_binary,
+            opa_binary,
             "run",
             "--server",
             "--addr",
@@ -65,10 +65,10 @@ class OpaPolicyEngine:
         ]
 
         # Start the OPA server as a subprocess, and wait to ensure it's running
-        self.process = subprocess.Popen(opa_cmd, stdout=sys.stdout, stderr=sys.stderr)
+        self._process = subprocess.Popen(opa_cmd, stdout=sys.stdout, stderr=sys.stderr)
         time.sleep(2)
 
     def stop(self) -> None:
-        if self.process:
-            self.process.terminate()
-            self.process.wait()
+        if self._process:
+            self._process.terminate()
+            self._process.wait()
