@@ -1,3 +1,4 @@
+import logging
 import platform
 import shutil
 import subprocess
@@ -6,10 +7,9 @@ import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-from .api.routers import public
-from .config import settings
+from eunomia.config import settings
+from eunomia.server.api import routers
 
 
 def ensure_opa_installed() -> str:
@@ -19,10 +19,10 @@ def ensure_opa_installed() -> str:
     """
     opa_path = shutil.which("opa")
     if opa_path:
-        print("OPA is installed at:", opa_path)
+        logging.info("OPA is installed at:", opa_path)
         return opa_path
 
-    print("OPA not found. Attempting to install OPA...")
+    logging.info("OPA not found. Attempting to install OPA...")
     system = platform.system()
     try:
         if system == "Darwin":
@@ -31,18 +31,20 @@ def ensure_opa_installed() -> str:
             subprocess.run(["sudo", "apt-get", "update"], check=True)
             subprocess.run(["sudo", "apt-get", "install", "-y", "opa"], check=True)
         else:
-            print(f"Automatic installation not supported on {system}.")
+            logging.info(f"Automatic installation not supported on {system}.")
             sys.exit(1)
     except subprocess.CalledProcessError:
-        print("Failed to install OPA automatically. Please install it manually.")
+        logging.info("Failed to install OPA automatically. Please install it manually.")
         sys.exit(1)
 
     opa_path = shutil.which("opa")
     if not opa_path:
-        print("OPA installation succeeded, but the binary is still not found in PATH.")
+        logging.info(
+            "OPA installation succeeded, but the binary is still not found in PATH."
+        )
         sys.exit(1)
 
-    print("OPA is now installed at:", opa_path)
+    logging.info("OPA is now installed at:", opa_path)
     return opa_path
 
 
@@ -57,7 +59,7 @@ async def lifespan(app: FastAPI):
         "run",
         "--server",
         "--addr",
-        f"{settings.OPA_SERVER_URL}:{settings.OPA_SERVER_PORT}",
+        f"{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}",
         settings.OPA_POLICY_PATH,
     ]
 
@@ -77,22 +79,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(public.router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "eunomia.server.api.main:app",
-        host=settings.SERVER_HOST,
-        port=settings.SERVER_PORT,
-        reload=True,
-    )
+app.include_router(routers.router)

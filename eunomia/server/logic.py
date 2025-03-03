@@ -2,7 +2,7 @@ from typing import List
 
 import httpx
 
-from eunomia.server.config import settings
+from eunomia.config import settings
 
 
 async def check_access_logic(principal_id: str, resource_id: str) -> bool:
@@ -13,9 +13,8 @@ async def check_access_logic(principal_id: str, resource_id: str) -> bool:
     input_data = {"input": {"principal_id": principal_id, "resource_id": resource_id}}
     async with httpx.AsyncClient() as client:
         # Call the decision endpoint for check_access.
-        # Adjust the URL path ('/v1/data/example/check_access') to match your policy.
         response = await client.post(
-            f"http://{settings.OPA_SERVER_URL}:{settings.OPA_SERVER_PORT}/v1/data/example/check_access",
+            f"http://{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}/v1/data/eunomia",
             json=input_data,
         )
         response.raise_for_status()
@@ -36,7 +35,7 @@ async def allowed_resources_logic(principal_id: str) -> List[str]:
         # Call the decision endpoint for allowed_resources.
         # Adjust the URL path ('/v1/data/example/allowed_resources') to match your policy.
         response = await client.post(
-            f"http://{settings.OPA_SERVER_URL}:{settings.OPA_SERVER_PORT}/v1/data/example/allowed_resources",
+            f"http://{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}/v1/data/eunomia/allowed_resources",
             json=input_data,
         )
         response.raise_for_status()
