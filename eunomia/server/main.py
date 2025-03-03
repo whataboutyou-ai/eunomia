@@ -1,15 +1,16 @@
-from contextlib import asynccontextmanager
-import subprocess
-import time
-import shutil
-import sys
 import platform
+import shutil
+import subprocess
+import sys
+import time
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import settings
 from .api.routers import public
+from .config import settings
+
 
 def ensure_opa_installed() -> str:
     """
@@ -44,32 +45,35 @@ def ensure_opa_installed() -> str:
     print("OPA is now installed at:", opa_path)
     return opa_path
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Ensure OPA is installed before starting the API gateway.
     opa_binary = ensure_opa_installed()
-    
+
     # Build the OPA command using settings from config.
     opa_cmd = [
         opa_binary,
         "run",
         "--server",
-        "--addr", f"{settings.OPA_SERVER_URL}:{settings.OPA_SERVER_PORT}",
+        "--addr",
+        f"{settings.OPA_SERVER_URL}:{settings.OPA_SERVER_PORT}",
         settings.OPA_POLICY_PATH,
     ]
-    
+
     # Start the OPA server as a subprocess.
     opa_process = subprocess.Popen(opa_cmd, stdout=sys.stdout, stderr=sys.stderr)
-    
+
     # Wait a short period for OPA to initialize.
     time.sleep(2)
-    
+
     try:
         yield
     finally:
         # Terminate the OPA process on shutdown.
         opa_process.terminate()
         opa_process.wait()
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -85,7 +89,10 @@ app.add_middleware(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("eunomia.server.api.main:app", host=settings.SERVER_HOST, port=settings.SERVER_PORT, reload=True)
-    
 
-
+    uvicorn.run(
+        "eunomia.server.api.main:app",
+        host=settings.SERVER_HOST,
+        port=settings.SERVER_PORT,
+        reload=True,
+    )

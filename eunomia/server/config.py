@@ -1,6 +1,8 @@
-from functools import lru_cache
-from pydantic_settings import BaseSettings
 import os
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Eunomia Server"
@@ -14,9 +16,11 @@ class Settings(BaseSettings):
         env_file = os.getenv("ENV_FILE", ".env")
         case_sensitive = True
 
+
 @lru_cache()
 def get_settings() -> Settings:
 
     return Settings()
+
 
 settings = get_settings()
