@@ -1,0 +1,15 @@
+[project]
+name = "eunomia-sdk-langchain"
+version = "0.1.0"
+description = "Eunomia SDK for Langchain"
+authors = [
+    { name="What About You team", email="info@whataboutyou.ai" }
+]
+license = "Apache-2.0"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.28.1",
+    "langchain>=0.3.20",
+    "langchain-core>=0.3.41",
+]
