@@ -1,9 +1,10 @@
-import uuid
-import requests
-from langchain_core.document_loaders.base import BaseLoader
 import asyncio
+import uuid
 from typing import AsyncIterator, Iterator, List
+
+import requests
 from langchain.schema import Document
+from langchain_core.document_loaders.base import BaseLoader
 
 # Example usage:
 # Assuming `MyDocumentLoader` is a loader class from LangChain that implements
@@ -49,7 +50,9 @@ class EunomiaLoader:
             "content": doc.page_content,
         }
         response = requests.post(self.eunomia_server_api_url, json=payload)
-        print(f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}")
+        print(
+            f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
+        )
 
     async def send_api_async(self, doc: Document):
         loop = asyncio.get_running_loop()
@@ -58,7 +61,9 @@ class EunomiaLoader:
             "metadata": doc.metadata,
             "content": doc.page_content,
         }
-        await loop.run_in_executor(None, lambda: requests.post(self.eunomia_server_api_url, json=payload))
+        await loop.run_in_executor(
+            None, lambda: requests.post(self.eunomia_server_api_url, json=payload)
+        )
 
     async def alazy_load(self) -> AsyncIterator[Document]:
         async for doc in self.loader.alazy_load():
@@ -91,5 +96,3 @@ class EunomiaLoader:
         explicitly defined in this wrapper.
         """
         return getattr(self.loader, name)
-
-

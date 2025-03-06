@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 import httpx
 from fastapi import APIRouter, HTTPException, status
@@ -35,3 +35,25 @@ async def allowed_resources(principal_id: str) -> List[str]:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"OPA call failed: {exc}",
         )
+
+
+@router.post("/register_resource/")
+async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Receive and process a document payload.
+
+    The payload is expected to contain keys such as "doc_id", "metadata", and "content".
+    """
+    try:
+        # Example processing logic:
+        eunomia_id = payload.get("eunomia_id", "unknown")
+
+        ##
+        ##TODO: LOGIC
+        ##
+
+        return {"status": "success", "eunomia_id": eunomia_id}
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
