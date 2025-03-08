@@ -37,7 +37,6 @@ class Resource(ResourceCreate):
         from_attributes = True
 
 
-
 class PrincipalCreate(BaseModel):
     metadatas: dict[str, Any]
 

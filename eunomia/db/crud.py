@@ -77,4 +77,3 @@ def _create_principal_metadata(
     db.commit()
     db.refresh(db_doc_metadata)
     return db_doc_metadata
-

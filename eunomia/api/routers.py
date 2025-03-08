@@ -62,7 +62,8 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
     except ValueError as exc:
         raise HTTPException(status_code=500, detail=str(exc))
-    
+
+
 @router.post("/register_principal/")
 async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
     """

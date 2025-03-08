@@ -35,7 +35,7 @@ class EunomiaClient:
         response = self.client.post("/register_principal/", json=json_body)
         response.raise_for_status()
         return response.json()
-    
+
     # TODO: Change output function once defined Resource
     def allowed_resources(self, principal_id: str) -> list[str]:
         """Return the resources the principal specified by the principal_id has access to"""
