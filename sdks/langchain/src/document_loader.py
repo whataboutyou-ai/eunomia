@@ -28,66 +28,78 @@ from langchain_core.document_loaders.base import BaseLoader
 
 
 class EunomiaLoader:
-    def __init__(self, loader: BaseLoader, eunomia_server_base_url: str):
+    def __init__(
+        self,
+        loader: BaseLoader,
+        eunomia_server_base_url: str,
+        send_content: bool = False,
+    ):
         """
         :param loader: The original document loader instance.
         :param api_url: The API endpoint to send document metadata.
         """
-        self.loader = loader
-        self.eunomia_server_api_url = f"{eunomia_server_base_url}/register_resource/"
+        self._loader = loader
+        self._eunomia_server_api_url = f"{eunomia_server_base_url}/register_resource/"
+        self._send_content = send_content
 
-    def process_document(self, doc: Document) -> Document:
+    def _get_request_payload(self, doc):
+        request_payload = {
+            "metadata": doc.metadata,
+            "content": doc.page_content if self._send_content is True else None,
+        }
+        return request_payload
+
+    def _process_document(self, doc: Document, eunomia_group: str = None) -> Document:
         unique_id = str(uuid.uuid4())
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
         doc.metadata["eunomia_id"] = unique_id
+        doc.metadata["eunomia_group"] = eunomia_group
         return doc
 
-    def send_api_sync(self, doc: Document):
-        payload = {
-            "eunomia_id": doc.metadata["eunomia_id"],
-            "metadata": doc.metadata,
-            "content": doc.page_content,
-        }
-        response = requests.post(self.eunomia_server_api_url, json=payload)
+    def _send_api_sync(self, doc: Document):
+        payload = self._get_request_payload(doc)
+
+        # TODO Use Python SDK for calling API:
+        response = requests.post(self._eunomia_server_api_url, json=payload)
         print(
             f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
         )
 
-    async def send_api_async(self, doc: Document):
+    async def _send_api_async(self, doc: Document):
         loop = asyncio.get_running_loop()
-        payload = {
-            "eunomia_id": doc.metadata["eunomia_id"],
-            "metadata": doc.metadata,
-            "content": doc.page_content,
-        }
+        payload = self._get_request_payload(doc)
         await loop.run_in_executor(
-            None, lambda: requests.post(self.eunomia_server_api_url, json=payload)
+            None, lambda: requests.post(self._eunomia_server_api_url, json=payload)
         )
 
-    async def alazy_load(self) -> AsyncIterator[Document]:
-        async for doc in self.loader.alazy_load():
-            processed_doc = self.process_document(doc)
-            await self.send_api_async(processed_doc)
+    async def alazy_load(self, eunomia_group: str = None) -> AsyncIterator[Document]:
+        async for doc in self._loader.alazy_load():
+            processed_doc = self._process_document(doc, eunomia_group)
+            await self._send_api_async(processed_doc)
             yield processed_doc
 
-    async def aload(self) -> List[Document]:
-        documents = await self.loader.aload()
-        processed_docs = [self.process_document(doc) for doc in documents]
-        await asyncio.gather(*[self.send_api_async(doc) for doc in processed_docs])
+    async def aload(self, eunomia_group: str = None) -> List[Document]:
+        documents = await self._loader.aload()
+        processed_docs = [
+            self._process_document(doc, eunomia_group) for doc in documents
+        ]
+        await asyncio.gather(*[self._send_api_async(doc) for doc in processed_docs])
         return processed_docs
 
-    def lazy_load(self) -> Iterator[Document]:
-        for doc in self.loader.lazy_load():
-            processed_doc = self.process_document(doc)
-            self.send_api_sync(processed_doc)
+    def lazy_load(self, eunomia_group: str = None) -> Iterator[Document]:
+        for doc in self._loader.lazy_load():
+            processed_doc = self._process_document(doc, eunomia_group)
+            self._send_api_sync(processed_doc)
             yield processed_doc
 
-    def load(self) -> List[Document]:
-        documents = self.loader.load()
-        processed_docs = [self.process_document(doc) for doc in documents]
+    def load(self, eunomia_group: str = None) -> List[Document]:
+        documents = self._loader.load()
+        processed_docs = [
+            self._process_document(doc, eunomia_group) for doc in documents
+        ]
         for doc in processed_docs:
-            self.send_api_sync(doc)
+            self._send_api_sync(doc)
         return processed_docs
 
     def __getattr__(self, name):
@@ -95,4 +107,4 @@ class EunomiaLoader:
         Delegate any attribute or method lookup to the underlying loader if not
         explicitly defined in this wrapper.
         """
-        return getattr(self.loader, name)
+        return getattr(self._loader, name)

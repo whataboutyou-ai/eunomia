@@ -45,14 +45,21 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
     The payload is expected to contain keys such as "doc_id", "metadata", and "content".
     """
     try:
-        # Example processing logic:
-        eunomia_id = payload.get("eunomia_id", "unknown")
+        resource_metadata = payload.get("metadata", None)
+        resource_content = payload.get("content", None)
 
-        ##
-        ##TODO: LOGIC
-        ##
+        if resource_metadata is None:
+            raise HTTPException(
+                status_code=500, detail=f"Processing failed: Missing resoure metadata"
+            )
 
-        return {"status": "success", "eunomia_id": eunomia_id}
+        success = await server.register_resource(resource_metadata, resource_content)
+        if success is True:
+            return {"status": "success", "eunomia_id": resource_metadata["eunomia_id"]}
+        else:
+            raise HTTPException(
+                status_code=500, detail=f"Processing failed: Internal Problem"
+            )
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
     except ValueError as exc:

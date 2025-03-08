@@ -1,8 +1,10 @@
+import logging
 from typing import List
 
 import httpx
 
 from eunomia.config import settings
+from eunomia.db import crud, db, schemas
 from eunomia.engine.opa import OpaPolicyEngine
 
 
@@ -33,3 +35,16 @@ class EunomiaServer:
         This function calls the OPA server and returns the list of resources.
         """
         raise NotImplementedError("Allowed resources not implemented")
+
+    async def register_resource(
+        self, resource_metadata: dict, resource_content: str
+    ) -> bool:
+        """
+        Register a new resource on the server
+        """
+        new_resource = schemas.ResourceCreate(
+            metadatas=resource_metadata, content=resource_content
+        )
+        db_session = next(db.get_db())
+        crud.create_resource(new_resource, db=db_session)
+        return True
