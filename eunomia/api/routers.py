@@ -40,7 +40,7 @@ async def allowed_resources(principal_id: str) -> List[str]:
 @router.post("/register_resource/")
 async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Receive and process a document payload.
+    Receive and process a resource.
     """
     try:
         resource_metadata = payload.get("metadata", None)
@@ -52,6 +52,31 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
             )
 
         eunomia_id = await server.register_resource(resource_metadata, resource_content)
+        if eunomia_id is not None:
+            return {"status": "success", "eunomia_id": eunomia_id}
+        else:
+            raise HTTPException(
+                status_code=500, detail=f"Processing failed: Internal Problem"
+            )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    
+@router.post("/register_principal/")
+async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Receive and process a principal.
+    """
+    try:
+        principal_metadata = payload.get("metadata", None)
+
+        if principal_metadata is None:
+            raise HTTPException(
+                status_code=500, detail=f"Processing failed: Missing resoure metadata"
+            )
+
+        eunomia_id = await server.register_principal(principal_metadata)
         if eunomia_id is not None:
             return {"status": "success", "eunomia_id": eunomia_id}
         else:

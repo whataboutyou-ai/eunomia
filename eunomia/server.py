@@ -50,3 +50,16 @@ class EunomiaServer:
         eunomia_id = str(uuid.uuid4())
         crud.create_resource(new_resource, eunomia_id, db=db_session)
         return eunomia_id
+    
+    async def register_principal(
+        self, principal_metadata: dict
+    ) -> str:
+        """
+        Register a new principal on the server
+        """
+        new_principal = schemas.PrincipalCreate(
+            metadatas=principal_metadata)
+        db_session = next(db.get_db())
+        eunomia_id = str(uuid.uuid4())
+        crud.create_principal(new_principal, eunomia_id, db=db_session)
+        return eunomia_id

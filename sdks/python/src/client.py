@@ -12,9 +12,13 @@ class EunomiaClient:
             server_host if server_host is not None else "http://localhost:8000"
         )
 
+        headers = {}
+        if self.api_key is not None:
+            headers["WAY-API-KEY"] = self.api_key
+
         self.client = httpx.Client(
             base_url=self.server_host,
-            headers={"WAY-API-KEY": self.api_key},
+            headers=headers,
             timeout=60,
         )
 
@@ -25,6 +29,13 @@ class EunomiaClient:
         response.raise_for_status()
         return response.json()
 
+    def register_principal(self, metadatas: dict) -> dict:
+        """Register a new principal to the server and obtain a eunomia ID for the principal"""
+        json_body = {"metadata": metadatas}
+        response = self.client.post("/register_principal/", json=json_body)
+        response.raise_for_status()
+        return response.json()
+    
     # TODO: Change output function once defined Resource
     def allowed_resources(self, principal_id: str) -> list[str]:
         """Return the resources the principal specified by the principal_id has access to"""

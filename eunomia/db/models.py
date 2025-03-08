@@ -16,7 +16,7 @@ class Resource(db.Base):
     registered_at: Mapped[datetime]
 
     # relationships
-    metadatas: Mapped[list["ResourceMetadata"]] = relationship(
+    resources_metadatas: Mapped[list["ResourceMetadata"]] = relationship(
         back_populates="resource"
     )
 
@@ -30,4 +30,29 @@ class ResourceMetadata(db.Base):
     value: Mapped[str]
 
     # relationships
-    resource: Mapped["Resource"] = relationship(back_populates="metadatas")
+    resource: Mapped["Resource"] = relationship(back_populates="resources_metadatas")
+
+
+class Principal(db.Base):
+    __tablename__ = "principals"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    eunomia_id: Mapped[str] = mapped_column(String, nullable=False)
+    registered_at: Mapped[datetime]
+
+    # relationships
+    principals_metadatas: Mapped[list["PrincipalMetadata"]] = relationship(
+        back_populates="principal"
+    )
+
+
+class PrincipalMetadata(db.Base):
+    __tablename__ = "principal_metadatas"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    principal_id: Mapped[int] = mapped_column(ForeignKey(Principal.id))
+    key: Mapped[str]
+    value: Mapped[str]
+
+    # relationships
+    principal: Mapped["Principal"] = relationship(back_populates="principals_metadatas")
