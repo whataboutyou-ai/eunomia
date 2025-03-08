@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import List
 
 import httpx
@@ -38,7 +39,7 @@ class EunomiaServer:
 
     async def register_resource(
         self, resource_metadata: dict, resource_content: str
-    ) -> bool:
+    ) -> str:
         """
         Register a new resource on the server
         """
@@ -46,5 +47,6 @@ class EunomiaServer:
             metadatas=resource_metadata, content=resource_content
         )
         db_session = next(db.get_db())
-        crud.create_resource(new_resource, db=db_session)
-        return True
+        eunomia_id = str(uuid.uuid4())
+        crud.create_resource(new_resource, eunomia_id, db=db_session)
+        return eunomia_id

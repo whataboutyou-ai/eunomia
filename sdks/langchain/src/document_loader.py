@@ -49,22 +49,42 @@ class EunomiaLoader:
         }
         return request_payload
 
-    def _process_document(self, doc: Document, eunomia_group: str = None) -> Document:
-        unique_id = str(uuid.uuid4())
+    def _process_document_sync(
+        self, doc: Document, eunomia_group: str = None
+    ) -> Document:
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
-        doc.metadata["eunomia_id"] = unique_id
         doc.metadata["eunomia_group"] = eunomia_group
-        return doc
-
-    def _send_api_sync(self, doc: Document):
         payload = self._get_request_payload(doc)
-
-        # TODO Use Python SDK for calling API:
         response = requests.post(self._eunomia_server_api_url, json=payload)
+        response_data = response.json()
+        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+
         print(
             f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
         )
+        return doc
+
+    async def _process_document_async(
+        self, doc: Document, eunomia_group: str = None
+    ) -> Document:
+        if not hasattr(doc, "metadata") or doc.metadata is None:
+            doc.metadata = {}
+        doc.metadata["eunomia_group"] = eunomia_group
+        payload = self._get_request_payload(doc)
+        loop = asyncio.get_running_loop()
+        payload = self._get_request_payload(doc)
+        response = await loop.run_in_executor(
+            None, lambda: requests.post(self._eunomia_server_api_url, json=payload)
+        )
+
+        response_data = response.json()
+        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+
+        print(
+            f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
+        )
+        return doc
 
     async def _send_api_async(self, doc: Document):
         loop = asyncio.get_running_loop()
@@ -75,31 +95,26 @@ class EunomiaLoader:
 
     async def alazy_load(self, eunomia_group: str = None) -> AsyncIterator[Document]:
         async for doc in self._loader.alazy_load():
-            processed_doc = self._process_document(doc, eunomia_group)
-            await self._send_api_async(processed_doc)
+            processed_doc = await self._process_document_async(doc, eunomia_group)
             yield processed_doc
 
     async def aload(self, eunomia_group: str = None) -> List[Document]:
         documents = await self._loader.aload()
         processed_docs = [
-            self._process_document(doc, eunomia_group) for doc in documents
+            await self._process_document_async(doc, eunomia_group) for doc in documents
         ]
-        await asyncio.gather(*[self._send_api_async(doc) for doc in processed_docs])
         return processed_docs
 
     def lazy_load(self, eunomia_group: str = None) -> Iterator[Document]:
         for doc in self._loader.lazy_load():
-            processed_doc = self._process_document(doc, eunomia_group)
-            self._send_api_sync(processed_doc)
+            processed_doc = self._process_document_sync(doc, eunomia_group)
             yield processed_doc
 
     def load(self, eunomia_group: str = None) -> List[Document]:
         documents = self._loader.load()
         processed_docs = [
-            self._process_document(doc, eunomia_group) for doc in documents
+            self._process_document_sync(doc, eunomia_group) for doc in documents
         ]
-        for doc in processed_docs:
-            self._send_api_sync(doc)
         return processed_docs
 
     def __getattr__(self, name):

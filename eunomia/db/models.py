@@ -11,6 +11,7 @@ class Resource(db.Base):
     __tablename__ = "resources"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    eunomia_id: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     registered_at: Mapped[datetime]
 

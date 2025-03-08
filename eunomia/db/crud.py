@@ -7,10 +7,11 @@ from eunomia.db import db, models, schemas
 
 
 def create_resource(
-    resource_create: schemas.ResourceCreate, db: Session
+    resource_create: schemas.ResourceCreate, eunomia_id: str, db: Session
 ) -> schemas.Resource:
     """Create a new resource in db"""
     db_resource = models.Resource(
+        eunomia_id=eunomia_id,
         content=resource_create.content,
         registered_at=datetime.now(),
     )

@@ -41,8 +41,6 @@ async def allowed_resources(principal_id: str) -> List[str]:
 async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Receive and process a document payload.
-
-    The payload is expected to contain keys such as "doc_id", "metadata", and "content".
     """
     try:
         resource_metadata = payload.get("metadata", None)
@@ -53,9 +51,9 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
                 status_code=500, detail=f"Processing failed: Missing resoure metadata"
             )
 
-        success = await server.register_resource(resource_metadata, resource_content)
-        if success is True:
-            return {"status": "success", "eunomia_id": resource_metadata["eunomia_id"]}
+        eunomia_id = await server.register_resource(resource_metadata, resource_content)
+        if eunomia_id is not None:
+            return {"status": "success", "eunomia_id": eunomia_id}
         else:
             raise HTTPException(
                 status_code=500, detail=f"Processing failed: Internal Problem"
