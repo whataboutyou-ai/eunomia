@@ -32,7 +32,14 @@ class EunomiaClient:
     def register_principal(self, metadatas: dict) -> dict:
         """Register a new principal to the server and obtain a eunomia ID for the principal"""
         json_body = {"metadata": metadatas}
-        response = self.client.post("/register_principal/", json=json_body)
+        response = self.client.post("/register_principal", json=json_body)
+        response.raise_for_status()
+        return response.json()
+
+    def register_resource(self, metadatas: dict) -> dict:
+        """Register a new resource to the server and obtain a eunomia ID for the resource"""
+        json_body = {"metadata": metadatas}
+        response = self.client.post("/register_resource", json=json_body)
         response.raise_for_status()
         return response.json()
 

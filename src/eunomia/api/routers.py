@@ -37,7 +37,7 @@ async def allowed_resources(principal_id: str) -> List[str]:
         )
 
 
-@router.post("/register_resource/")
+@router.post("/register_resource")
 async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Receive and process a resource.
@@ -48,7 +48,8 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
 
         if resource_metadata is None:
             raise HTTPException(
-                status_code=500, detail=f"Processing failed: Missing resoure metadata"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Processing failed: Missing resoure metadata",
             )
 
         eunomia_id = await server.register_resource(resource_metadata, resource_content)
@@ -56,15 +57,21 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
             return {"status": "success", "eunomia_id": eunomia_id}
         else:
             raise HTTPException(
-                status_code=500, detail=f"Processing failed: Internal Problem"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Processing failed: Internal Problem",
             )
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Processing failed: {exc}",
+        )
     except ValueError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
 
 
-@router.post("/register_principal/")
+@router.post("/register_principal")
 async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Receive and process a principal.
@@ -74,7 +81,8 @@ async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
 
         if principal_metadata is None:
             raise HTTPException(
-                status_code=500, detail=f"Processing failed: Missing resoure metadata"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Processing failed: Missing resoure metadata",
             )
 
         eunomia_id = await server.register_principal(principal_metadata)
@@ -82,9 +90,15 @@ async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
             return {"status": "success", "eunomia_id": eunomia_id}
         else:
             raise HTTPException(
-                status_code=500, detail=f"Processing failed: Internal Problem"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Processing failed: Internal Problem",
             )
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Processing failed: {exc}",
+        )
     except ValueError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )

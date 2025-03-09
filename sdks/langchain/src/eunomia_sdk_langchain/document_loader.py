@@ -1,8 +1,7 @@
 import asyncio
-import uuid
 from typing import AsyncIterator, Iterator, List
 
-import requests
+from eunomia_sdk_python.client import EunomiaClient
 from langchain.schema import Document
 from langchain_core.document_loaders.base import BaseLoader
 
@@ -32,6 +31,7 @@ class EunomiaLoader:
         self,
         loader: BaseLoader,
         eunomia_server_base_url: str,
+        api_key: str | None = None,
         send_content: bool = False,
     ):
         """
@@ -39,10 +39,12 @@ class EunomiaLoader:
         :param api_url: The API endpoint to send document metadata.
         """
         self._loader = loader
-        self._eunomia_server_api_url = f"{eunomia_server_base_url}/register_resource/"
         self._send_content = send_content
+        self._client = EunomiaClient(
+            api_key=api_key, server_host=eunomia_server_base_url
+        )
 
-    def _get_request_payload(self, doc):
+    def _get_request_payload(self, doc: Document):
         request_payload = {
             "metadata": doc.metadata,
             "content": doc.page_content if self._send_content is True else None,
@@ -56,13 +58,8 @@ class EunomiaLoader:
             doc.metadata = {}
         doc.metadata["eunomia_group"] = eunomia_group
         payload = self._get_request_payload(doc)
-        response = requests.post(self._eunomia_server_api_url, json=payload)
-        response_data = response.json()
+        response_data = self._client.register_resource(payload)
         doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
-
-        print(
-            f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
-        )
         return doc
 
     async def _process_document_async(
@@ -74,24 +71,11 @@ class EunomiaLoader:
         payload = self._get_request_payload(doc)
         loop = asyncio.get_running_loop()
         payload = self._get_request_payload(doc)
-        response = await loop.run_in_executor(
-            None, lambda: requests.post(self._eunomia_server_api_url, json=payload)
+        response_data = await loop.run_in_executor(
+            None, lambda: self._client.register_resource(payload)
         )
-
-        response_data = response.json()
         doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
-
-        print(
-            f"Document {doc.metadata['eunomia_id']} processed, status code: {response.status_code}"
-        )
         return doc
-
-    async def _send_api_async(self, doc: Document):
-        loop = asyncio.get_running_loop()
-        payload = self._get_request_payload(doc)
-        await loop.run_in_executor(
-            None, lambda: requests.post(self._eunomia_server_api_url, json=payload)
-        )
 
     async def alazy_load(self, eunomia_group: str = None) -> AsyncIterator[Document]:
         async for doc in self._loader.alazy_load():
