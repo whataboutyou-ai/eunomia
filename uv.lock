@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.12.4'",
@@ -440,7 +441,7 @@ docs = [
 [[package]]
 name = "eunomia-sdk-langchain"
 version = "0.1.0"
-source = { virtual = "sdks/langchain" }
+source = { editable = "sdks/langchain" }
 dependencies = [
     { name = "httpx" },
     { name = "langchain" },
@@ -469,7 +470,7 @@ dev = [
 [[package]]
 name = "eunomia-sdk-python"
 version = "0.1.0"
-source = { virtual = "sdks/python" }
+source = { editable = "sdks/python" }
 dependencies = [
     { name = "httpx" },
 ]
