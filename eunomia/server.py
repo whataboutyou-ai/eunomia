@@ -4,7 +4,6 @@ from typing import List
 
 import httpx
 
-from eunomia.config import settings
 from eunomia.db import crud, db, schemas
 from eunomia.engine.opa import OpaPolicyEngine
 
@@ -13,21 +12,32 @@ class EunomiaServer:
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
 
-    async def check_access(self, principal_id: str, resource_id: str) -> bool:
+    async def check_access(self, principal_id: str, resource_id: str, access_method: str = "allow") -> bool:
         """
         Check access of the principal specified by principal_id to the resource specified by resource_id.
         This function calls the OPA server and returns the decision.
         """
+        access_method_url = None
+        if access_method != "allow":
+            raise NotImplemented()
+
+        ## Get principal and resource metadata
+        db_session = next(db.get_db())
+        resource_metadata = crud.get_resource_metadata(resource_id, db_session)
+        principal_metadata = crud.get_principal_metadata(principal_id, db_session)      
+
         input_data = {
-            "input": {"principal_id": principal_id, "resource_id": resource_id}
+            "input" : {
+                "principal": {"eunomia_id": principal_id, "metadata": principal_metadata}, 
+                "resource": {"eunomia_id": resource_id, "metadata": resource_metadata}
+            }
         }
+
         async with httpx.AsyncClient() as client:
-            response = await client.post(self._engine.url, json=input_data)
+            response = await client.post(f"{self._engine.url}/{access_method}", json=input_data)
             response.raise_for_status()
             result = response.json()
-            # Assuming your policy returns a JSON structure like: {"result": {"allow": true}}
-            decision = result.get("result", {}).get("allow")
-            # If the decision is undefined, return False or handle it as needed.
+            decision = result.get("result", False)
             return bool(decision)
 
     async def allowed_resources(self, principal_id: str) -> List[str]:
