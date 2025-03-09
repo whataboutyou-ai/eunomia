@@ -10,9 +10,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Eunomia Server"
     DEBUG: bool = False
 
+    LOCAL_DB_HOST: str = "sqlite:///db.sqlite"
+
     OPA_SERVER_HOST: str = "127.0.0.1"
     OPA_SERVER_PORT: int = 8181
-    OPA_POLICY_PATH: str
+    
+    OPA_POLICY_PATH: str = ""
 
     class Config:
         env_file = ".env"

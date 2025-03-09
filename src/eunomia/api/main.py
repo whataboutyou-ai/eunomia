@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from eunomia.api.routers import router
 from eunomia.config import settings
+from eunomia.db import db
 from eunomia.engine.opa import OpaPolicyEngine
 
 
@@ -12,6 +13,7 @@ async def lifespan(app: FastAPI):
     engine = OpaPolicyEngine()
     try:
         engine.start()
+        db.init_db()
         yield
     finally:
         engine.stop()
