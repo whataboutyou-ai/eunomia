@@ -3,11 +3,13 @@ title: Welcome to Eunomia
 ---
 
 ## What is Eunomia?
-Eunomia is a Python library that allows you to decouple the authorization logic from the main architecture of your AI Agent.
+
+Eunomia is a Python library that allows you to decouple the authorization logic from the main architecture of your AI Agent. Eunomia is built as a standalone authorization server that can serve any application.
+
 It is built and maintained by [What About You][whataboutyou-website], while contributions are welcome from the [community](../community/index.md).
 
-
 ## How to Get Started?
+
 <div class="grid cards" markdown>
 
 -   :material-clock-fast:{ .lg .middle } __Set up in seconds__
@@ -28,13 +30,13 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
     [:material-arrow-right: Quickstart](quickstart.md)
 
 
--   :material-view-module:{ .lg .middle } __A standalone AuthZ service__
+-   :material-application-brackets-outline:{ .lg .middle } __Integrate within your codebase__
 
     ---
 
-    Eunomia is a standalone authorization server that can serve any AI application
+    Use one of the available SDKs to integrate Eunomia into your project
 
-    [:material-arrow-right: Explore Docs](../api/index.md)
+    [:material-arrow-right: Explore SDKs](../sdks/index.md)
 
 
 -   :material-scale-balance:{ .lg .middle } __Open Source__
@@ -46,7 +48,6 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
     [:material-arrow-right: License](license.md)
 
 </div>
-
 
 ## Why Eunomia?
 

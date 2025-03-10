@@ -4,20 +4,22 @@ import httpx
 
 
 class EunomiaClient:
-    def __init__(self, api_key: str = None, server_host: str = None) -> None:
-        self.api_key = (
-            api_key if api_key is not None else os.getenv("WAY_API_KEY", None)
-        )
-        self.server_host = (
+    def __init__(
+        self, server_host: str | None = None, api_key: str | None = None
+    ) -> None:
+        self._server_host = (
             server_host if server_host is not None else "http://localhost:8000"
+        )
+        self._api_key = (
+            api_key if api_key is not None else os.getenv("WAY_API_KEY", None)
         )
 
         headers = {}
-        if self.api_key is not None:
-            headers["WAY-API-KEY"] = self.api_key
+        if self._api_key is not None:
+            headers["WAY-API-KEY"] = self._api_key
 
         self.client = httpx.Client(
-            base_url=self.server_host,
+            base_url=self._server_host,
             headers=headers,
             timeout=60,
         )

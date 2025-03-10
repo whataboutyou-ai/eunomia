@@ -46,7 +46,7 @@ Different packages are available in this repository for an easier interaction wi
 The following packages are currently available:
 
 - [Python](sdks/python)
-- [Langchain](sdks/langchain)
+- [LangChain](sdks/langchain)
 - ...and more coming soon!
 
 ## Documentation

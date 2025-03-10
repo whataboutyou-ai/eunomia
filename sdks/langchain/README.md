@@ -1,6 +1,6 @@
-# Eunomia SDK for Langchain
+# Eunomia SDK for LangChain
 
-This package allows to streamline [Langchain's loaders][langchain-loaders-docs] resources and their metadata to the Eunomia server for an easier policy configuration process.
+This package allows to streamline [LangChain's loaders][langchain-loaders-docs] resources and their metadata to the Eunomia server for an easier policy configuration process.
 
 ## Installation
 

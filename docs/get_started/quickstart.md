@@ -1,7 +1,7 @@
 After [installing Eunomia](installation.md), you can start using it by following this quickstart example.
 
 ## Basic Usage
-Quickstart example is under restructuring
+TODO: update quickstart example
 
 === "Code"
     ```py
@@ -12,4 +12,4 @@ Quickstart example is under restructuring
     Hello, world
     ```
 
-Congratulations! You've just made your first steps with Eunomia. You can continue to the detailed [documentation](../api/index.md) or explore the [cookbook](../cookbook/index.md) examples.
+Congratulations! You've just made your first steps with Eunomia. You can continue to the detailed [documentation](../api/index.md) or explore the available [SDKs](../sdks/index.md).

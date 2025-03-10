@@ -62,6 +62,16 @@ extra:
       link: https://pypi.org/project/eunomia-ai/
       name: eunomia on PyPi
 
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_root_heading: true
+            heading_level: 3
+
 nav:
   - Home: index.md
   - Getting Started:
@@ -71,6 +81,10 @@ nav:
       - License: get_started/license.md
   - Docs:
       - api/index.md
+  - SDKs:
+      - sdks/index.md
+      - Python SDK: sdks/python.md
+      - LangChain SDK: sdks/langchain.md
   - Community:
       - community/index.md
       - How to Contribute: community/contribute.md
