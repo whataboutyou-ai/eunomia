@@ -1,4 +1,3 @@
-import logging
 import uuid
 from typing import List
 
@@ -12,7 +11,9 @@ class EunomiaServer:
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
 
-    async def check_access(self, principal_id: str, resource_id: str, access_method: str = "allow") -> bool:
+    async def check_access(
+        self, principal_id: str, resource_id: str, access_method: str = "allow"
+    ) -> bool:
         """
         Check access of the principal specified by principal_id to the resource specified by resource_id.
         This function calls the OPA server and returns the decision.
@@ -24,17 +25,22 @@ class EunomiaServer:
         ## Get principal and resource metadata
         db_session = next(db.get_db())
         resource_metadata = crud.get_resource_metadata(resource_id, db_session)
-        principal_metadata = crud.get_principal_metadata(principal_id, db_session)      
+        principal_metadata = crud.get_principal_metadata(principal_id, db_session)
 
         input_data = {
-            "input" : {
-                "principal": {"eunomia_id": principal_id, "metadata": principal_metadata}, 
-                "resource": {"eunomia_id": resource_id, "metadata": resource_metadata}
+            "input": {
+                "principal": {
+                    "eunomia_id": principal_id,
+                    "metadata": principal_metadata,
+                },
+                "resource": {"eunomia_id": resource_id, "metadata": resource_metadata},
             }
         }
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{self._engine.url}/{access_method}", json=input_data)
+            response = await client.post(
+                f"{self._engine.url}/{access_method}", json=input_data
+            )
             response.raise_for_status()
             result = response.json()
             decision = result.get("result", False)

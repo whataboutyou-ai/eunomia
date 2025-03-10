@@ -1,10 +1,9 @@
-import secrets
 from datetime import datetime
 
-from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from eunomia.db import db, models, schemas
+from eunomia.db import models, schemas
 
 
 def create_resource(
@@ -79,6 +78,7 @@ def _create_principal_metadata(
     db.refresh(db_doc_metadata)
     return db_doc_metadata
 
+
 def get_resource_metadata(eunomia_id: str, db: Session) -> dict:
     """Given a eunomia_id for a Resource, this function returns its associated metadata as a dictionary, where each key is the metadata key and each value is the metadata value."""
     stmt = select(models.Resource).where(models.Resource.eunomia_id == eunomia_id)
@@ -87,8 +87,11 @@ def get_resource_metadata(eunomia_id: str, db: Session) -> dict:
     if not resource:
         raise ValueError("Resource not found.")
 
-    metadata_dict = {metadata.key: metadata.value for metadata in resource.resources_metadatas}
+    metadata_dict = {
+        metadata.key: metadata.value for metadata in resource.resources_metadatas
+    }
     return metadata_dict
+
 
 def get_principal_metadata(eunomia_id: str, db: Session) -> dict:
     """Given a eunomia_id for a Principal, this function returns its associated metadata as a dictionary, where each key is the metadata key and each value is the metadata value."""
@@ -98,5 +101,7 @@ def get_principal_metadata(eunomia_id: str, db: Session) -> dict:
     if not resource:
         raise ValueError("Principal not found.")
 
-    metadata_dict = {metadata.key: metadata.value for metadata in resource.principals_metadatas}
+    metadata_dict = {
+        metadata.key: metadata.value for metadata in resource.principals_metadatas
+    }
     return metadata_dict
