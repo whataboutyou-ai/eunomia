@@ -3,7 +3,7 @@ title: Welcome to Eunomia
 ---
 
 ## What is Eunomia?
-Eunomia is a Python library that allows you to control which data flows into your Large Language Model-based application.
+Eunomia is a Python library that allows you to decouple the authorization logic from the main architecture of your AI Agent.
 It is built and maintained by [What About You][whataboutyou-website], while contributions are welcome from the [community](../community/index.md).
 
 
@@ -28,11 +28,11 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
     [:material-arrow-right: Quickstart](quickstart.md)
 
 
--   :material-view-module:{ .lg .middle } __A modular framework__
+-   :material-view-module:{ .lg .middle } __A standalone AuthZ service__
 
     ---
 
-    Eunomia is designed to be modular and easy to extend.
+    Eunomia is a standalone authorization server that can serve any AI application
 
     [:material-arrow-right: Explore Docs](../api/index.md)
 

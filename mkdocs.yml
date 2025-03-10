@@ -3,7 +3,7 @@ site_name: Eunomia
 repo_name: whataboutyou-ai/eunomia
 repo_url: https://github.com/whataboutyou-ai/eunomia
 
-copyright: Copyright &copy; 2024 - eunomia authors
+copyright: Copyright &copy; 2025 - Eunomia authors
 
 theme:
   name: material
@@ -71,11 +71,6 @@ nav:
       - License: get_started/license.md
   - Docs:
       - api/index.md
-  - Cookbook:
-      - cookbook/index.md
-  - Integrations:
-      - integrations/index.md
-      - Model Context Protocol (MCP): integrations/mcp.md
   - Community:
       - community/index.md
       - How to Contribute: community/contribute.md
