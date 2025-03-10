@@ -1,6 +1,11 @@
 <div align="center" style="margin-bottom: 1em;">
 
-<img src="docs/assets/logo.svg" alt="Eunomia Logo" width=300></img>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/logo-owl-dark.png">
+  <img alt="Eunomia Logo" src="./docs/assets/logo-owl.png" width=300>
+</picture>
+
+**Eunomia**
 
 _Authorization layer for AI Agents_
 

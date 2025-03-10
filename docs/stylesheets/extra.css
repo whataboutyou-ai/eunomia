@@ -1,11 +1,15 @@
 .md-button {
-    color: black !important;
-    border-color: black !important;
-    transition: background-color 0.3s ease-in-out;
-    border-radius: 6px !important;
-    padding: 0.4rem 0.8rem !important;
+  color: black !important;
+  border-color: black !important;
+  transition: background-color 0.3s ease-in-out;
+  border-radius: 6px !important;
+  padding: 0.4rem 0.8rem !important;
 }
 .md-button:hover {
-    background-color: black !important;
-    color: white !important;
+  background-color: black !important;
+  color: hsl(47.9, 95.8%, 53.1%) !important;
+}
+.md-button--primary {
+  background-color: black !important;
+  color: white !important;
 }
