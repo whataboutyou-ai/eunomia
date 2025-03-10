@@ -80,7 +80,12 @@ nav:
       - Quickstart: get_started/quickstart.md
       - License: get_started/license.md
   - Docs:
-      - api/index.md
+      - server/index.md
+      - APIs: server/apis.md
+      - Config: server/config.md
+      - DB: server/db.md
+      - Engine: server/engine.md
+      - Server: server/server.md
   - SDKs:
       - sdks/index.md
       - Python SDK: sdks/python.md

@@ -12,4 +12,4 @@ TODO: update quickstart example
     Hello, world
     ```
 
-Congratulations! You've just made your first steps with Eunomia. You can continue to the detailed [documentation](../api/index.md) or explore the available [SDKs](../sdks/index.md).
+Congratulations! You've just made your first steps with Eunomia. You can continue to the detailed [documentation](../server/index.md) or explore the available [SDKs](../sdks/index.md).

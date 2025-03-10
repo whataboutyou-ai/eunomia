@@ -49,7 +49,7 @@ _Note: a GitHub workflow will check the tests and formatting and reject the PR i
 Install the required dependecies with [uv][uv-home] including the documentation dependencies:
 
 ```bash
-uv sync --group docs
+uv sync --all-packages --all-group
 ```
 
 To build the documentation and serve it locally, run the following command in the repository's root folder; the documentation will update every time you make a change:
