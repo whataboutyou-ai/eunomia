@@ -5,26 +5,6 @@ from eunomia_sdk_python import EunomiaClient
 from langchain.schema import Document
 from langchain_core.document_loaders.base import BaseLoader
 
-# Example usage:
-# Assuming `MyDocumentLoader` is a loader class from LangChain that implements
-# these four methods and has already been instantiated with necessary parameters:
-#
-#   from my_loaders import MyDocumentLoader
-#
-#   my_loader = MyDocumentLoader(param1="value1", param2="value2")
-#   server_url = "https://your-eunomia-server-endpoint.com/process"
-#   wrapped_loader = EunomiaLoader(my_loader, server_url)
-#
-# You can then call any of the overridden methods:
-#
-#   docs_sync = wrapped_loader.load()
-#   for doc in wrapped_loader.lazy_load():
-#       pass
-#
-#   # For asynchronous methods, run them in an event loop:
-#   import asyncio
-#   asyncio.run(wrapped_loader.aload())
-
 
 class EunomiaLoader:
     def __init__(
