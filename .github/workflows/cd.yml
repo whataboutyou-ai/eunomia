@@ -30,7 +30,7 @@ jobs:
           cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
-        run: uv sync --only-group docs
+        run: uv sync --group docs --all-packages
 
       - name: Deploy documentation
         run: uv run mkdocs gh-deploy --force
