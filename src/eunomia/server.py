@@ -8,6 +8,13 @@ from eunomia.engine.opa import OpaPolicyEngine
 
 
 class EunomiaServer:
+    """
+    Core logic of the Eunomia Server.
+
+    This class provides an interface to the Open Policy Agent (OPA) engine
+    for making access control decisions and managing resources and principals.
+    """
+
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
 
@@ -15,8 +22,32 @@ class EunomiaServer:
         self, principal_id: str, resource_id: str, access_method: str = "allow"
     ) -> bool:
         """
-        Check access of the principal specified by principal_id to the resource specified by resource_id.
-        This function calls the OPA server and returns the decision.
+        Check if a principal has access to a specific resource.
+
+        This method first get resource and principals metadata and then
+        queries the OPA server to determine if the specified principal
+        is allowed to access the specified resource.
+
+        Parameters
+        ----------
+        principal_id : str
+            Unique identifier for the principal requesting access.
+        resource_id : str
+            Unique identifier for the resource being accessed.
+        access_method : str, optional
+            The type of access to check. Currently only "allow" is supported.
+
+        Returns
+        -------
+        bool
+            True if access is granted, False otherwise.
+
+        Raises
+        ------
+        NotImplementedError
+            If access_method is not "allow".
+        httpx.HTTPError
+            If communication with the OPA server fails.
         """
         if access_method != "allow":
             raise NotImplementedError("Only allow method is supported")
@@ -46,31 +77,53 @@ class EunomiaServer:
             return bool(decision)
 
     async def allowed_resources(self, principal_id: str) -> List[str]:
-        """
-        Return the resources the principal specified by principal_id has access to.
-        This function calls the OPA server and returns the list of resources.
-        """
         raise NotImplementedError("Allowed resources not implemented")
 
     async def register_resource(
-        self, resource_metadata: dict, resource_content: str
+        self, metadata: dict, content: str | None = None
     ) -> str:
         """
-        Register a new resource on the server
+        Register a new resource in the system.
+
+        Creates a new resource with the provided metadata and content,
+        generating a unique identifier for future reference.
+
+        Parameters
+        ----------
+        metadata : dict
+            Dictionary containing metadata about the resource.
+        content : str, optional, default=None
+            The content of the resource as a string.
+
+        Returns
+        -------
+        str
+            The generated unique identifier (eunomia_id) for the resource.
         """
-        new_resource = schemas.ResourceCreate(
-            metadatas=resource_metadata, content=resource_content
-        )
+        new_resource = schemas.ResourceCreate(metadatas=metadata, content=content)
         db_session = next(db.get_db())
         eunomia_id = str(uuid.uuid4())
         crud.create_resource(new_resource, eunomia_id, db=db_session)
         return eunomia_id
 
-    async def register_principal(self, principal_metadata: dict) -> str:
+    async def register_principal(self, metadata: dict) -> str:
         """
-        Register a new principal on the server
+        Register a new principal in the system.
+
+        Creates a new principal with the provided metadata,
+        generating a unique identifier for future reference.
+
+        Parameters
+        ----------
+        metadata : dict
+            Dictionary containing metadata about the principal.
+
+        Returns
+        -------
+        str
+            The generated unique identifier (eunomia_id) for the principal.
         """
-        new_principal = schemas.PrincipalCreate(metadatas=principal_metadata)
+        new_principal = schemas.PrincipalCreate(metadatas=metadata)
         db_session = next(db.get_db())
         eunomia_id = str(uuid.uuid4())
         crud.create_principal(new_principal, eunomia_id, db=db_session)

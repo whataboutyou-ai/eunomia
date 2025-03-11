@@ -9,6 +9,14 @@ from eunomia.config import settings
 
 
 class OpaPolicyEngine:
+    """
+    Interface to the Open Policy Agent (OPA) engine.
+
+    This class manages the lifecycle of an OPA server instance and provides
+    an interface for interacting with it. It handles the installation check,
+    server startup, and shutdown operations.
+    """
+
     def __init__(self) -> None:
         self._server_address = f"{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}"
         self._policy_path = settings.OPA_POLICY_PATH
@@ -17,10 +25,9 @@ class OpaPolicyEngine:
         self.url = f"http://{self._server_address}/v1/data/eunomia"
 
     def _check_installation(self) -> str:
-        """
-        Check if the OPA binary is available; if not, attempt to install it.
-        Returns the absolute path of the OPA binary.
-        """
+        # Check if the OPA binary is available; if not, attempt to install it.
+        # Returns the absolute path of the OPA binary.
+
         opa_path = shutil.which("opa")
         if opa_path:
             logging.info("OPA is installed at:", opa_path)
@@ -54,6 +61,19 @@ class OpaPolicyEngine:
         return opa_path
 
     def start(self) -> None:
+        """
+        Start the OPA server.
+
+        This method first checks the installation of OPA and tries to install it
+        if it is not found. Then it launches the OPA server as a subprocess using
+        the configured address and policy path. It waits briefly to ensure the
+        server has started before returning.
+
+        Raises
+        ------
+        SystemExit
+            If OPA binary cannot be found or installed.
+        """
         opa_binary = self._check_installation()
         opa_cmd = [
             opa_binary,
@@ -69,6 +89,12 @@ class OpaPolicyEngine:
         time.sleep(2)
 
     def stop(self) -> None:
+        """
+        Stop the OPA server.
+
+        This method terminates the OPA server subprocess if it is running
+        and waits for it to exit.
+        """
         if self._process:
             self._process.terminate()
             self._process.wait()

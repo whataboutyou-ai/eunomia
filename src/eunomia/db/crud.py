@@ -9,7 +9,26 @@ from eunomia.db import models, schemas
 def create_resource(
     resource_create: schemas.ResourceCreate, eunomia_id: str, db: Session
 ) -> schemas.Resource:
-    """Create a new resource in db"""
+    """
+    Create a new resource in the database.
+
+    This function creates a new resource record and its associated metadata
+    in the database.
+
+    Parameters
+    ----------
+    resource_create : schemas.ResourceCreate
+        Pydantic model containing the resource data to be created.
+    eunomia_id : str
+        Unique identifier for the resource.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    schemas.Resource
+        The created resource as a Pydantic model, including its ID and registration timestamp.
+    """
     db_resource = models.Resource(
         eunomia_id=eunomia_id,
         content=resource_create.content,
@@ -46,7 +65,26 @@ def _create_resource_metadata(
 def create_principal(
     principal_create: schemas.PrincipalCreate, eunomia_id: str, db: Session
 ) -> schemas.Principal:
-    """Create a new resource in db"""
+    """
+    Create a new principal in the database.
+
+    This function creates a new principal record and its associated metadata
+    in the database.
+
+    Parameters
+    ----------
+    principal_create : schemas.PrincipalCreate
+        Pydantic model containing the principal data to be created.
+    eunomia_id : str
+        Unique identifier for the principal.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    schemas.Principal
+        The created principal as a Pydantic model, including its ID and registration timestamp.
+    """
     db_principal = models.Principal(
         eunomia_id=eunomia_id,
         registered_at=datetime.now(),
@@ -80,7 +118,29 @@ def _create_principal_metadata(
 
 
 def get_resource_metadata(eunomia_id: str, db: Session) -> dict:
-    """Given a eunomia_id for a Resource, this function returns its associated metadata as a dictionary, where each key is the metadata key and each value is the metadata value."""
+    """
+    Retrieve metadata for a resource by its unique identifier.
+
+    This function retrieves all metadata associated with a specific resource
+    and returns it as a dictionary.
+
+    Parameters
+    ----------
+    eunomia_id : str
+        Unique identifier of the resource.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    dict
+        Dictionary containing all metadata key-value pairs for the resource.
+
+    Raises
+    ------
+    ValueError
+        If no resource with the specified eunomia_id is found.
+    """
     stmt = select(models.Resource).where(models.Resource.eunomia_id == eunomia_id)
     resource = db.scalars(stmt).first()
 
@@ -94,7 +154,29 @@ def get_resource_metadata(eunomia_id: str, db: Session) -> dict:
 
 
 def get_principal_metadata(eunomia_id: str, db: Session) -> dict:
-    """Given a eunomia_id for a Principal, this function returns its associated metadata as a dictionary, where each key is the metadata key and each value is the metadata value."""
+    """
+    Retrieve metadata for a principal by its unique identifier.
+
+    This function retrieves all metadata associated with a specific principal
+    and returns it as a dictionary.
+
+    Parameters
+    ----------
+    eunomia_id : str
+        Unique identifier of the principal.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    dict
+        Dictionary containing all metadata key-value pairs for the principal.
+
+    Raises
+    ------
+    ValueError
+        If no principal with the specified eunomia_id is found.
+    """
     stmt = select(models.Principal).where(models.Principal.eunomia_id == eunomia_id)
     resource = db.scalars(stmt).first()
 
