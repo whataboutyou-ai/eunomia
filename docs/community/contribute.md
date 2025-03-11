@@ -38,8 +38,8 @@ Before pushing your changes, ensure the tests pass and the code style aligns:
 
 ```bash
 uv run pytest
-uv run black .
-uv run isort --profile black .
+ruff check
+ruff format
 ```
 
 _Note: a GitHub workflow will check the tests and formatting and reject the PR if it doesn't pass, so please make sure it passes locally._
