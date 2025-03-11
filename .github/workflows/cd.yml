@@ -21,16 +21,16 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.12'
-          cache: 'poetry'
+          version: "0.6.3"
+          python-version-file: ".python-version"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
-        run: poetry install --only docs
+        run: uv sync --only-group docs
 
       - name: Deploy documentation
-        run: poetry run mkdocs gh-deploy --force
+        run: uv run mkdocs gh-deploy --force

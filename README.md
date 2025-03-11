@@ -1,6 +1,11 @@
+# Eunomia
+
 <div align="center" style="margin-bottom: 1em;">
 
-<img src="docs/assets/logo.svg" alt="Eunomia Logo" width=300></img>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/logo-owl-dark.png">
+  <img alt="Eunomia Logo" src="./docs/assets/logo-owl.png" width=300>
+</picture>
 
 _Authorization layer for AI Agents_
 
@@ -10,33 +15,45 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 </div>
 
-> [!WARNING]  
-> Eunomia is currently under a major restructuring.
->
-> Stay tuned for a new release or join the [Discord][discord] to access the preview.
+## Get Started
 
-## Why Eunomia?
+Eunomia is a standalone server to decouple the authorization logic from the main architecture of your AI Agent.
 
-As AI-driven applications evolve, the necessity of separating authorization concerns from core logic becomes more apparent. By implementing policy enforcement as a distinct service, developers can ensure that AI Agents operate efficiently while maintaining the flexibility needed to adapt to changing security landscapes.
+### Installation
 
-This library aims to provide a structured approach to **decoupling authorization policies from AI Agent architectures**, enabling developers to focus on agents' performance while ensuring robust and scalable security mechanisms.
+Install the `eunomia` package via pip:
 
-![schema](docs/assets/eunomia_schema.png)
+```bash
+pip install eunomia-ai
+```
 
-> [!NOTE]  
-> Currently, this library encompasses the first iterations of this framework where we tested integrating specific data redaction tools, agentic frameworks, and access policy rules.
->
-> Some examples are:
->
-> - Integration with Anthropic's MCP: [link][eunomia-mcp]
-> - Text redaction with Microsoft Predisidio and custom fintuned models hosted on Hugging Face
-> - Role-based and ID-based policy enforcement
->
-> After testing and validating the framework against the mentioned concrete cases, we are now working on making this library more generic and easier to extend.
+### Running the Server
 
-Stay tuned for the new release!
+The server can be served locally with:
+
+```bash
+fastapi dev src/eunomia/api/main.py
+```
+
+### Usage
+
+Check out the [quickstart example][docs-quickstart] in the documentation for a fully working example.
+
+## Eunomia SDKs
+
+Different packages are available in this repository for an easier interaction with the server. These packages make the integration of Eunomia inside your AI application as seamless as possible within your favorite development framework.
+
+The following packages are currently available:
+
+- [Python](sdks/python)
+- [LangChain](sdks/langchain)
+- ...and more coming soon!
+
+## Documentation
+
+For more examples and detailed usage, check out the [documentation][docs].
 
 [whataboutyou-website]: https://whataboutyou.ai
 [docs]: https://whataboutyou-ai.github.io/eunomia/
+[docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [discord]: https://discord.gg/TyhGZtzg3G
-[eunomia-mcp]: https://github.com/whataboutyou-ai/eunomia-mcp-server

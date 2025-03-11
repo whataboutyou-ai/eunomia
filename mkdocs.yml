@@ -3,12 +3,12 @@ site_name: Eunomia
 repo_name: whataboutyou-ai/eunomia
 repo_url: https://github.com/whataboutyou-ai/eunomia
 
-copyright: Copyright &copy; 2024 - eunomia authors
+copyright: Copyright &copy; 2025 - Eunomia authors
 
 theme:
   name: material
-  logo: assets/logo.svg
-  favicon: assets/icon.svg
+  logo: assets/logo-owl.png
+  favicon: assets/logo-owl.png
   palette:
     primary: white
   font:
@@ -25,7 +25,6 @@ theme:
     - navigation.instant.progress
     - navigation.top
     - content.code.copy
-    - content.tabs.link
     - announce.dismiss
   custom_dir: docs/overrides
 
@@ -62,29 +61,34 @@ extra:
       link: https://pypi.org/project/eunomia-ai/
       name: eunomia on PyPi
 
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_root_heading: true
+            heading_level: 3
+
 nav:
   - Home: index.md
   - Getting Started:
-    - get_started/index.md
-    - Installation: get_started/installation.md
-    - Quickstart: get_started/quickstart.md
-    - License: get_started/license.md
+      - get_started/index.md
+      - Installation: get_started/installation.md
+      - Quickstart: get_started/quickstart.md
+      - License: get_started/license.md
   - Docs:
-    - api/index.md
-    - Orchestra: api/orchestra.md
-    - Instruments:
-      - api/instruments/index.md
-      - PII Instrument: api/instruments/pii_instrument.md
-      - Financials Instrument: api/instruments/financials_instrument.md
-      - RBAC Instrument: api/instruments/rbac_instrument.md
-      - IDBAC Instrument: api/instruments/idbac_instrument.md
-      - SQL Instrument: api/instruments/sql_instrument.md
-  - Cookbook:
-    - cookbook/index.md
-    - Managing PII in Support Tickets: cookbook/pii_tutorial.md
-  - Integrations: 
-      - integrations/index.md
-      - Model Context Protocol (MCP): integrations/mcp.md
+      - server/index.md
+      - APIs: server/apis.md
+      - Config: server/config.md
+      - DB: server/db.md
+      - Engine: server/engine.md
+      - Server: server/server.md
+  - SDKs:
+      - sdks/index.md
+      - Python SDK: sdks/python.md
+      - LangChain SDK: sdks/langchain.md
   - Community:
-    - community/index.md
-    - How to Contribute: community/contribute.md
+      - community/index.md
+      - How to Contribute: community/contribute.md
