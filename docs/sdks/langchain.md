@@ -10,7 +10,7 @@ Install the `eunomia-sdk-langchain` package via pip:
 pip install eunomia-sdk-langchain
 ```
 
-## API Documentation
+## SDK Docs
 
 ::: eunomia_sdk_langchain.document_loader.EunomiaLoader
 
