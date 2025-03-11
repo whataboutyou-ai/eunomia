@@ -1,6 +1,6 @@
 # Eunomia SDK for Python
 
-This package allows you to integrate Eunomia inside your Python application, providing a client to interact with the Eunomia server.
+This package allows you to integrate [Eunomia][eunomia-github] inside your Python application, providing a client to interact with the Eunomia server.
 
 ## Installation
 
@@ -33,4 +33,5 @@ is_allowed = client.check_access(
 
 For detailed usage, check out the SDK's [documentation][docs].
 
+[eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [docs]: https://whataboutyou-ai.github.io/eunomia/sdks/python/
