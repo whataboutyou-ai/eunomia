@@ -25,7 +25,6 @@ theme:
     - navigation.instant.progress
     - navigation.top
     - content.code.copy
-    - content.tabs.link
     - announce.dismiss
   custom_dir: docs/overrides
 

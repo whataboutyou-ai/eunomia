@@ -18,9 +18,8 @@ class EunomiaServer:
         Check access of the principal specified by principal_id to the resource specified by resource_id.
         This function calls the OPA server and returns the decision.
         """
-        access_method_url = None
         if access_method != "allow":
-            raise NotImplemented()
+            raise NotImplementedError("Only allow method is supported")
 
         ## Get principal and resource metadata
         db_session = next(db.get_db())

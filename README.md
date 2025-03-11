@@ -35,9 +35,9 @@ The server can be served locally with:
 fastapi dev src/eunomia/api/main.py
 ```
 
-### Basic Usage
+### Usage
 
-TODO
+Check out the [quickstart example][docs-quickstart] in the documentation for a fully working example.
 
 ## Eunomia SDKs
 
@@ -55,4 +55,5 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 [whataboutyou-website]: https://whataboutyou.ai
 [docs]: https://whataboutyou-ai.github.io/eunomia/
+[docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [discord]: https://discord.gg/TyhGZtzg3G
