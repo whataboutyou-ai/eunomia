@@ -1,3 +1,19 @@
+.md-typeset a {
+  color: #ca8a04;
+}
+
+.md-typeset a:hover {
+  color: #facc15;
+}
+
+.md-nav__link--active {
+  color: #ca8a04 !important;
+}
+
+.md-nav__link:hover {
+  color: #facc15 !important;
+}
+
 .md-button {
   color: black !important;
   border-color: black !important;
@@ -5,11 +21,11 @@
   border-radius: 6px !important;
   padding: 0.4rem 0.8rem !important;
 }
-.md-button:hover {
-  background-color: black !important;
-  color: hsl(47.9, 95.8%, 53.1%) !important;
-}
 .md-button--primary {
   background-color: black !important;
   color: white !important;
+}
+.md-button:hover {
+  background-color: #facc15 !important;
+  color: black !important;
 }
