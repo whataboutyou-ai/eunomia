@@ -62,6 +62,7 @@ extra:
       name: eunomia on PyPi
 
 plugins:
+  - search
   - mkdocstrings:
       default_handler: python
       handlers:
