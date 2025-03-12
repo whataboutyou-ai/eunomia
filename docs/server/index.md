@@ -6,8 +6,8 @@ The Eunomia server is a standalone service to handle the authorization logic of 
 
 Interactions from your application to the Eunomia server are held in two different phases:
 
-- **Configuration**: use Eunomia to define and configure the authorization policies. The server allows you to store metadata for principals and resources which can then be used to define the policies.
-- **Enforcement**: your application can communicate with the server to check if a given principal has access to a specific resource. At runtime, the server retrieves the metadata stored in the previous phase for the given principal and resource and then evaluate them against the defined policies.
+- **Configuration Phase**: use Eunomia to define and configure the authorization policies. The server allows you to store metadata for principals and resources which can then be used to define the policies.
+- **Enforcement Phase**: your application can communicate with the server to check if a given principal has access to a specific resource. At runtime, the server retrieves the metadata stored in the previous phase for the given principal and resource and then evaluate them against the defined policies.
 
 The Eunomia server is built on top of [Open Policy Agent (OPA)][opa-website] which Eunomia will try to install automatically if it is not already present in your system.
 

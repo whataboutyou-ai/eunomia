@@ -6,7 +6,7 @@ Let's assume you have a multi-agent system where an orchestrator routes the user
 
 You first need to **configure** the policies with the Eunomia server. Then, you need to connect your application to the Eunomia server in order to **enforce** the policies at runtime.
 
-### Configuration
+### Configuration Phase
 
 #### Policy definition
 
@@ -41,7 +41,10 @@ You can now start the Eunomia server:
 fastapi dev src/eunomia/api/main.py
 ```
 
-Register the resources and principals you want to use with the Eunomia server (to use the Python SDK, check out its [documentation](../sdks/python.md) for installation instructions):
+!!! warning
+    This registration step is mandatory right now, but will be made optional in the future - allowing you to directly pass the resources and principals metadata at runtime.
+
+You now need to register the resources and principals you want to use with the Eunomia server:
 
 === "Python"
     ```python
@@ -49,10 +52,11 @@ Register the resources and principals you want to use with the Eunomia server (t
     
     eunomia = EunomiaClient()
 
-    eunomia.register_resource(metadatas={"agent_id": "faq"})
-    eunomia.register_resource(metadatas={"agent_id": "hr"})
-    eunomia.register_principal(metadatas={"department": "hr"})
-    eunomia.register_principal(metadatas={"department": "sales"})
+    faq_agent = eunomia.register_resource(metadatas={"agent_id": "faq"})
+    hr_agent = eunomia.register_resource(metadatas={"agent_id": "hr"})
+
+    user_hr_department = eunomia.register_principal(metadatas={"department": "hr"})
+    user_sales_department = eunomia.register_principal(metadatas={"department": "sales"})
     ```
 
 === "Curl"
@@ -71,7 +75,10 @@ Register the resources and principals you want to use with the Eunomia server (t
     {"status": "success", "eunomia_id": "4f609741-7800-44f6-a1d6-640d6fe9bf01"}
     ```
 
-### Enforcement
+!!! info
+    To use the Python SDK, check out its [documentation](../sdks/python.md) for installation instructions.
+
+### Enforcement Phase
 
 Now, you can enforce the policies in your application at runtime:
 
@@ -81,15 +88,19 @@ Now, you can enforce the policies in your application at runtime:
     
     eunomia = EunomiaClient()
 
-    faq_agent_id = "76d66319-cfb2-4f12-a30a-689dc9dd58b0"
-    hr_agent_id = "e86e248b-2b51-4d34-abb3-3302c047cb72"
-    hr_user_id = "c194e9e4-1086-4d9b-89cb-2236e5158d36"
-    sales_user_id = "4f609741-7800-44f6-a1d6-640d6fe9bf01"
+    eunomia.check_access(user_hr_department["eunomia_id"], faq_agent["eunomia_id"])
+    eunomia.check_access(user_hr_department["eunomia_id"], hr_agent["eunomia_id"])
 
-    eunomia.check_access(hr_user_id, faq_agent_id)
-    eunomia.check_access(hr_user_id, hr_agent_id)
-    eunomia.check_access(sales_user_id, faq_agent_id)
-    eunomia.check_access(sales_user_id, hr_agent_id)
+    eunomia.check_access(user_sales_department["eunomia_id"], faq_agent["eunomia_id"])
+    eunomia.check_access(user_sales_department["eunomia_id"], hr_agent["eunomia_id"])
+    ```
+
+=== "Curl"
+    ```bash
+    curl -X GET http://localhost:8000/check_access?principal_id=c194e9e4-1086-4d9b-89cb-2236e5158d36&resource_id=76d66319-cfb2-4f12-a30a-689dc9dd58b0
+    curl -X GET http://localhost:8000/check_access?principal_id=c194e9e4-1086-4d9b-89cb-2236e5158d36&resource_id=e86e248b-2b51-4d34-abb3-3302c047cb72
+    curl -X GET http://localhost:8000/check_access?principal_id=4f609741-7800-44f6-a1d6-640d6fe9bf01&resource_id=76d66319-cfb2-4f12-a30a-689dc9dd58b0
+    curl -X GET http://localhost:8000/check_access?principal_id=4f609741-7800-44f6-a1d6-640d6fe9bf01&resource_id=e86e248b-2b51-4d34-abb3-3302c047cb72
     ```
 
 === "Output"

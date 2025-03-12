@@ -29,6 +29,9 @@ theme:
   custom_dir: docs/overrides
 
 markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -42,8 +45,8 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - attr_list
-  - md_in_html
+  - pymdownx.tasklist:
+      custom_checkbox: true
 
 extra_css:
   - stylesheets/extra.css
@@ -62,6 +65,7 @@ extra:
       name: eunomia on PyPi
 
 plugins:
+  - search
   - mkdocstrings:
       default_handler: python
       handlers:

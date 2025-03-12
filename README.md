@@ -13,6 +13,12 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 [Read the docs][docs] · [Join the Discord][discord]
 
+[![PyPi][pypi-badge]][pypi]
+[![CI][ci-badge]][ci]
+[![CD][cd-badge]][cd]
+[![License][license-badge]][license]
+[![Discord][discord-badge]][discord]
+
 </div>
 
 ## Get Started
@@ -56,4 +62,13 @@ For more examples and detailed usage, check out the [documentation][docs].
 [whataboutyou-website]: https://whataboutyou.ai
 [docs]: https://whataboutyou-ai.github.io/eunomia/
 [docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
+[pypi]: https://pypi.python.org/pypi/eunomia-ai
+[pypi-badge]: https://img.shields.io/pypi/v/eunomia-ai.svg
+[ci]: https://github.com/whataboutyou-ai/eunomia/actions/workflows/ci.yml
+[ci-badge]: https://github.com/whataboutyou-ai/eunomia/actions/workflows/ci.yml/badge.svg
+[cd]: https://github.com/whataboutyou-ai/eunomia/actions/workflows/cd.yml
+[cd-badge]: https://github.com/whataboutyou-ai/eunomia/actions/workflows/cd.yml/badge.svg
+[license]: https://github.com/whataboutyou-ai/eunomia/blob/main/LICENSE
+[license-badge]: https://img.shields.io/github/license/whataboutyou-ai/eunomia.svg?v
 [discord]: https://discord.gg/TyhGZtzg3G
+[discord-badge]: https://dcbadge.vercel.app/api/server/TyhGZtzg3G?style=flat&theme=default-inverted
