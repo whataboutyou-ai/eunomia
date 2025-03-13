@@ -49,10 +49,10 @@ Check out the [quickstart example][docs-quickstart] in the documentation for a f
 
 Different packages are available in this repository for an easier interaction with the server. These packages make the integration of Eunomia inside your AI application as seamless as possible within your favorite development framework.
 
-The following packages are currently available:
+The following integrations are currently available:
 
-- [Python](sdks/python)
-- [LangChain](sdks/langchain)
+- [Python](pkgs/sdks/python)
+- [LangChain](pkgs/sdks/langchain)
 - ...and more coming soon!
 
 ## Documentation
