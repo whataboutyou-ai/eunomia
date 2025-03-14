@@ -1,10 +1,10 @@
 from typing import List
 
 import httpx
-from eunomia_core import enums, schemas
+from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.db import crud
+from eunomia.db import crud, models
 from eunomia.engine.opa import OpaPolicyEngine
 
 
@@ -88,52 +88,35 @@ class EunomiaServer:
     async def allowed_resources(self, principal_uri: str) -> List[str]:
         raise NotImplementedError("Allowed resources not implemented")
 
-    async def register_resource(self, attributes: dict, db: Session) -> str:
+    def register_entity(
+        self, entity: schemas.EntityCreate, db: Session
+    ) -> models.Entity:
         """
-        Register a new resource in the system.
+        Register a new entity in the system.
 
-        Creates a new resource with the provided attributes,
-        generating a unique identifier for future reference.
+        Creates a new entity with the provided attributes,
+        generating a unique identifier for future reference,
+        if not provided.
 
         Parameters
         ----------
-        attributes : dict
-            Dictionary containing attributes about the resource.
+        entity : schemas.EntityCreate
+            Pydantic model containing attributes about the entity.
         db : Session
             The SQLAlchemy database session.
 
         Returns
         -------
-        str
-            The generated unique identifier for the resource.
+        models.Entity
+            The generated entity.
+
+        Raises
+        ------
+        ValueError
+            If the entity is already registered.
         """
-        resource = schemas.EntityCreate(
-            type=enums.EntityType.resource, attributes=attributes
-        )
-        _ = crud.create_entity(resource, db=db)
-        return resource.uri
-
-    async def register_principal(self, attributes: dict, db: Session) -> str:
-        """
-        Register a new principal in the system.
-
-        Creates a new principal with the provided attributes,
-        generating a unique identifier for future reference.
-
-        Parameters
-        ----------
-        attributes : dict
-            Dictionary containing attributes about the principal.
-        db : Session
-            The SQLAlchemy database session.
-
-        Returns
-        -------
-        str
-            The generated unique identifier for the principal.
-        """
-        principal = schemas.EntityCreate(
-            type=enums.EntityType.principal, attributes=attributes
-        )
-        _ = crud.create_entity(principal, db=db)
-        return principal.uri
+        db_entity = crud.get_entity(entity.uri, db=db)
+        if db_entity is not None:
+            raise ValueError(f"Entity with uri '{entity.uri}' is already registered")
+        db_entity = crud.create_entity(entity, db=db)
+        return db_entity

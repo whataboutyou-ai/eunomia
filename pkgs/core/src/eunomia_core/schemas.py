@@ -1,9 +1,9 @@
-import uuid
 from datetime import datetime
 from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
+from eunomia_core import utils
 from eunomia_core.enums import EntityType
 
 
@@ -30,12 +30,18 @@ class EntityBase(BaseModel):
 
 class EntityCreate(EntityBase):
     uri: Optional[str] = Field(
-        default_factory=lambda: str(uuid.uuid4()),
+        default_factory=utils.generate_uri,
         description="Optional unique identifier for the entity, if not provided, the server will generate a random UUID",
     )
     attributes: list[AttributeCreate] | dict = Field(
-        default_factory=list, description="Entity attributes"
+        default_factory=list,
+        description="Entity attributes, either as a list of key, value pairs or a dictionary",
     )
+
+    @field_validator("uri", mode="before")
+    @classmethod
+    def validate_uri(cls, v):
+        return v if v is not None else utils.generate_uri()
 
     @field_validator("attributes", mode="before")
     @classmethod

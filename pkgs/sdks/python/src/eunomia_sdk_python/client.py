@@ -1,6 +1,7 @@
 import os
 
 import httpx
+from eunomia_core import enums, schemas
 
 
 class EunomiaClient:
@@ -62,50 +63,36 @@ class EunomiaClient:
         params = {"principal_id": principal_id, "resource_id": resource_id}
         response = self.client.get("/check-access", params=params)
         response.raise_for_status()
-        return response.json()
+        return bool(response.json())
 
-    def register_principal(self, metadatas: dict) -> dict:
-        """Register a new principal with the Eunomia server and obtain its Eunomia ID.
+    def register_entity(
+        self, type: enums.EntityType, attributes: dict, uri: str | None = None
+    ) -> schemas.Entity:
+        """Register a new entity with the Eunomia server.
+
+        This method registers a new entity with its attributes to the Eunomia server.
+        If no uri identifier is provided, the server will generate a random UUID.
 
         Parameters
         ----------
-        metadatas : dict
-            A dictionary containing metadata for the principal.
+        type : enums.EntityType
+            The type of entity to register. Either "resource", "principal" or "any".
+        attributes : dict
+            The attributes to associate with the entity.
+        uri : str | None, optional
+            The uri for the entity. If not provided, the server will generate a random UUID.
 
         Returns
         -------
-        dict
-            The JSON response from the server, including the newly registered principal's Eunomia ID.
+        schemas.Entity
+            The newly registered entity.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        json_body = {"metadata": metadatas}
-        response = self.client.post("/register_principal", json=json_body)
+        entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
+        response = self.client.post("/register-entity", json=entity.model_dump())
         response.raise_for_status()
-        return response.json()
-
-    def register_resource(self, metadatas: dict) -> dict:
-        """Register a new resource with the Eunomia server and obtain its Eunomia ID.
-
-        Parameters
-        ----------
-        metadatas : dict
-            A dictionary containing metadata for the resource.
-
-        Returns
-        -------
-        dict
-            The JSON response from the server, including the newly registered resource's Eunomia ID.
-
-        Raises
-        ------
-        httpx.HTTPStatusError
-            If the HTTP request returns an unsuccessful status code.
-        """
-        json_body = {"metadata": metadatas}
-        response = self.client.post("/register_resource", json=json_body)
-        response.raise_for_status()
-        return response.json()
+        return schemas.Entity.model_validate(response.json())

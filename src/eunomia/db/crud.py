@@ -40,6 +40,25 @@ def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:
     return db_entity
 
 
+def get_entity(uri: str, db: Session) -> models.Entity | None:
+    """
+    Retrieve an entity from the database by its unique identifier.
+
+    Parameters
+    ----------
+    uri : str
+        Unique identifier of the entity.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    models.Entity | None
+        The entity as a SQLAlchemy model or None if it does not exist.
+    """
+    return db.query(models.Entity).filter(models.Entity.uri == uri).first()
+
+
 def get_entity_attributes(uri: str, db: Session) -> dict:
     """
     Retrieve attributes for a resource by its unique identifier.
@@ -64,8 +83,7 @@ def get_entity_attributes(uri: str, db: Session) -> dict:
     ValueError
         If no entity with the specified uri is found.
     """
-    db_entity = db.query(models.Entity).filter(models.Entity.uri == uri).first()
+    db_entity = get_entity(uri, db)
     if db_entity is None:
-        raise ValueError("Entity not found.")
-
+        raise ValueError(f"Entity with uri '{uri}' not found.")
     return {attribute.key: attribute.value for attribute in db_entity.attributes}
