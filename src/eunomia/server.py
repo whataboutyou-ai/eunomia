@@ -1,9 +1,10 @@
-import uuid
 from typing import List
 
 import httpx
+from eunomia_core import enums, schemas
+from sqlalchemy.orm import Session
 
-from eunomia.db import crud, db, schemas
+from eunomia.db import crud
 from eunomia.engine.opa import OpaPolicyEngine
 
 
@@ -19,21 +20,27 @@ class EunomiaServer:
         self._engine = OpaPolicyEngine()
 
     async def check_access(
-        self, principal_id: str, resource_id: str, access_method: str = "allow"
+        self,
+        principal_uri: str,
+        resource_uri: str,
+        db: Session,
+        access_method: str = "allow",
     ) -> bool:
         """
         Check if a principal has access to a specific resource.
 
-        This method first get resource and principals metadata and then
+        This method first get resource and principals attributes and then
         queries the OPA server to determine if the specified principal
         is allowed to access the specified resource.
 
         Parameters
         ----------
-        principal_id : str
+        principal_uri : str
             Unique identifier for the principal requesting access.
-        resource_id : str
+        resource_uri : str
             Unique identifier for the resource being accessed.
+        db : Session
+            The SQLAlchemy database session.
         access_method : str, optional
             The type of access to check. Currently only "allow" is supported.
 
@@ -52,18 +59,20 @@ class EunomiaServer:
         if access_method != "allow":
             raise NotImplementedError("Only allow method is supported")
 
-        ## Get principal and resource metadata
-        db_session = next(db.get_db())
-        resource_metadata = crud.get_resource_metadata(resource_id, db_session)
-        principal_metadata = crud.get_principal_metadata(principal_id, db_session)
+        ## Get principal and resource attributes
+        resource_attributes = crud.get_entity_attributes(resource_uri, db=db)
+        principal_attributes = crud.get_entity_attributes(principal_uri, db=db)
 
         input_data = {
             "input": {
                 "principal": {
-                    "eunomia_id": principal_id,
-                    "metadata": principal_metadata,
+                    "uri": principal_uri,
+                    "attributes": principal_attributes,
                 },
-                "resource": {"eunomia_id": resource_id, "metadata": resource_metadata},
+                "resource": {
+                    "uri": resource_uri,
+                    "attributes": resource_attributes,
+                },
             }
         }
 
@@ -76,55 +85,55 @@ class EunomiaServer:
             decision = result.get("result", False)
             return bool(decision)
 
-    async def allowed_resources(self, principal_id: str) -> List[str]:
+    async def allowed_resources(self, principal_uri: str) -> List[str]:
         raise NotImplementedError("Allowed resources not implemented")
 
-    async def register_resource(
-        self, metadata: dict, content: str | None = None
-    ) -> str:
+    async def register_resource(self, attributes: dict, db: Session) -> str:
         """
         Register a new resource in the system.
 
-        Creates a new resource with the provided metadata and content,
+        Creates a new resource with the provided attributes,
         generating a unique identifier for future reference.
 
         Parameters
         ----------
-        metadata : dict
-            Dictionary containing metadata about the resource.
-        content : str, optional, default=None
-            The content of the resource as a string.
+        attributes : dict
+            Dictionary containing attributes about the resource.
+        db : Session
+            The SQLAlchemy database session.
 
         Returns
         -------
         str
-            The generated unique identifier (eunomia_id) for the resource.
+            The generated unique identifier for the resource.
         """
-        new_resource = schemas.ResourceCreate(metadatas=metadata, content=content)
-        db_session = next(db.get_db())
-        eunomia_id = str(uuid.uuid4())
-        crud.create_resource(new_resource, eunomia_id, db=db_session)
-        return eunomia_id
+        resource = schemas.EntityCreate(
+            type=enums.EntityType.resource, attributes=attributes
+        )
+        _ = crud.create_entity(resource, db=db)
+        return resource.uri
 
-    async def register_principal(self, metadata: dict) -> str:
+    async def register_principal(self, attributes: dict, db: Session) -> str:
         """
         Register a new principal in the system.
 
-        Creates a new principal with the provided metadata,
+        Creates a new principal with the provided attributes,
         generating a unique identifier for future reference.
 
         Parameters
         ----------
-        metadata : dict
-            Dictionary containing metadata about the principal.
+        attributes : dict
+            Dictionary containing attributes about the principal.
+        db : Session
+            The SQLAlchemy database session.
 
         Returns
         -------
         str
-            The generated unique identifier (eunomia_id) for the principal.
+            The generated unique identifier for the principal.
         """
-        new_principal = schemas.PrincipalCreate(metadatas=metadata)
-        db_session = next(db.get_db())
-        eunomia_id = str(uuid.uuid4())
-        crud.create_principal(new_principal, eunomia_id, db=db_session)
-        return eunomia_id
+        principal = schemas.EntityCreate(
+            type=enums.EntityType.principal, attributes=attributes
+        )
+        _ = crud.create_entity(principal, db=db)
+        return principal.uri

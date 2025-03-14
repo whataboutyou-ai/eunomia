@@ -109,27 +109,3 @@ class EunomiaClient:
         response = self.client.post("/register_resource", json=json_body)
         response.raise_for_status()
         return response.json()
-
-    # TODO: Change output function once defined Resource
-    def allowed_resources(self, principal_id: str) -> list[str]:
-        """Retrieve a list of resources that the specified principal has access to.
-
-        Parameters
-        ----------
-        principal_id : str
-            The identifier of the principal.
-
-        Returns
-        -------
-        list[str]
-            A list of resource identifiers that the principal can access.
-
-        Raises
-        ------
-        httpx.HTTPStatusError
-            If the HTTP request returns an unsuccessful status code.
-        """
-        params = {"principal_id": principal_id}
-        response = self.client.get("/allowed-resources", params=params)
-        response.raise_for_status()
-        return response.json()

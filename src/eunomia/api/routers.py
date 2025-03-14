@@ -1,8 +1,10 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import httpx
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from eunomia.db import db
 from eunomia.server import EunomiaServer
 
 router = APIRouter()
@@ -10,20 +12,11 @@ server = EunomiaServer()
 
 
 @router.get("/check-access")
-async def check_access(principal_id: str, resource_id: str) -> bool:
+async def check_access(
+    principal_id: str, resource_id: str, db_session: Session = Depends(db.get_db)
+) -> bool:
     try:
-        return await server.check_access(principal_id, resource_id)
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"OPA call failed: {exc}",
-        )
-
-
-@router.get("/allowed-resources")
-async def allowed_resources(principal_id: str) -> List[str]:
-    try:
-        return await server.allowed_resources(principal_id)
+        return await server.check_access(principal_id, resource_id, db=db_session)
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -32,7 +25,9 @@ async def allowed_resources(principal_id: str) -> List[str]:
 
 
 @router.post("/register_resource")
-async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
+async def register_resource(
+    payload: Dict[str, Any], db_session: Session = Depends(db.get_db)
+) -> Dict[str, Any]:
     try:
         resource_metadata = payload.get("metadata", None)
         resource_content = payload.get("content", None)
@@ -43,7 +38,7 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
                 detail="Processing failed: Missing resoure metadata",
             )
 
-        eunomia_id = await server.register_resource(resource_metadata, resource_content)
+        eunomia_id = await server.register_resource(resource_metadata, db=db_session)
         if eunomia_id is not None:
             return {"status": "success", "eunomia_id": eunomia_id}
         else:
@@ -63,7 +58,9 @@ async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @router.post("/register_principal")
-async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
+async def register_principal(
+    payload: Dict[str, Any], db_session: Session = Depends(db.get_db)
+) -> Dict[str, Any]:
     try:
         principal_metadata = payload.get("metadata", None)
 
@@ -73,7 +70,7 @@ async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
                 detail="Processing failed: Missing resoure metadata",
             )
 
-        eunomia_id = await server.register_principal(principal_metadata)
+        eunomia_id = await server.register_principal(principal_metadata, db=db_session)
         if eunomia_id is not None:
             return {"status": "success", "eunomia_id": eunomia_id}
         else:

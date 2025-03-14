@@ -1,189 +1,71 @@
-from datetime import datetime
-
-from sqlalchemy import select
+from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.db import models, schemas
+from eunomia.db import models
 
 
-def create_resource(
-    resource_create: schemas.ResourceCreate, eunomia_id: str, db: Session
-) -> schemas.Resource:
+def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:
     """
-    Create a new resource in the database.
+    Create a new entity in the database.
 
-    This function creates a new resource record and its associated metadata
+    This function creates a new entity record and its associated attributes
     in the database.
 
     Parameters
     ----------
-    resource_create : schemas.ResourceCreate
-        Pydantic model containing the resource data to be created.
-    eunomia_id : str
-        Unique identifier for the resource.
+    entity : schemas.EntityCreate
+        Pydantic model containing the entity data to be created.
     db : Session
         SQLAlchemy database session.
 
     Returns
     -------
-    schemas.Resource
-        The created resource as a Pydantic model, including its ID and registration timestamp.
+    models.Entity
+        The created entity as a SQLAlchemy model.
     """
-    db_resource = models.Resource(
-        eunomia_id=eunomia_id,
-        content=resource_create.content,
-        registered_at=datetime.now(),
+    db_entity = models.Entity(
+        uri=entity.uri,
+        type=entity.type,
     )
-    db.add(db_resource)
+    for attribute in entity.attributes:
+        db_attribute = models.Attribute(
+            key=attribute.key,
+            value=attribute.value,
+        )
+        db_entity.attributes.append(db_attribute)
+
+    db.add(db_entity)
     db.commit()
-    db.refresh(db_resource)
-
-    # add metadata
-    for key, value in resource_create.metadatas.items():
-        _ = _create_resource_metadata(db_resource.id, key, str(value), db)
-
-    doc_schema = schemas.Resource(
-        id=db_resource.id,
-        registered_at=db_resource.registered_at,
-        **resource_create.model_dump(),
-    )
-    return doc_schema
+    db.refresh(db_entity)
+    return db_entity
 
 
-def _create_resource_metadata(
-    resource_id: int, key: str, value: str, db: Session
-) -> models.ResourceMetadata:
-    db_doc_metadata = models.ResourceMetadata(
-        resource_id=resource_id, key=key, value=value
-    )
-    db.add(db_doc_metadata)
-    db.commit()
-    db.refresh(db_doc_metadata)
-    return db_doc_metadata
-
-
-def create_principal(
-    principal_create: schemas.PrincipalCreate, eunomia_id: str, db: Session
-) -> schemas.Principal:
+def get_entity_attributes(uri: str, db: Session) -> dict:
     """
-    Create a new principal in the database.
+    Retrieve attributes for a resource by its unique identifier.
 
-    This function creates a new principal record and its associated metadata
-    in the database.
-
-    Parameters
-    ----------
-    principal_create : schemas.PrincipalCreate
-        Pydantic model containing the principal data to be created.
-    eunomia_id : str
-        Unique identifier for the principal.
-    db : Session
-        SQLAlchemy database session.
-
-    Returns
-    -------
-    schemas.Principal
-        The created principal as a Pydantic model, including its ID and registration timestamp.
-    """
-    db_principal = models.Principal(
-        eunomia_id=eunomia_id,
-        registered_at=datetime.now(),
-    )
-    db.add(db_principal)
-    db.commit()
-    db.refresh(db_principal)
-
-    # add metadata
-    for key, value in principal_create.metadatas.items():
-        _ = _create_principal_metadata(db_principal.id, key, str(value), db)
-
-    doc_schema = schemas.Principal(
-        id=db_principal.id,
-        registered_at=db_principal.registered_at,
-        **principal_create.model_dump(),
-    )
-    return doc_schema
-
-
-def _create_principal_metadata(
-    principal_id: int, key: str, value: str, db: Session
-) -> models.PrincipalMetadata:
-    db_doc_metadata = models.PrincipalMetadata(
-        principal_id=principal_id, key=key, value=value
-    )
-    db.add(db_doc_metadata)
-    db.commit()
-    db.refresh(db_doc_metadata)
-    return db_doc_metadata
-
-
-def get_resource_metadata(eunomia_id: str, db: Session) -> dict:
-    """
-    Retrieve metadata for a resource by its unique identifier.
-
-    This function retrieves all metadata associated with a specific resource
+    This function retrieves all attributes associated with a specific resource
     and returns it as a dictionary.
 
     Parameters
     ----------
-    eunomia_id : str
-        Unique identifier of the resource.
+    uri : str
+        Unique identifier of the entity.
     db : Session
         SQLAlchemy database session.
 
     Returns
     -------
     dict
-        Dictionary containing all metadata key-value pairs for the resource.
+        Dictionary containing all attributes key-value pairs for the entity.
 
     Raises
     ------
     ValueError
-        If no resource with the specified eunomia_id is found.
+        If no entity with the specified uri is found.
     """
-    stmt = select(models.Resource).where(models.Resource.eunomia_id == eunomia_id)
-    resource = db.scalars(stmt).first()
+    db_entity = db.query(models.Entity).filter(models.Entity.uri == uri).first()
+    if db_entity is None:
+        raise ValueError("Entity not found.")
 
-    if not resource:
-        raise ValueError("Resource not found.")
-
-    metadata_dict = {
-        metadata.key: metadata.value for metadata in resource.resources_metadatas
-    }
-    return metadata_dict
-
-
-def get_principal_metadata(eunomia_id: str, db: Session) -> dict:
-    """
-    Retrieve metadata for a principal by its unique identifier.
-
-    This function retrieves all metadata associated with a specific principal
-    and returns it as a dictionary.
-
-    Parameters
-    ----------
-    eunomia_id : str
-        Unique identifier of the principal.
-    db : Session
-        SQLAlchemy database session.
-
-    Returns
-    -------
-    dict
-        Dictionary containing all metadata key-value pairs for the principal.
-
-    Raises
-    ------
-    ValueError
-        If no principal with the specified eunomia_id is found.
-    """
-    stmt = select(models.Principal).where(models.Principal.eunomia_id == eunomia_id)
-    resource = db.scalars(stmt).first()
-
-    if not resource:
-        raise ValueError("Principal not found.")
-
-    metadata_dict = {
-        metadata.key: metadata.value for metadata in resource.principals_metadatas
-    }
-    return metadata_dict
+    return {attribute.key: attribute.value for attribute in db_entity.attributes}
