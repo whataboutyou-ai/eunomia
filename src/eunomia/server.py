@@ -61,22 +61,22 @@ class EunomiaServer:
             raise NotImplementedError("Only allow method is supported")
 
         principal_attributes = {}
-        if principal.attributes:
-            principal_attributes.update(
-                {item.key: item.value for item in principal.attributes}
-            )
         if principal.uri is not None:
             principal_attributes.update(
                 crud.get_entity_attributes(principal.uri, db=db)
             )
+        if principal.attributes:
+            principal_attributes.update(
+                {item.key: item.value for item in principal.attributes}
+            )
 
         resource_attributes = {}
+        if resource.uri is not None:
+            resource_attributes.update(crud.get_entity_attributes(resource.uri, db=db))
         if resource.attributes:
             resource_attributes.update(
                 {item.key: item.value for item in resource.attributes}
             )
-        if resource.uri is not None:
-            resource_attributes.update(crud.get_entity_attributes(resource.uri, db=db))
 
         input_data = {
             "input": {
