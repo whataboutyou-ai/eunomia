@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 import httpx
@@ -21,8 +22,8 @@ class EunomiaServer:
 
     async def check_access(
         self,
-        principal_uri: str,
-        resource_uri: str,
+        principal: schemas.PrincipalRequest,
+        resource: schemas.ResourceRequest,
         db: Session,
         access_method: str = "allow",
     ) -> bool:
@@ -35,10 +36,10 @@ class EunomiaServer:
 
         Parameters
         ----------
-        principal_uri : str
-            Unique identifier for the principal requesting access.
-        resource_uri : str
-            Unique identifier for the resource being accessed.
+        principal : schemas.PrincipalRequest
+            The principal requesting access, either through it's registered identifier or its attributes.
+        resource : schemas.ResourceRequest
+            The resource being accessed, either through it's registered identifier or its attributes.
         db : Session
             The SQLAlchemy database session.
         access_method : str, optional
@@ -59,22 +60,37 @@ class EunomiaServer:
         if access_method != "allow":
             raise NotImplementedError("Only allow method is supported")
 
-        ## Get principal and resource attributes
-        resource_attributes = crud.get_entity_attributes(resource_uri, db=db)
-        principal_attributes = crud.get_entity_attributes(principal_uri, db=db)
+        principal_attributes = {}
+        if principal.attributes:
+            principal_attributes.update(
+                {item.key: item.value for item in principal.attributes}
+            )
+        if principal.uri is not None:
+            principal_attributes.update(
+                crud.get_entity_attributes(principal.uri, db=db)
+            )
+
+        resource_attributes = {}
+        if resource.attributes:
+            resource_attributes.update(
+                {item.key: item.value for item in resource.attributes}
+            )
+        if resource.uri is not None:
+            resource_attributes.update(crud.get_entity_attributes(resource.uri, db=db))
 
         input_data = {
             "input": {
                 "principal": {
-                    "uri": principal_uri,
+                    "uri": principal.uri,
                     "attributes": principal_attributes,
                 },
                 "resource": {
-                    "uri": resource_uri,
+                    "uri": resource.uri,
                     "attributes": resource_attributes,
                 },
             }
         }
+        print(input_data)
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -89,7 +105,7 @@ class EunomiaServer:
         raise NotImplementedError("Allowed resources not implemented")
 
     def register_entity(
-        self, entity: schemas.EntityCreate, db: Session
+        self, entity: schemas.EntityRequest, db: Session
     ) -> models.Entity:
         """
         Register a new entity in the system.
@@ -100,7 +116,7 @@ class EunomiaServer:
 
         Parameters
         ----------
-        entity : schemas.EntityCreate
+        entity : schemas.EntityRequest
             Pydantic model containing attributes about the entity.
         db : Session
             The SQLAlchemy database session.
@@ -115,8 +131,14 @@ class EunomiaServer:
         ValueError
             If the entity is already registered.
         """
-        db_entity = crud.get_entity(entity.uri, db=db)
-        if db_entity is not None:
-            raise ValueError(f"Entity with uri '{entity.uri}' is already registered")
+        if entity.uri is None:
+            entity.uri = str(uuid.uuid4())
+        else:
+            db_entity = crud.get_entity(entity.uri, db=db)
+            if db_entity is not None:
+                raise ValueError(
+                    f"Entity with uri '{entity.uri}' is already registered"
+                )
+
         db_entity = crud.create_entity(entity, db=db)
         return db_entity

@@ -40,15 +40,25 @@ class EunomiaClient:
             timeout=60,
         )
 
-    def check_access(self, principal_id: str, resource_id: str) -> bool:
+    def check_access(
+        self,
+        principal_uri: str | None = None,
+        resource_uri: str | None = None,
+        principal_attributes: dict = {},
+        resource_attributes: dict = {},
+    ) -> bool:
         """Check whether a principal has access to a specific resource.
 
         Parameters
         ----------
-        principal_id : str
-            The identifier of the principal.
-        resource_id : str
-            The identifier of the resource.
+        principal_uri : str, optional
+            The identifier of the principal. Can be provided for registered principals to automatically retrieve attributes.
+        resource_uri : str, optional
+            The identifier of the resource. Can be provided for registered resources to automatically retrieve attributes.
+        principal_attributes : dict, optional
+            The attributes of the principal. Shall be provided if the principal is not registered.
+        resource_attributes : dict, optional
+            The attributes of the resource. Shall be provided if the resource is not registered.
 
         Returns
         -------
@@ -60,14 +70,21 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        params = {"principal_id": principal_id, "resource_id": resource_id}
-        response = self.client.get("/check-access", params=params)
+        data = {
+            "principal": schemas.PrincipalRequest(
+                uri=principal_uri, attributes=principal_attributes
+            ).model_dump(),
+            "resource": schemas.ResourceRequest(
+                uri=resource_uri, attributes=resource_attributes
+            ).model_dump(),
+        }
+        response = self.client.post("/check-access", json=data)
         response.raise_for_status()
         return bool(response.json())
 
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None
-    ) -> schemas.Entity:
+    ) -> schemas.EntityResponse:
         """Register a new entity with the Eunomia server.
 
         This method registers a new entity with its attributes to the Eunomia server.
@@ -84,7 +101,7 @@ class EunomiaClient:
 
         Returns
         -------
-        schemas.Entity
+        schemas.EntityResponse
             The newly registered entity.
 
         Raises
@@ -92,7 +109,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
+        entity = schemas.EntityRequest(type=type, attributes=attributes, uri=uri)
         response = self.client.post("/register-entity", json=entity.model_dump())
         response.raise_for_status()
-        return schemas.Entity.model_validate(response.json())
+        return schemas.EntityResponse.model_validate(response.json())

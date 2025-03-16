@@ -10,12 +10,14 @@ router = APIRouter()
 server = EunomiaServer()
 
 
-@router.get("/check-access")
+@router.post("/check-access", response_model=bool)
 async def check_access(
-    principal_id: str, resource_id: str, db_session: Session = Depends(db.get_db)
-) -> bool:
+    principal: schemas.PrincipalRequest,
+    resource: schemas.ResourceRequest,
+    db_session: Session = Depends(db.get_db),
+):
     try:
-        return await server.check_access(principal_id, resource_id, db=db_session)
+        return await server.check_access(principal, resource, db=db_session)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -33,10 +35,10 @@ async def check_access(
         )
 
 
-@router.post("/register-entity", response_model=schemas.Entity)
+@router.post("/register-entity", response_model=schemas.EntityResponse)
 async def register_entity(
-    entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
-) -> schemas.Entity:
+    entity: schemas.EntityRequest, db_session: Session = Depends(db.get_db)
+):
     try:
         return server.register_entity(entity, db=db_session)
     except ValueError as exc:

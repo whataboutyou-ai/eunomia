@@ -1,18 +1,17 @@
 from datetime import datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from eunomia_core import utils
 from eunomia_core.enums import EntityType
 
 
-class AttributeCreate(BaseModel):
+class AttributeRequest(BaseModel):
     key: str = Field(..., description="Attribute key")
     value: str = Field(..., description="Attribute value")
 
 
-class Attribute(AttributeCreate):
+class AttributeResponse(AttributeRequest):
     updated_at: datetime = Field(
         description="Time when this attribute was last updated"
     )
@@ -28,41 +27,42 @@ class EntityBase(BaseModel):
     type: EntityType = Field(..., description="Type of entity")
 
 
-class EntityCreate(EntityBase):
+class EntityRequest(EntityBase):
     uri: Optional[str] = Field(
-        default_factory=utils.generate_uri,
-        description="Optional unique identifier for the entity, if not provided, the server will generate a random UUID",
+        default=None,
+        description="Optional unique identifier for the entity",
     )
-    attributes: list[AttributeCreate] | dict = Field(
+    attributes: Optional[list[AttributeRequest] | dict] = Field(
         default_factory=list,
         description="Entity attributes, either as a list of key, value pairs or a dictionary",
     )
 
-    @field_validator("uri", mode="before")
-    @classmethod
-    def validate_uri(cls, v):
-        return v if v is not None else utils.generate_uri()
+    @model_validator(mode="after")
+    def ensure_uri_or_attributes(self) -> "EntityRequest":
+        if not self.uri and not self.attributes:
+            raise ValueError("Either 'uri' or non-empty 'attributes' must be provided")
+        return self
 
     @field_validator("attributes", mode="before")
     @classmethod
     def validate_attributes(cls, v):
         if isinstance(v, dict):
-            return [AttributeCreate(key=k, value=str(val)) for k, val in v.items()]
+            return [AttributeRequest(key=k, value=str(val)) for k, val in v.items()]
         return v
 
 
-class Entity(EntityBase):
+class EntityResponse(EntityBase):
     uri: str = Field(..., description="Unique identifier for the entity")
-    attributes: list[Attribute] = Field(..., description="Entity attributes")
+    attributes: list[AttributeResponse] = Field(..., description="Entity attributes")
     registered_at: datetime = Field(description="Time when this entity was registered")
 
     class Config:
         from_attributes = True
 
 
-class Resource(Entity):
+class ResourceRequest(EntityRequest):
     type: Literal[EntityType.resource, EntityType.any] = EntityType.resource
 
 
-class Principal(Entity):
+class PrincipalRequest(EntityRequest):
     type: Literal[EntityType.principal, EntityType.any] = EntityType.principal
