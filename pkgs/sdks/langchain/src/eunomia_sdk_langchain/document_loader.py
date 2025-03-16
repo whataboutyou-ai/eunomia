@@ -64,7 +64,7 @@ class EunomiaLoader:
         response_data = self._client.register_entity(
             type=enums.EntityType.resource, attributes=doc.metadata
         )
-        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+        doc.metadata["eunomia_uri"] = response_data.uri
         return doc
 
     async def _process_document_async(
@@ -81,7 +81,7 @@ class EunomiaLoader:
                 type=enums.EntityType.resource, attributes=doc.metadata
             ),
         )
-        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+        doc.metadata["eunomia_uri"] = response_data.uri
         return doc
 
     async def alazy_load(
@@ -98,7 +98,8 @@ class EunomiaLoader:
         Yields
         ------
         Document
-            Documents with Eunomia identifiers added to their metadata, yielded one by one.
+            Documents with Eunomia identifiers added to their metadata as 'eunomia_uri',
+            yielded one by one.
 
         Examples
         --------
@@ -129,7 +130,8 @@ class EunomiaLoader:
         Returns
         -------
         List[Document]
-            The list of loaded documents with Eunomia identifiers added to their metadata.
+            The list of loaded documents with Eunomia identifiers added to their metadata
+            as 'eunomia_uri'.
 
         Examples
         --------
@@ -157,7 +159,8 @@ class EunomiaLoader:
         Yields
         ------
         Document
-            Documents with Eunomia identifiers added to their metadata, yielded one by one.
+            Documents with Eunomia identifiers added to their metadata as 'eunomia_uri',
+            yielded one by one.
 
         Examples
         --------
@@ -183,7 +186,8 @@ class EunomiaLoader:
         Returns
         -------
         List[Document]
-            The list of loaded documents with Eunomia identifiers added to their metadata.
+            The list of loaded documents with Eunomia identifiers added to their metadata
+            as 'eunomia_uri'.
 
         Examples
         --------
