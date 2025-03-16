@@ -23,9 +23,8 @@ class Entity(db.Base):
 class Attribute(db.Base):
     __tablename__ = "attributes"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    entity_uri: Mapped[str] = mapped_column(ForeignKey(Entity.uri))
-    key: Mapped[str]
+    entity_uri: Mapped[str] = mapped_column(ForeignKey(Entity.uri), primary_key=True)
+    key: Mapped[str] = mapped_column(primary_key=True)
     value: Mapped[str]
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
