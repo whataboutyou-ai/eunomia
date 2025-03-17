@@ -21,6 +21,19 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 </div>
 
+## Overview
+
+Traditional authorization layers, focused on user-resource separation, become obsolete with AI agents. These agents, both autonomous and controllable, necessitate a new permission paradigm.
+
+The ability for agents to access tools—executable actions beyond static data—and initiate interactions with other agents introduced policy requirements that legacy systems couldn't meet. This duality demands dynamic yet deterministic boundaries that adapt to context, reflecting their role as both actor and resource.
+
+What About You aims at solving this with Eunomia, its open source, developer oriented, authorization framework that:
+
+- Makes it possible to consider agents as both actors and resources
+- Enforces dynamic yet deterministic policies based on static and contextual attributes
+- Enables leaner agent architectures with decoupled authorization logic
+- Preserves agent decision-making while enforcing security
+
 ## Get Started
 
 Eunomia is a standalone server to decouple the authorization logic from the main architecture of your AI Agent.
