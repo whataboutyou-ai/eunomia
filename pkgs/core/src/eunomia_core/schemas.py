@@ -61,8 +61,28 @@ class EntityResponse(EntityBase):
 
 
 class ResourceRequest(EntityRequest):
+    """
+    Resource entity.
+    The type is always overridden to "resource", although it can accept "any" as input.
+    """
+
     type: Literal[EntityType.resource, EntityType.any] = EntityType.resource
+
+    @field_validator("type", mode="after")
+    @classmethod
+    def normalize_type(cls, v):
+        return EntityType.resource
 
 
 class PrincipalRequest(EntityRequest):
+    """
+    Principal entity.
+    The type is always overridden to "principal", although it can accept "any" as input.
+    """
+
     type: Literal[EntityType.principal, EntityType.any] = EntityType.principal
+
+    @field_validator("type", mode="after")
+    @classmethod
+    def normalize_type(cls, v):
+        return EntityType.principal
