@@ -12,12 +12,10 @@ server = EunomiaServer()
 
 @router.post("/check-access", response_model=bool)
 async def check_access(
-    principal: schemas.PrincipalRequest,
-    resource: schemas.ResourceRequest,
-    db_session: Session = Depends(db.get_db),
+    request: schemas.AccessRequest, db_session: Session = Depends(db.get_db)
 ):
     try:
-        return await server.check_access(principal, resource, db=db_session)
+        return await server.check_access(request, db=db_session)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -20,13 +20,7 @@ class EunomiaServer:
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
 
-    async def check_access(
-        self,
-        principal: schemas.PrincipalRequest,
-        resource: schemas.ResourceRequest,
-        db: Session,
-        access_method: str = "allow",
-    ) -> bool:
+    async def check_access(self, request: schemas.AccessRequest, db: Session) -> bool:
         """
         Check if a principal has access to a specific resource.
 
@@ -36,14 +30,11 @@ class EunomiaServer:
 
         Parameters
         ----------
-        principal : schemas.PrincipalRequest
-            The principal requesting access, either through it's registered identifier or its attributes.
-        resource : schemas.ResourceRequest
-            The resource being accessed, either through it's registered identifier or its attributes.
+        access_request : schemas.AccessRequest
+            The access request to check, containing the principal requesting access and the resource being accessed.
+            Both entities can be specified either by their registered identifier, by their attributes or by both.
         db : Session
             The SQLAlchemy database session.
-        access_method : str, optional
-            The type of access to check. Currently only "allow" is supported.
 
         Returns
         -------
@@ -52,40 +43,37 @@ class EunomiaServer:
 
         Raises
         ------
-        NotImplementedError
-            If access_method is not "allow".
         httpx.HTTPError
             If communication with the OPA server fails.
         """
-        if access_method != "allow":
-            raise NotImplementedError("Only allow method is supported")
-
         principal_attributes = {}
-        if principal.uri is not None:
+        if request.principal.uri is not None:
             principal_attributes.update(
-                crud.get_entity_attributes(principal.uri, db=db)
+                crud.get_entity_attributes(request.principal.uri, db=db)
             )
-        if principal.attributes:
+        if request.principal.attributes:
             principal_attributes.update(
-                {item.key: item.value for item in principal.attributes}
+                {item.key: item.value for item in request.principal.attributes}
             )
 
         resource_attributes = {}
-        if resource.uri is not None:
-            resource_attributes.update(crud.get_entity_attributes(resource.uri, db=db))
-        if resource.attributes:
+        if request.resource.uri is not None:
             resource_attributes.update(
-                {item.key: item.value for item in resource.attributes}
+                crud.get_entity_attributes(request.resource.uri, db=db)
+            )
+        if request.resource.attributes:
+            resource_attributes.update(
+                {item.key: item.value for item in request.resource.attributes}
             )
 
         input_data = {
             "input": {
                 "principal": {
-                    "uri": principal.uri,
+                    "uri": request.principal.uri,
                     "attributes": principal_attributes,
                 },
                 "resource": {
-                    "uri": resource.uri,
+                    "uri": request.resource.uri,
                     "attributes": resource_attributes,
                 },
             }
@@ -94,7 +82,7 @@ class EunomiaServer:
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{self._engine.url}/{access_method}", json=input_data
+                f"{self._engine.url}/{request.action}", json=input_data
             )
             response.raise_for_status()
             result = response.json()

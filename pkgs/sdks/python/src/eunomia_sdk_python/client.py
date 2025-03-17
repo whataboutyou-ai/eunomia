@@ -70,15 +70,15 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        data = {
-            "principal": schemas.PrincipalRequest(
+        request = schemas.AccessRequest(
+            principal=schemas.PrincipalRequest(
                 uri=principal_uri, attributes=principal_attributes
-            ).model_dump(),
-            "resource": schemas.ResourceRequest(
+            ),
+            resource=schemas.ResourceRequest(
                 uri=resource_uri, attributes=resource_attributes
-            ).model_dump(),
-        }
-        response = self.client.post("/check-access", json=data)
+            ),
+        )
+        response = self.client.post("/check-access", json=request.model_dump())
         response.raise_for_status()
         return bool(response.json())
 

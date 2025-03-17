@@ -86,3 +86,15 @@ class PrincipalRequest(EntityRequest):
     @classmethod
     def normalize_type(cls, v):
         return EntityType.principal
+
+
+class AccessRequest(BaseModel):
+    principal: PrincipalRequest = Field(
+        ..., description="The principal requesting access"
+    )
+    resource: ResourceRequest = Field(..., description="The resource being accessed")
+    action: Literal["allow"] = Field(
+        default="allow",
+        description="Action to be performed on the resource. "
+        "Currently only 'allow' is supported.",
+    )
