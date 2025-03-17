@@ -1,69 +1,55 @@
-from pydantic import BaseModel
+from eunomia_core import schemas
 
-REGO_ALLOW_POLICY = """\
-package eunomia\n
-default allow := false\n
-{rules}"""
-
-REGO_ALLOW_RULE = """\
-allow if {{
-{item_attributes}
-}}"""
-
-REGO_EQUAL_ITEM_ATTRIBUTE = """\
-input.{type}.{attribute_name} == "{attribute_value}"\
-"""
+EQUAL_URI_STMNT = '	input.{type}.uri == "{uri}"'
+EQUAL_ATTRIBUTE_STMNT = '	input.{type}.attributes.{key} == "{value}"'
+ALLOW_RULE_STMNT = "allow if {{\n{entity_stmts}\n}}"
+ALLOW_POLICY_STMNT = "package eunomia\n\ndefault allow := false\n\n{rules}\n"
 
 
-class Item(BaseModel):
-    type: str
-    attributes: dict[str, str]
-
-    def to_rego(self) -> str:
-        return "\n".join(
-            [
-                REGO_EQUAL_ITEM_ATTRIBUTE.format(
-                    type=self.type, attribute_name=name, attribute_value=value
-                )
-                for name, value in self.attributes.items()
-            ]
+def entity_to_rego(entity: schemas.EntityRequest) -> str:
+    uri_stmt = (
+        [EQUAL_URI_STMNT.format(type=entity.type.value, uri=entity.uri)]
+        if entity.uri
+        else []
+    )
+    attribute_stmts = [
+        EQUAL_ATTRIBUTE_STMNT.format(
+            type=entity.type.value, key=attribute.key, value=attribute.value
         )
+        for attribute in entity.attributes
+    ]
+    return "\n".join(uri_stmt + attribute_stmts)
 
 
-class Rule(BaseModel):
-    items: list[Item]
+def access_rule_to_rego(rule: schemas.AccessRequest) -> str:
+    rego_items = "\n".join(
+        [entity_to_rego(rule.principal), entity_to_rego(rule.resource)]
+    )
+    return ALLOW_RULE_STMNT.format(entity_stmts=rego_items)
 
-    def to_rego(self) -> str:
-        rego_items = "\n".join([item.to_rego() for item in self.items])
-        return REGO_ALLOW_RULE.format(item_attributes=rego_items)
 
-
-class Policy(BaseModel):
-    rules: list[Rule]
-
-    def to_rego(self) -> str:
-        rego_rules = "\n\n".join([rule.to_rego() for rule in self.rules])
-        return REGO_ALLOW_POLICY.format(rules=rego_rules)
+def policy_to_rego(policy: schemas.Policy) -> str:
+    rego_rules = "\n\n".join([access_rule_to_rego(rule) for rule in policy.rules])
+    return ALLOW_POLICY_STMNT.format(rules=rego_rules)
 
 
 ### Example usage
-# policy = Policy(
+# policy = schemas.Policy(
 #     rules=[
-#         Rule(
-#             items=[
-#                 Item(type="caller", attributes={"id": "orchestrator"}),
-#                 Item(type="user", attributes={"department": "hr"}),
-#                 Item(type="resource", attributes={"id": "hr-agent"}),
-#             ]
+#         schemas.AccessRequest(
+#             principal=schemas.PrincipalRequest(
+#                 uri="orchestrator",
+#                 attributes={"from": "caller"},
+#             ),
+#             resource=schemas.ResourceRequest(uri="hr-agent"),
 #         ),
-#         Rule(
-#             items=[
-#                 Item(type="caller", attributes={"id": "orchestrator"}),
-#                 Item(type="user", attributes={"department": "it", "role": "admin"}),
-#                 Item(type="resource", attributes={"id": "it-agent"}),
-#             ],
+#         schemas.AccessRequest(
+#             principal=schemas.PrincipalRequest(
+#                 attributes={"from": "user", "department": "it", "role": "admin"},
+#             ),
+#             resource=schemas.ResourceRequest(uri="it-agent"),
 #         ),
 #     ],
 # )
 # with open("policies/agents_policy.rego", "w") as f:
-#     f.write(policy.to_rego())
+#     f.write(policy_to_rego(policy))

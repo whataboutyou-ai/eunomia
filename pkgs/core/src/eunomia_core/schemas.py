@@ -98,3 +98,7 @@ class AccessRequest(BaseModel):
         description="Action to be performed on the resource. "
         "Currently only 'allow' is supported.",
     )
+
+
+class Policy(BaseModel):
+    rules: list[AccessRequest] = Field(..., description="List of access rules")
