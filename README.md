@@ -27,7 +27,7 @@ Traditional authorization layers, focused on user-resource separation, become ob
 
 The ability for agents to access tools—executable actions beyond static data—and initiate interactions with other agents introduced policy requirements that legacy systems couldn't meet. This duality demands dynamic yet deterministic boundaries that adapt to context, reflecting their role as both actor and resource.
 
-What About You aims at solving this with Eunomia, its open source, developer oriented, authorization framework that:
+We aim to solve this with Eunomia, an open-source, developer-oriented authorization framework that:
 
 - Makes it possible to consider agents as both actors and resources
 - Enforces dynamic yet deterministic policies based on static and contextual attributes
