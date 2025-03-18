@@ -6,12 +6,16 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from eunomia_core.enums import EntityType
 
 
-class AttributeRequest(BaseModel):
+class AttributeBase(BaseModel):
     key: str = Field(..., description="Attribute key")
     value: str = Field(..., description="Attribute value")
 
 
-class AttributeResponse(AttributeRequest):
+class AttributeRequest(AttributeBase):
+    pass
+
+
+class AttributeResponse(AttributeBase):
     updated_at: datetime = Field(
         description="Time when this attribute was last updated"
     )

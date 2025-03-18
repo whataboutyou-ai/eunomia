@@ -5,7 +5,7 @@ import httpx
 from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.db import crud, models
+from eunomia.db import crud
 from eunomia.engine.opa import OpaPolicyEngine
 
 
@@ -94,7 +94,7 @@ class EunomiaServer:
 
     def register_entity(
         self, entity: schemas.EntityRequest, db: Session
-    ) -> models.Entity:
+    ) -> schemas.EntityResponse:
         """
         Register a new entity in the system.
 
@@ -111,8 +111,8 @@ class EunomiaServer:
 
         Returns
         -------
-        models.Entity
-            The generated entity.
+        schemas.EntityResponse
+            The generated entity as a Pydantic model.
 
         Raises
         ------
@@ -121,12 +121,10 @@ class EunomiaServer:
         """
         if entity.uri is None:
             entity.uri = str(uuid.uuid4())
-        else:
-            db_entity = crud.get_entity(entity.uri, db=db)
-            if db_entity is not None:
-                raise ValueError(
-                    f"Entity with uri '{entity.uri}' is already registered"
-                )
+
+        db_entity = crud.get_entity(entity.uri, db=db)
+        if db_entity is not None:
+            raise ValueError(f"Entity with uri '{entity.uri}' is already registered")
 
         db_entity = crud.create_entity(entity, db=db)
-        return db_entity
+        return schemas.EntityResponse.model_validate(db_entity)
