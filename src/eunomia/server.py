@@ -20,6 +20,26 @@ class EunomiaServer:
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
 
+    def _get_merged_attributes(self, entity: schemas.EntityAccess, db: Session) -> dict:
+        attributes = {}
+
+        if entity.uri is not None:
+            registered_attributes = crud.get_entity_attributes(entity.uri, db=db)
+            # if any attribute is colliding with the registered attributes, raise an error
+            for attribute in entity.attributes:
+                if (
+                    attribute.key in registered_attributes
+                    and registered_attributes[attribute.key] != attribute.value
+                ):
+                    raise ValueError(
+                        f"For entity '{entity.uri}', attribute '{attribute.key}' has a collision with the registered attributes"
+                    )
+            attributes.update(registered_attributes)
+
+        if entity.attributes:
+            attributes.update({item.key: item.value for item in entity.attributes})
+        return attributes
+
     async def check_access(self, request: schemas.AccessRequest, db: Session) -> bool:
         """
         Check if a principal has access to a specific resource.
@@ -45,26 +65,11 @@ class EunomiaServer:
         ------
         httpx.HTTPError
             If communication with the OPA server fails.
+        ValueError
+            If there is a discrepancy between the provided attributes and the registered attributes.
         """
-        principal_attributes = {}
-        if request.principal.uri is not None:
-            principal_attributes.update(
-                crud.get_entity_attributes(request.principal.uri, db=db)
-            )
-        if request.principal.attributes:
-            principal_attributes.update(
-                {item.key: item.value for item in request.principal.attributes}
-            )
-
-        resource_attributes = {}
-        if request.resource.uri is not None:
-            resource_attributes.update(
-                crud.get_entity_attributes(request.resource.uri, db=db)
-            )
-        if request.resource.attributes:
-            resource_attributes.update(
-                {item.key: item.value for item in request.resource.attributes}
-            )
+        principal_attributes = self._get_merged_attributes(request.principal, db=db)
+        resource_attributes = self._get_merged_attributes(request.resource, db=db)
 
         input_data = {
             "input": {
@@ -78,7 +83,6 @@ class EunomiaServer:
                 },
             }
         }
-        print(input_data)
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
