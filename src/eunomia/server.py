@@ -30,7 +30,7 @@ class EunomiaServer:
 
         Parameters
         ----------
-        access_request : schemas.AccessRequest
+        request : schemas.AccessRequest
             The access request to check, containing the principal requesting access and the resource being accessed.
             Both entities can be specified either by their registered identifier, by their attributes or by both.
         db : Session
@@ -93,8 +93,8 @@ class EunomiaServer:
         raise NotImplementedError("Allowed resources not implemented")
 
     def register_entity(
-        self, entity: schemas.EntityRequest, db: Session
-    ) -> schemas.EntityResponse:
+        self, entity: schemas.EntityCreate, db: Session
+    ) -> schemas.EntityInDb:
         """
         Register a new entity in the system.
 
@@ -104,14 +104,14 @@ class EunomiaServer:
 
         Parameters
         ----------
-        entity : schemas.EntityRequest
+        entity : schemas.EntityCreate
             Pydantic model containing attributes about the entity.
         db : Session
             The SQLAlchemy database session.
 
         Returns
         -------
-        schemas.EntityResponse
+        schemas.EntityInDb
             The generated entity as a Pydantic model.
 
         Raises
@@ -127,4 +127,4 @@ class EunomiaServer:
             raise ValueError(f"Entity with uri '{entity.uri}' is already registered")
 
         db_entity = crud.create_entity(entity, db=db)
-        return schemas.EntityResponse.model_validate(db_entity)
+        return schemas.EntityInDb.model_validate(db_entity)

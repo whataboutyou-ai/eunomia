@@ -33,9 +33,9 @@ async def check_access(
         )
 
 
-@router.post("/register-entity", response_model=schemas.EntityResponse)
+@router.post("/register-entity", response_model=schemas.EntityInDb)
 async def register_entity(
-    entity: schemas.EntityRequest, db_session: Session = Depends(db.get_db)
+    entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
 ):
     try:
         return server.register_entity(entity, db=db_session)

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from eunomia.db import models
 
 
-def create_entity(entity: schemas.EntityRequest, db: Session) -> models.Entity:
+def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:
     """
     Create a new entity in the database.
 
@@ -13,7 +13,7 @@ def create_entity(entity: schemas.EntityRequest, db: Session) -> models.Entity:
 
     Parameters
     ----------
-    entity : schemas.EntityRequest
+    entity : schemas.EntityCreate
         Pydantic model containing the entity data to be created.
     db : Session
         SQLAlchemy database session.

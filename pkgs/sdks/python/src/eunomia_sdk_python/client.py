@@ -71,10 +71,10 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         request = schemas.AccessRequest(
-            principal=schemas.PrincipalRequest(
+            principal=schemas.PrincipalAccess(
                 uri=principal_uri, attributes=principal_attributes
             ),
-            resource=schemas.ResourceRequest(
+            resource=schemas.ResourceAccess(
                 uri=resource_uri, attributes=resource_attributes
             ),
         )
@@ -84,7 +84,7 @@ class EunomiaClient:
 
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None
-    ) -> schemas.EntityResponse:
+    ) -> schemas.EntityInDb:
         """Register a new entity with the Eunomia server.
 
         This method registers a new entity with its attributes to the Eunomia server.
@@ -101,7 +101,7 @@ class EunomiaClient:
 
         Returns
         -------
-        schemas.EntityResponse
+        schemas.EntityInDb
             The newly registered entity.
 
         Raises
@@ -109,7 +109,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        entity = schemas.EntityRequest(type=type, attributes=attributes, uri=uri)
+        entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post("/register-entity", json=entity.model_dump())
         response.raise_for_status()
-        return schemas.EntityResponse.model_validate(response.json())
+        return schemas.EntityInDb.model_validate(response.json())
