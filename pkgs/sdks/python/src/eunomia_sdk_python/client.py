@@ -150,3 +150,21 @@ class EunomiaClient:
         )
         response.raise_for_status()
         return schemas.EntityInDb.model_validate(response.json())
+
+    def delete_entity(self, uri: str) -> None:
+        """
+        Delete an entity from the Eunomia server.
+
+        Parameters
+        ----------
+        uri : str
+            The uri of the entity to delete.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        response = self.client.post("/delete-entity", params={"uri": uri})
+        response.raise_for_status()
+        return

@@ -74,6 +74,27 @@ def update_entity_attributes(
     return db_entity
 
 
+def delete_entity(db_entity: models.Entity, db: Session) -> None:
+    """
+    Delete an entity from the database.
+
+    This function deletes an entity record and its associated attributes
+    from the database.
+
+    Parameters
+    ----------
+    db_entity : models.Entity
+        The entity to delete.
+    db : Session
+        SQLAlchemy database session.
+    """
+    delete_entity_attributes(db_entity, db)
+    db.delete(db_entity)
+    db.commit()
+    db.refresh(db_entity)
+    return
+
+
 def delete_entity_attributes(db_entity: models.Entity, db: Session) -> None:
     """
     Delete all attributes of an entity.

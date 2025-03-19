@@ -69,3 +69,19 @@ async def update_entity(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed /update-entity: {exc}",
         )
+
+
+@router.post("/delete-entity", response_model=schemas.EntityInDb)
+async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
+    try:
+        return server.delete_entity(uri, db=db_session)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /delete-entity: {exc}",
+        )

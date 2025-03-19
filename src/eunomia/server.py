@@ -165,3 +165,27 @@ class EunomiaServer:
 
         db_entity = crud.update_entity_attributes(db_entity, entity.attributes, db=db)
         return schemas.EntityInDb.model_validate(db_entity)
+
+    def delete_entity(self, uri: str, db: Session) -> None:
+        """
+        Delete an entity from the system.
+
+        Parameters
+        ----------
+        uri : str
+            The uri of the entity to delete.
+        db : Session
+            The SQLAlchemy database session.
+
+
+        Raises
+        ------
+        ValueError
+            If the entity is not registered.
+        """
+        db_entity = crud.get_entity(uri, db=db)
+        if db_entity is None:
+            raise ValueError(f"Entity with uri '{uri}' is not registered")
+
+        crud.delete_entity(db_entity, db=db)
+        return
