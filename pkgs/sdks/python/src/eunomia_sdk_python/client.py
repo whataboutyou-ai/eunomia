@@ -5,7 +5,8 @@ from eunomia_core import enums, schemas
 
 
 class EunomiaClient:
-    """A client for interacting with the Eunomia server.
+    """
+    A client for interacting with the Eunomia server.
 
     This client provides methods to register resources and principals,
     check access permissions, and retrieve allowed resources for a principal.
@@ -47,7 +48,8 @@ class EunomiaClient:
         principal_attributes: dict = {},
         resource_attributes: dict = {},
     ) -> bool:
-        """Check whether a principal has access to a specific resource.
+        """
+        Check whether a principal has access to a specific resource.
 
         Parameters
         ----------
@@ -85,7 +87,8 @@ class EunomiaClient:
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None
     ) -> schemas.EntityInDb:
-        """Register a new entity with the Eunomia server.
+        """
+        Register a new entity with the Eunomia server.
 
         This method registers a new entity with its attributes to the Eunomia server.
         If no uri identifier is provided, the server will generate a random UUID.
@@ -111,5 +114,39 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post("/register-entity", json=entity.model_dump())
+        response.raise_for_status()
+        return schemas.EntityInDb.model_validate(response.json())
+
+    def update_entity(
+        self, uri: str, attributes: dict, override: bool = False
+    ) -> schemas.EntityInDb:
+        """
+        Update the attributes of an existing entity.
+
+        Parameters
+        ----------
+        uri : str
+            The uri of the entity to update.
+        attributes : dict
+            The attributes to update.
+        override : bool, default=False
+            If True, the existing attributes are deleted and the new attributes are added.
+            If False, the existing attributes are maintaned or updated in case of overlap,
+            and the additional new attributes are added.
+
+        Returns
+        -------
+        schemas.EntityInDb
+            The updated entity.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        entity = schemas.EntityUpdate(uri=uri, attributes=attributes)
+        response = self.client.post(
+            "/update-entity", json=entity.model_dump(), params={"override": override}
+        )
         response.raise_for_status()
         return schemas.EntityInDb.model_validate(response.json())

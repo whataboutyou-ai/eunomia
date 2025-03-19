@@ -59,6 +59,8 @@ class EntityCreate(EntityBase):
 
 
 class EntityUpdate(EntityBase):
+    type: EntityType = EntityType.any  # type is not required for the attributes update
+
     @field_validator("attributes", mode="before")
     @classmethod
     def at_least_one_attribute(cls, v):

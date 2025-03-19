@@ -28,16 +28,68 @@ def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:
         type=entity.type,
     )
     for attribute in entity.attributes:
-        db_attribute = models.Attribute(
-            key=attribute.key,
-            value=attribute.value,
-        )
+        db_attribute = models.Attribute(key=attribute.key, value=attribute.value)
         db_entity.attributes.append(db_attribute)
 
     db.add(db_entity)
     db.commit()
     db.refresh(db_entity)
     return db_entity
+
+
+def update_entity_attributes(
+    db_entity: models.Entity, attributes: list[schemas.Attribute], db: Session
+) -> models.Entity:
+    """
+    Update the attributes of an existing entity.
+
+    This function updates the attributes of an existing entity.
+    If an attribute does not exist, it is created.
+    If an attribute exists, it is updated.
+
+    Parameters
+    ----------
+    db_entity : models.Entity
+        The entity to update.
+    attributes : list[schemas.Attribute]
+        The attributes to update.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    models.Entity
+        The updated entity as a SQLAlchemy model.
+    """
+    for attribute in attributes:
+        db_attribute = get_attribute(db_entity.uri, attribute.key, db)
+        if db_attribute is not None:
+            db_attribute.value = attribute.value
+        else:
+            db_attribute = models.Attribute(key=attribute.key, value=attribute.value)
+            db_entity.attributes.append(db_attribute)
+
+    db.commit()
+    db.refresh(db_entity)
+    return db_entity
+
+
+def delete_entity_attributes(db_entity: models.Entity, db: Session) -> None:
+    """
+    Delete all attributes of an entity.
+
+    Parameters
+    ----------
+    db_entity : models.Entity
+        The entity to delete attributes from.
+    db : Session
+        SQLAlchemy database session.
+    """
+    db.query(models.Attribute).filter(
+        models.Attribute.entity_uri == db_entity.uri
+    ).delete()
+    db.commit()
+    db.refresh(db_entity)
 
 
 def get_entity(uri: str, db: Session) -> models.Entity | None:
@@ -57,6 +109,31 @@ def get_entity(uri: str, db: Session) -> models.Entity | None:
         The entity as a SQLAlchemy model or None if it does not exist.
     """
     return db.query(models.Entity).filter(models.Entity.uri == uri).first()
+
+
+def get_attribute(uri: str, key: str, db: Session) -> models.Attribute | None:
+    """
+    Retrieve an attribute from the database by its key and entity uri.
+
+    Parameters
+    ----------
+    uri : str
+        The uri of the entity.
+    key : str
+        The key of the attribute.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    models.Attribute | None
+        The attribute as a SQLAlchemy model or None if it does not exist.
+    """
+    return (
+        db.query(models.Attribute)
+        .filter(models.Attribute.entity_uri == uri, models.Attribute.key == key)
+        .first()
+    )
 
 
 def get_entity_attributes(uri: str, db: Session) -> dict:

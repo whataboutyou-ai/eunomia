@@ -49,3 +49,23 @@ async def register_entity(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed /register-entity: {exc}",
         )
+
+
+@router.post("/update-entity", response_model=schemas.EntityInDb)
+async def update_entity(
+    entity: schemas.EntityUpdate,
+    override: bool = False,
+    db_session: Session = Depends(db.get_db),
+):
+    try:
+        return server.update_entity(entity, override=override, db=db_session)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /update-entity: {exc}",
+        )

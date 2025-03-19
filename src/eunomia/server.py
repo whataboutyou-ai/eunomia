@@ -128,3 +128,40 @@ class EunomiaServer:
 
         db_entity = crud.create_entity(entity, db=db)
         return schemas.EntityInDb.model_validate(db_entity)
+
+    def update_entity(
+        self, entity: schemas.EntityUpdate, override: bool, db: Session
+    ) -> schemas.EntityInDb:
+        """
+        Update the attributes of an existing entity.
+
+        Parameters
+        ----------
+        entity : schemas.EntityUpdate
+            The entity to update, with its identifier and the attributes to update.
+        override : bool
+            If True, the existing attributes are deleted and the new attributes are added.
+            If False, the existing attributes are maintaned or updated in case of overlap,
+            and the additional new attributes are added.
+        db : Session
+            The SQLAlchemy database session.
+
+        Returns
+        -------
+        schemas.EntityInDb
+            The updated entity as a Pydantic model.
+
+        Raises
+        ------
+        ValueError
+            If the entity is not registered.
+        """
+        db_entity = crud.get_entity(entity.uri, db=db)
+        if db_entity is None:
+            raise ValueError(f"Entity with uri '{entity.uri}' is not registered")
+
+        if override:
+            crud.delete_entity_attributes(db_entity, db=db)
+
+        db_entity = crud.update_entity_attributes(db_entity, entity.attributes, db=db)
+        return schemas.EntityInDb.model_validate(db_entity)
