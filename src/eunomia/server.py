@@ -1,4 +1,3 @@
-import uuid
 from typing import List
 
 import httpx
@@ -123,9 +122,6 @@ class EunomiaServer:
         ValueError
             If the entity is already registered.
         """
-        if entity.uri is None:
-            entity.uri = str(uuid.uuid4())
-
         db_entity = crud.get_entity(entity.uri, db=db)
         if db_entity is not None:
             raise ValueError(f"Entity with uri '{entity.uri}' is already registered")

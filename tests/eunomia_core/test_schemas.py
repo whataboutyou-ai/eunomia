@@ -13,7 +13,7 @@ def valid_attributes_dict():
     return {"test": "test"}
 
 
-class TestEntityRegisterRequest:
+class TestEntityCreate:
     def test_valid_cases(self, valid_attributes_list, valid_attributes_dict):
         # Both URI and attributes
         schemas.EntityCreate.model_validate(
@@ -26,9 +26,16 @@ class TestEntityRegisterRequest:
         )
 
         # Attributes only (URI is optional)
-        schemas.EntityCreate.model_validate(
+        entity = schemas.EntityCreate.model_validate(
             {"type": "resource", "attributes": valid_attributes_list}
         )
+        assert entity.uri is not None
+
+        # Attributes and None URI
+        entity = schemas.EntityCreate.model_validate(
+            {"type": "resource", "uri": None, "attributes": valid_attributes_list}
+        )
+        assert entity.uri is not None
 
     def test_invalid_cases(self):
         # URI only (missing attributes)
@@ -55,7 +62,7 @@ class TestEntityRegisterRequest:
             schemas.EntityCreate.model_validate({"type": "resource"})
 
 
-class TestEntityUpdateRequest:
+class TestEntityUpdate:
     def test_valid_cases(self, valid_attributes_list, valid_attributes_dict):
         # Both URI and attributes
         schemas.EntityUpdate.model_validate(
@@ -101,7 +108,7 @@ class TestEntityUpdateRequest:
             schemas.EntityUpdate.model_validate({"type": "resource"})
 
 
-class TestEntityCheckRequest:
+class TestEntityAccess:
     def test_valid_cases(self, valid_attributes_list, valid_attributes_dict):
         # Both URI and attributes
         schemas.EntityAccess.model_validate(

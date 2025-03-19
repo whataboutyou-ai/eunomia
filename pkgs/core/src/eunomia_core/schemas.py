@@ -4,6 +4,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from eunomia_core.enums import EntityType
+from eunomia_core.utils import generate_uri
 
 
 class Attribute(BaseModel):
@@ -38,7 +39,8 @@ class EntityBase(BaseModel):
 
 class EntityCreate(EntityBase):
     uri: Optional[str] = Field(
-        default=None, description="Unique identifier for the entity"
+        default_factory=lambda: generate_uri(),
+        description="Unique identifier for the entity, generated if not provided",
     )
 
     @field_validator("attributes", mode="before")
@@ -46,6 +48,13 @@ class EntityCreate(EntityBase):
     def at_least_one_attribute(cls, v):
         if not v:
             raise ValueError("At least one attribute must be provided")
+        return v
+
+    @field_validator("uri", mode="after")
+    @classmethod
+    def enforce_uri(cls, v):
+        if v is None:
+            return generate_uri()
         return v
 
 
