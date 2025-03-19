@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-sdk-langchain"
-version = "0.1.0"
+version = "0.2.1"
 description = "Eunomia SDK for LangChain"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }

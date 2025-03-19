@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-ai"
-version = "0.2.0"
+version = "0.2.1"
 description = "Authorization layer for AI Agents"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
