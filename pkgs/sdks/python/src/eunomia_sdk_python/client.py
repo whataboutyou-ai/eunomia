@@ -41,6 +41,17 @@ class EunomiaClient:
             timeout=60,
         )
 
+    def _handle_response(self, response: httpx.Response) -> None:
+        try:
+            response.raise_for_status()
+            return
+        except httpx.HTTPStatusError as e:
+            raise httpx.HTTPStatusError(
+                f"{e}\nResponse: {e.response.text}",
+                request=e.request,
+                response=e.response,
+            ) from None
+
     def check_access(
         self,
         principal_uri: str | None = None,
@@ -81,7 +92,7 @@ class EunomiaClient:
             ),
         )
         response = self.client.post("/check-access", json=request.model_dump())
-        response.raise_for_status()
+        self._handle_response(response)
         return bool(response.json())
 
     def register_entity(
@@ -114,7 +125,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post("/register-entity", json=entity.model_dump())
-        response.raise_for_status()
+        self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
 
     def update_entity(
@@ -148,7 +159,7 @@ class EunomiaClient:
         response = self.client.post(
             "/update-entity", json=entity.model_dump(), params={"override": override}
         )
-        response.raise_for_status()
+        self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
 
     def delete_entity(self, uri: str) -> None:
@@ -166,7 +177,7 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         response = self.client.post("/delete-entity", params={"uri": uri})
-        response.raise_for_status()
+        self._handle_response(response)
         return
 
     def create_policy(
@@ -191,5 +202,5 @@ class EunomiaClient:
         response = self.client.post(
             "/create-policy", json=policy.model_dump(), params=params
         )
-        response.raise_for_status()
+        self._handle_response(response)
         return
