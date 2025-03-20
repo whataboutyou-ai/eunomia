@@ -71,10 +71,11 @@ async def update_entity(
         )
 
 
-@router.post("/delete-entity", response_model=schemas.EntityInDb)
+@router.post("/delete-entity")
 async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
     try:
-        return server.delete_entity(uri, db=db_session)
+        server.delete_entity(uri, db=db_session)
+        return {"uri": uri, "message": "Entity deleted successfully"}
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -84,4 +85,21 @@ async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed /delete-entity: {exc}",
+        )
+
+
+@router.post("/create-policy")
+async def create_policy(policy: schemas.Policy, filename: str = "policy.rego"):
+    try:
+        path = server.create_policy(policy, filename=filename)
+        return {"path": path, "message": "Policy created successfully at path"}
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /create-policy: {exc}",
         )

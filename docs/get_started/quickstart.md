@@ -31,7 +31,7 @@ allow if {
 }
 ```
 
-Then copy the `env.example` file to `.env` and set the `OPA_POLICY_PATH` variable to the path of the `policies/` folder.
+Then copy the `env.example` file to `.env` and set the `OPA_POLICY_FOLDER` variable to the path of the `policies/` folder.
 
 #### Register resources and principals
 

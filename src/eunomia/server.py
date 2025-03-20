@@ -1,3 +1,5 @@
+import logging
+import os
 from typing import List
 
 import httpx
@@ -6,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from eunomia.db import crud
 from eunomia.engine.opa import OpaPolicyEngine
+from eunomia.engine.rego import policy_to_rego
 
 
 class EunomiaServer:
@@ -189,3 +192,44 @@ class EunomiaServer:
 
         crud.delete_entity(db_entity, db=db)
         return
+
+    def create_policy(self, policy: schemas.Policy, filename: str) -> str:
+        """
+        Create a new policy and save it to the local file system.
+
+        Parameters
+        ----------
+        policy : schemas.Policy
+            The policy to create, containing a list of access rules.
+            Rules are evaluated with OR logic (access is granted if ANY rule matches).
+            Within each rule, attributes for both principal and resource are evaluated
+            with AND logic (all specified attributes must match).
+        filename : str
+            The filename of the policy to create.
+
+        Returns
+        -------
+        str
+            The path to the created policy.
+
+        Raises
+        ------
+        ValueError
+            If the policy file already exists.
+        """
+        if not os.path.exists(self._engine.policy_folder):
+            os.makedirs(self._engine.policy_folder)
+            logging.info(
+                f"Policy folder did not exist, created it at {self._engine.policy_folder}"
+            )
+
+        path = os.path.join(self._engine.policy_folder, filename)
+        if os.path.exists(path):
+            raise ValueError(
+                f"Policy file '{filename}' already exists at {self._engine.policy_folder}"
+            )
+
+        policy_rego = policy_to_rego(policy)
+        with open(path, "w") as f:
+            f.write(policy_rego)
+        return path

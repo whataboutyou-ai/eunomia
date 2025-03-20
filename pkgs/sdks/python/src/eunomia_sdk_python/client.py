@@ -168,3 +168,28 @@ class EunomiaClient:
         response = self.client.post("/delete-entity", params={"uri": uri})
         response.raise_for_status()
         return
+
+    def create_policy(
+        self, policy: schemas.Policy, filename: str | None = None
+    ) -> None:
+        """
+        Create a new policy and save it to the local file system.
+
+        Parameters
+        ----------
+        policy : schemas.Policy
+            The policy to create.
+        filename : str, optional
+            The filename of the policy to create.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        params = {} if filename is None else {"filename": filename}
+        response = self.client.post(
+            "/create-policy", json=policy.model_dump(), params=params
+        )
+        response.raise_for_status()
+        return
