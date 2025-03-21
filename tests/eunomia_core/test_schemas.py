@@ -37,7 +37,17 @@ class TestEntityCreate:
         )
         assert entity.uri is not None
 
-    def test_invalid_cases(self):
+    def test_invalid_cases(self, valid_attributes_list):
+        # Both URI and attributes with duplicate keys
+        with pytest.raises(ValidationError):
+            schemas.EntityCreate.model_validate(
+                {
+                    "type": "resource",
+                    "uri": "123",
+                    "attributes": valid_attributes_list + valid_attributes_list,
+                }
+            )
+
         # URI only (missing attributes)
         with pytest.raises(ValidationError):
             schemas.EntityCreate.model_validate({"type": "resource", "uri": "123"})
@@ -110,7 +120,13 @@ class TestEntityAccess:
             {"type": "resource", "attributes": valid_attributes_list}
         )
 
-    def test_invalid_cases(self):
+    def test_invalid_cases(self, valid_attributes_list):
+        # Attributes with duplicate keys
+        with pytest.raises(ValidationError):
+            schemas.EntityAccess.model_validate(
+                {"attributes": valid_attributes_list + valid_attributes_list}
+            )
+
         # Empty attributes only
         with pytest.raises(ValidationError):
             schemas.EntityAccess.model_validate({"type": "resource", "attributes": []})

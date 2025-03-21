@@ -31,9 +31,21 @@ class EntityBase(BaseModel):
 
     @field_validator("attributes", mode="before")
     @classmethod
-    def from_dict(cls, v):
+    def from_dict(cls, v: list[Attribute] | dict) -> list[Attribute]:
         if isinstance(v, dict):
             return [Attribute(key=k, value=str(val)) for k, val in v.items()]
+        return v
+
+    @field_validator("attributes", mode="after")
+    @classmethod
+    def unique_attribute_keys(cls, v: list[Attribute]) -> list[Attribute]:
+        keys = {}
+        for i, attr in enumerate(v):
+            if attr.key in keys:
+                raise ValueError(
+                    f"Duplicate attribute key: '{attr.key}' at positions {keys[attr.key]} and {i}"
+                )
+            keys[attr.key] = i
         return v
 
 
@@ -45,14 +57,14 @@ class EntityCreate(EntityBase):
 
     @field_validator("attributes", mode="before")
     @classmethod
-    def at_least_one_attribute(cls, v):
+    def at_least_one_attribute(cls, v: list[Attribute]) -> list[Attribute]:
         if not v:
             raise ValueError("At least one attribute must be provided")
         return v
 
     @field_validator("uri", mode="after")
     @classmethod
-    def enforce_uri(cls, v):
+    def enforce_uri(cls, v: str | None) -> str:
         if v is None:
             return generate_uri()
         return v
@@ -63,7 +75,7 @@ class EntityUpdate(EntityBase):
 
     @field_validator("attributes", mode="before")
     @classmethod
-    def at_least_one_attribute(cls, v):
+    def at_least_one_attribute(cls, v: list[Attribute]) -> list[Attribute]:
         if not v:
             raise ValueError("At least one attribute must be provided")
         return v
