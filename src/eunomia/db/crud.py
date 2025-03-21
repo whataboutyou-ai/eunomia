@@ -162,7 +162,8 @@ def get_entity_attributes(uri: str, db: Session) -> dict:
     Retrieve attributes for a resource by its unique identifier.
 
     This function retrieves all attributes associated with a specific resource
-    and returns it as a dictionary.
+    and returns it as a dictionary. If no entity with the specified uri is found,
+    an empty dictionary is returned.
 
     Parameters
     ----------
@@ -175,13 +176,8 @@ def get_entity_attributes(uri: str, db: Session) -> dict:
     -------
     dict
         Dictionary containing all attributes key-value pairs for the entity.
-
-    Raises
-    ------
-    ValueError
-        If no entity with the specified uri is found.
     """
     db_entity = get_entity(uri, db)
     if db_entity is None:
-        raise ValueError(f"Entity with uri '{uri}' not found.")
+        return {}
     return {attribute.key: attribute.value for attribute in db_entity.attributes}
