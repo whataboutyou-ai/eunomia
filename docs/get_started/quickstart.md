@@ -1,18 +1,74 @@
 After [installing Eunomia](installation.md), you can start using it by following this quickstart example.
 
-## Access control for multi-agent architecture
+## Access Control for Multi-Agent Architecture
 
-Let's assume you have a multi-agent system where an orchestrator routes the user requests to one of the agents that can perform a specific task. You want to allow a user to access only a specific set of the agents based on their attributes.
+Let's assume you have a multi-agent system where an orchestrator routes the user requests to one of the available agents that can perform a specific task. You want to allow a user to access only a specific set of the agents based on their attributes.
 
-You first need to **configure** the policies with the Eunomia server. Then, you need to connect your application to the Eunomia server in order to **enforce** the policies at runtime.
+Particulary, let's say that access to the _IT Desk Agent_ is restricted to employess in the IT department, while access to the _HR Agent_ is restricted to managers in the HR department.
 
-### Configuration Phase
+### Server Setup
 
-#### Policy definition
+First, copy the `.env.example` file to `.env` and set the `OPA_POLICY_FOLDER` variable to the path where you want to store the policies.
 
-First, you need to configure the policies with the Eunomia server. You can write the policies in a file using [Rego][rego-docs].
+Then, let's start the Eunomia server with:
 
-Create a `policies/agents.rego` file:
+```bash
+fastapi dev src/eunomia/api/main.py
+```
+
+### Policy Configuration
+
+Now, you need to create a policy that will be used to enforce the access control. The policy will contain two rules:
+
+1. Allow access to the resource with identifier `it-desk-agent` to principals with the `department` attribute set to `it`.
+2. Allow access to the resource with identifier `hr-agent` to principals with the `department` attribute set to `hr` _AND_ the `role` attribute set to `manager`.
+
+You can use the `POST /create-policy` endpoint for this.
+
+=== "Python"
+    ```python
+    from eunomia_core.schemas import AccessRequest, Policy, PrincipalAccess, ResourceAccess
+    from eunomia_sdk_python import EunomiaClient
+
+    eunomia = EunomiaClient()
+
+    policy = Policy(
+        rules=[
+            AccessRequest(
+                principal=PrincipalAccess(attributes={"department": "it"}),
+                resource=ResourceAccess(uri="it-desk-agent"),
+            ),
+            AccessRequest(
+                principal=PrincipalAccess(
+                    attributes={"department": "hr", "role": "manager"}
+                ),
+                resource=ResourceAccess(uri="hr-agent"),
+            ),
+        ],
+    )
+
+    eunomia.create_policy(policy)
+    ```
+
+    !!! info
+        To use the Python SDK, check out its [documentation](../sdks/python.md) for installation instructions.
+
+=== "Curl"
+    ```bash
+    curl -X POST 'http://localhost:8000/create-policy' \
+    -H "Content-Type: application/json" \
+    -d '{"rules": [{"principal": {"attributes": {"department": "it"}}, "resource": {"uri": "it-desk-agent"}}, {"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"uri": "hr-agent"}}]}'
+    ```
+
+=== "Output"
+    ```json
+    {
+        "path":"/your-path/policies/policy.rego",
+        "message":"Policy created successfully at path"
+    }
+    ```
+
+The policy will be saved in your filesystem at the path specified in the response. The file will contain the translated policy in OPA Rego language:
 
 ```rego
 package eunomia
@@ -20,99 +76,60 @@ package eunomia
 default allow := false
 
 allow if {
-    # allow anyone to access faq agent
-    input.resource.metadata.agent_id == "faq"
+	input.principal.attributes.department == "it"
+	input.resource.uri == "it-desk-agent"
 }
 
 allow if {
-    # allow hr department to access hr agent
-    input.principal.metadata.department == "hr"
-    input.resource.metadata.agent_id == "hr"
+	input.principal.attributes.department == "hr"
+	input.principal.attributes.role == "manager"
+	input.resource.uri == "hr-agent"
 }
 ```
 
-Then copy the `env.example` file to `.env` and set the `OPA_POLICY_FOLDER` variable to the path of the `policies/` folder.
+### Policy Enforcement
 
-#### Register resources and principals
+Now, you can enforce the policies in your application at runtime by checking the access of a given principal to a specific resource.
 
-You can now start the Eunomia server:
-
-```bash
-fastapi dev src/eunomia/api/main.py
-```
-
-!!! warning
-    This registration step is mandatory right now, but will be made optional in the future - allowing you to directly pass the resources and principals metadata at runtime.
-
-You now need to register the resources and principals you want to use with the Eunomia server:
+You can use the `POST /check-access` endpoint for this, passing the principal and resource identifiers and their attributes.
 
 === "Python"
     ```python
-    from eunomia_sdk_python import EunomiaClient
-    
-    eunomia = EunomiaClient()
+    # allowed access
+    eunomia.check_access(
+        resource_uri="it-desk-agent", principal_attributes={"department": "it"}
+    )
+    eunomia.check_access(
+        resource_uri="hr-agent",
+        principal_attributes={"department": "hr", "role": "manager"},
+    )
 
-    faq_agent = eunomia.register_resource(metadatas={"agent_id": "faq"})
-    hr_agent = eunomia.register_resource(metadatas={"agent_id": "hr"})
-
-    user_hr_department = eunomia.register_principal(metadatas={"department": "hr"})
-    user_sales_department = eunomia.register_principal(metadatas={"department": "sales"})
+    # denied access
+    eunomia.check_access(
+        resource_uri="it-desk-agent", principal_attributes={"department": "sales"}
+    )
+    eunomia.check_access(
+        resource_uri="hr-agent",
+        principal_attributes={"department": "hr", "role": "analyst"},
+    )
     ```
 
 === "Curl"
     ```bash
-    curl -X POST http://localhost:8000/register_resource -H "Content-Type: application/json" -d '{"metadata": {"agent_id": "faq"}}'
-    curl -X POST http://localhost:8000/register_resource -H "Content-Type: application/json" -d '{"metadata": {"agent_id": "hr"}}'
-    curl -X POST http://localhost:8000/register_principal -H "Content-Type: application/json" -d '{"metadata": {"department": "hr"}}'
-    curl -X POST http://localhost:8000/register_principal -H "Content-Type: application/json" -d '{"metadata": {"department": "sales"}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "it"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "sales"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
     ```
 
 === "Output"
     ```bash
-    {"status": "success", "eunomia_id": "76d66319-cfb2-4f12-a30a-689dc9dd58b0"}
-    {"status": "success", "eunomia_id": "e86e248b-2b51-4d34-abb3-3302c047cb72"}
-    {"status": "success", "eunomia_id": "c194e9e4-1086-4d9b-89cb-2236e5158d36"}
-    {"status": "success", "eunomia_id": "4f609741-7800-44f6-a1d6-640d6fe9bf01"}
-    ```
-
-!!! info
-    To use the Python SDK, check out its [documentation](../sdks/python.md) for installation instructions.
-
-### Enforcement Phase
-
-Now, you can enforce the policies in your application at runtime:
-
-=== "Python"
-    ```python
-    from eunomia_sdk_python import EunomiaClient
-    
-    eunomia = EunomiaClient()
-
-    eunomia.check_access(user_hr_department["eunomia_id"], faq_agent["eunomia_id"])
-    eunomia.check_access(user_hr_department["eunomia_id"], hr_agent["eunomia_id"])
-
-    eunomia.check_access(user_sales_department["eunomia_id"], faq_agent["eunomia_id"])
-    eunomia.check_access(user_sales_department["eunomia_id"], hr_agent["eunomia_id"])
-    ```
-
-=== "Curl"
-    ```bash
-    curl -X GET http://localhost:8000/check_access?principal_id=c194e9e4-1086-4d9b-89cb-2236e5158d36&resource_id=76d66319-cfb2-4f12-a30a-689dc9dd58b0
-    curl -X GET http://localhost:8000/check_access?principal_id=c194e9e4-1086-4d9b-89cb-2236e5158d36&resource_id=e86e248b-2b51-4d34-abb3-3302c047cb72
-    curl -X GET http://localhost:8000/check_access?principal_id=4f609741-7800-44f6-a1d6-640d6fe9bf01&resource_id=76d66319-cfb2-4f12-a30a-689dc9dd58b0
-    curl -X GET http://localhost:8000/check_access?principal_id=4f609741-7800-44f6-a1d6-640d6fe9bf01&resource_id=e86e248b-2b51-4d34-abb3-3302c047cb72
-    ```
-
-=== "Output"
-    ```bash
-    True
-    True
-    True
-    False
+    true
+    true
+    false
+    false
     ```
 
 Congratulations! You've just made your first steps with Eunomia.
 
 You can now continue to the detailed [server documentation](../server/index.md) or explore the available [SDKs](../sdks/index.md) to discover how to best integrate Eunomia into your application.
-
-[rego-docs]: https://www.openpolicyagent.org/docs/latest/policy-language/
