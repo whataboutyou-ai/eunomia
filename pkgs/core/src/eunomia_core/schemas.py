@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from eunomia_core.enums import EntityType
 from eunomia_core.utils import generate_uri
@@ -20,8 +20,7 @@ class AttributeInDb(Attribute):
         description="Time when this attribute was first registered"
     )
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class EntityBase(BaseModel):
@@ -100,8 +99,7 @@ class EntityInDb(EntityBase):
     attributes: list[AttributeInDb] = Field(..., description="Entity attributes")
     registered_at: datetime = Field(description="Time when this entity was registered")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ResourceAccess(EntityAccess):
