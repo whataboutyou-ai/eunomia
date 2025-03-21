@@ -1,3 +1,36 @@
+"""
+Rego Policy Conversion Module
+
+This module provides functionality to convert Eunomia policy definitions into Rego language for use with OPA (Open Policy Agent).
+
+Since Eunomia uses OPA as its policy enforcement engine, policies defined using the Eunomia schema need to be
+translated into Rego - OPA's native policy language. This module handles this conversion process.
+
+Example Rego Output:
+------------------------
+```
+package eunomia
+
+default allow := false
+
+# Rule allowing admin access to documents
+allow if {
+    input.principal.attributes.role == "admin"
+    input.resource.attributes.type == "document"
+}
+
+# Rule allowing members to access public documents
+allow if {
+    input.principal.attributes.role == "member"
+    input.resource.attributes.type == "document"
+    input.resource.attributes.confidentiality == "public"
+}
+```
+
+Note: In Rego, multiple allow blocks represent OR conditions, while statements within a block
+represent AND conditions. The policy evaluates to "allow := true" if any rule block is satisfied.
+"""
+
 from eunomia_core import schemas
 
 EQUAL_URI_STMNT = '	input.{type}.uri == "{uri}"'
