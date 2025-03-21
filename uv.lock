@@ -235,6 +235,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "httpx" },
     { name = "pydantic-settings" },
+    { name = "sqlalchemy" },
 ]
 
 [package.dev-dependencies]
@@ -254,6 +255,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.9" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pydantic-settings", specifier = ">=2.8.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.38" },
 ]
 
 [package.metadata.requires-dev]

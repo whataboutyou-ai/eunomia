@@ -13,7 +13,7 @@ First, copy the `.env.example` file to `.env` and set the `OPA_POLICY_FOLDER` va
 Then, let's start the Eunomia server with:
 
 ```bash
-fastapi dev src/eunomia/api/main.py
+eunomia server
 ```
 
 ### Policy Configuration

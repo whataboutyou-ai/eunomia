@@ -51,7 +51,7 @@ pip install eunomia-ai
 The server can be served locally with:
 
 ```bash
-fastapi dev src/eunomia/api/main.py
+eunomia server
 ```
 
 ### Usage

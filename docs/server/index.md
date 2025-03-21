@@ -18,7 +18,7 @@ Explore the [available SDKs](../sdks/index.md#available-sdks) for an easier inte
 The server can be served locally with:
 
 ```bash
-fastapi dev src/eunomia/api/main.py
+eunomia server
 ```
 
 ## Components

@@ -13,6 +13,7 @@ dependencies = [
     "fastapi[standard]>=0.115.9",
     "httpx>=0.28.1",
     "pydantic-settings>=2.8.1",
+    "sqlalchemy>=2.0.38",
 ]
 
 [dependency-groups]
@@ -25,6 +26,9 @@ docs = [
     "mkdocs-material>=9.6.5",
     "mkdocstrings[python]>=0.29.0",
 ]
+
+[project.scripts]
+eunomia = "eunomia.cli:app"
 
 [build-system]
 requires = ["hatchling"]

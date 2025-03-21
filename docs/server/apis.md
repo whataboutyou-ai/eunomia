@@ -7,7 +7,7 @@ The API is built with [FastAPI][fastapi-docs].
 The server can be served locally with:
 
 ```bash
-fastapi dev src/eunomia/api/main.py
+eunomia server
 ```
 
 ## API Endpoints
