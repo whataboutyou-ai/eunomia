@@ -39,7 +39,7 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     Use one of the available SDKs to integrate Eunomia into your project
 
-    [:material-arrow-right: Explore SDKs](../sdks/index.md)
+    [:material-arrow-right: Explore SDKs](../api/sdks/index.md)
 
 
 -   :material-scale-balance:{ .lg .middle } __Open Source__
@@ -82,7 +82,7 @@ In this phase, you configure the authorization policies that will govern access 
 
 - **Define Policies**: Write policies using the Rego policy language to specify access rules based on principals and resources attributes.
 - **Register Resources**: Register the resources (like documents, applications, or AI agents) that need to be protected, along with their metadata.
-- **Register Principals**: Register the principals (entities requesting access[*](#understanding-principals)) with their metadata that will be used for authorization decisions.
+- **Register Principals**: Register the principals (entities requesting access[*](#what-is-a-principal)) with their metadata that will be used for authorization decisions.
 
 For example, you might register an AI agent as a resource with its capabilities as metadata, and register users as principals with their roles and departments as metadata.
 

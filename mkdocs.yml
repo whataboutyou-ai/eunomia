@@ -84,16 +84,19 @@ nav:
       - Quickstart: get_started/quickstart.md
       - License: get_started/license.md
   - Docs:
-      - server/index.md
-      - APIs: server/apis.md
-      - Config: server/config.md
-      - DB: server/db.md
-      - Engine: server/engine.md
-      - Server: server/server.md
-  - SDKs:
-      - sdks/index.md
-      - Python SDK: sdks/python.md
-      - LangChain SDK: sdks/langchain.md
+      - Eunomia Docs: api/index.md
+      - APIs: api/apis.md
+      - Config: api/config.md
+      - DB: api/db.md
+      - Engine: api/engine.md
+      - Server: api/server.md
+      - Eunomia Core:
+          - Eunomia Core Docs: api/core/index.md
+          - Schemas: api/core/schemas.md
+      - SDKs:
+          - Eunomia SDKs: api/sdks/index.md
+          - Python SDK: api/sdks/python.md
+          - LangChain SDK: api/sdks/langchain.md
   - Community:
       - community/index.md
       - How to Contribute: community/contribute.md

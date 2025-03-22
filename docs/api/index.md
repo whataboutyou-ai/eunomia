@@ -1,7 +1,3 @@
----
-title: Eunomia Server Docs
----
-
 The Eunomia server is a standalone service to handle the authorization logic of your AI Agent. The server can be self-hosted, exposing a REST API to your application.
 
 Interactions from your application to the Eunomia server are held in two different phases:
@@ -11,7 +7,7 @@ Interactions from your application to the Eunomia server are held in two differe
 
 The Eunomia server is built on top of [Open Policy Agent (OPA)][opa-website] which Eunomia will try to install automatically if it is not already present in your system.
 
-Explore the [available SDKs](../sdks/index.md#available-sdks) for an easier integration of Eunomia into your application.
+Explore the [available SDKs](../api/sdks/index.md#available-sdks) for an easier integration of Eunomia into your application.
 
 ## Running the Server
 
