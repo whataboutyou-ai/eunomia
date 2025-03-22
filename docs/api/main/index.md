@@ -1,7 +1,3 @@
----
-title: Eunomia Server Docs
----
-
 The Eunomia server is a standalone service to handle the authorization logic of your AI Agent. The server can be self-hosted, exposing a REST API to your application.
 
 Interactions from your application to the Eunomia server are held in two different phases:

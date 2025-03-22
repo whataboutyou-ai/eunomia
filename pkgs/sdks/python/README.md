@@ -34,4 +34,4 @@ is_allowed = client.check_access(
 For detailed usage, check out the SDK's [documentation][docs].
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
-[docs]: https://whataboutyou-ai.github.io/eunomia/sdks/python/
+[docs]: https://whataboutyou-ai.github.io/eunomia/api/sdks/python/

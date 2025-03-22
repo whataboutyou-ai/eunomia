@@ -39,7 +39,7 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     Use one of the available SDKs to integrate Eunomia into your project
 
-    [:material-arrow-right: Explore SDKs](../sdks/index.md)
+    [:material-arrow-right: Explore SDKs](../api/sdks/index.md)
 
 
 -   :material-scale-balance:{ .lg .middle } __Open Source__
