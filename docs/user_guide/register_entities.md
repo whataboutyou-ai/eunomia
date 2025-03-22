@@ -1,5 +1,140 @@
 ---
-title: User Guide
+title: Register Entities
 ---
 
-This `eunomia` user guide explains how to configure the library and unlock its full potential. If you're new to `eunomia`, we recommend starting with the [Getting Started](../get_started/index.md) guide. Once you're familiar with the basics, simply use the left-hand menu to explore the topics that interest you further.
+In the [Quickstart](../get_started/index.md) guide, we showed how to use the `POST /check-access` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
+
+## Register a New Entity
+
+You can register a new entity using the `POST /register-entity` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
+
+### Payload Requirements
+
+Your JSON payload must include the following fields:
+
+- **`attributes`** (required):  
+  An array of attribute objects. Each attribute must include:
+  - **`key`** (*string*): The attribute's key.
+  - **`value`** (*string*): The attribute's value.  
+  
+  *Note: The attributes array must not be empty, and duplicate keys are not allowed.*
+
+- **`type`** (required):  
+  The type of the entity, defined by the **EntityType** enum (i.e., `principal` or `resource`).
+
+- **`uri`** (optional):  
+  A unique identifier for the entity. If omitted, the server will generate one automatically. This identifier is used later to check access for the entity.
+
+### Response Details
+
+On success, the server responds with a JSON object that includes the **`uri`** of the entity, which can be stored locally and used at a later stage.
+
+
+## Example Usage
+
+=== "Python"
+    ```python
+    from eunomia_core import enums
+
+    # Register a resource with metadata
+    resource = client.register_entity(
+        type=enums.EntityType.resource,
+        attributes={
+            "name": "sensitive_document",
+            "type": "document",
+            "classification": "confidential"
+        }
+    )
+    print("Resource:", resource)
+
+    # Register a principal with metadata
+    principal = client.register_entity(
+        type=enums.EntityType.principal,
+        attributes={
+            "name": "user_123",
+            "role": "analyst",
+            "department": "research"
+        }
+    )
+    print("Principal:", principal)
+    ```
+
+=== "Curl"
+    ```bash
+    curl -X POST 'http://localhost:8000/register-entity' \
+         -H "Content-Type: application/json" \
+         -d '{
+               "type": "resource",
+               "attributes": {
+                 "name": "sensitive_document",
+                 "type": "document",
+                 "classification": "confidential"
+               }
+             }'
+
+    curl -X POST 'http://localhost:8000/register-entity' \
+         -H "Content-Type: application/json" \
+         -d '{
+               "type": "principal",
+               "attributes": {
+                 "name": "user_123",
+                 "role": "analyst",
+                 "department": "research"
+               }
+             }'
+    ```
+
+=== "Output"
+    ```bash
+    # Example JSON response for a resource
+    {
+      "uri": "generated-uri-123",
+      "attributes": [
+          {
+            "key": "name",
+            "value": "sensitive_document",
+            "registered_at": "2025-03-22T10:00:00Z",
+            "updated_at": "2025-03-22T10:00:00Z"
+          },
+          {
+            "key": "type",
+            "value": "document",
+            "registered_at": "2025-03-22T10:00:00Z",
+            "updated_at": "2025-03-22T10:00:00Z"
+          },
+          {
+            "key": "classification",
+            "value": "confidential",
+            "registered_at": "2025-03-22T10:00:00Z",
+            "updated_at": "2025-03-22T10:00:00Z"
+          }
+      ],
+      "registered_at": "2025-03-22T10:00:00Z"
+    }
+
+    # Example JSON response for a principal
+    {
+      "uri": "generated-uri-456",
+      "attributes": [
+          {
+            "key": "name",
+            "value": "user_123",
+            "registered_at": "2025-03-22T10:01:00Z",
+            "updated_at": "2025-03-22T10:01:00Z"
+          },
+          {
+            "key": "role",
+            "value": "analyst",
+            "registered_at": "2025-03-22T10:01:00Z",
+            "updated_at": "2025-03-22T10:01:00Z"
+          },
+          {
+            "key": "department",
+            "value": "research",
+            "registered_at": "2025-03-22T10:01:00Z",
+            "updated_at": "2025-03-22T10:01:00Z"
+          }
+      ],
+      "registered_at": "2025-03-22T10:01:00Z"
+    }
+    ```

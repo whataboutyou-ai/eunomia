@@ -87,10 +87,11 @@ nav:
   - User Guide: 
       - user_guide/index.md
       - Configure Eunomia Server: user_guide/configure_server.md
+      - Create policies: user_guide/create_policies.md
       - Register entities: user_guide/register_entities.md
       - Update and delete entities: user_guide/upd_del_entities.md
       - Check access at runtime: user_guide/check_access.md
-      - Create policies: user_guide/create_policies.md
+
         
   - Docs:
       - Eunomia:
