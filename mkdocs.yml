@@ -84,12 +84,13 @@ nav:
       - Quickstart: get_started/quickstart.md
       - License: get_started/license.md
   - Docs:
-      - Eunomia Docs: api/index.md
-      - APIs: api/apis.md
-      - Config: api/config.md
-      - DB: api/db.md
-      - Engine: api/engine.md
-      - Server: api/server.md
+      - Eunomia:
+          - Eunomia Docs: api/main/index.md
+          - APIs: api/main/apis.md
+          - Config: api/main/config.md
+          - DB: api/main/db.md
+          - Engine: api/main/engine.md
+          - Server: api/main/server.md
       - Eunomia Core:
           - Eunomia Core Docs: api/core/index.md
           - Schemas: api/core/schemas.md

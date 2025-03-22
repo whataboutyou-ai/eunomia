@@ -132,4 +132,4 @@ You can use the `POST /check-access` endpoint for this, passing the principal an
 
 Congratulations! You've just made your first steps with Eunomia.
 
-You can now continue to the detailed [server documentation](../api/index.md) or explore the available [SDKs](../api/sdks/index.md) to discover how to best integrate Eunomia into your application.
+You can now continue to the detailed [server documentation](../api/main/index.md) or explore the available [SDKs](../api/sdks/index.md) to discover how to best integrate Eunomia into your application.
