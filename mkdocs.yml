@@ -82,7 +82,16 @@ nav:
       - get_started/index.md
       - Installation: get_started/installation.md
       - Quickstart: get_started/quickstart.md
-      - License: get_started/license.md
+      - How it works: get_started/how_it_works.md
+
+  - User Guide: 
+      - user_guide/index.md
+      - Configure Eunomia Server: user_guide/configure_server.md
+      - Register entities: user_guide/register_entities.md
+      - Update and delete entities: user_guide/upd_del_entities.md
+      - Check access at runtime: user_guide/check_access.md
+      - Create policies: user_guide/create_policies.md
+        
   - Docs:
       - server/index.md
       - APIs: server/apis.md
@@ -97,3 +106,4 @@ nav:
   - Community:
       - community/index.md
       - How to Contribute: community/contribute.md
+      - License: community/license.md
