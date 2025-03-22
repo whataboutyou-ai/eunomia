@@ -1,92 +1,105 @@
-from typing import Any, Dict, List
-
 import httpx
-from fastapi import APIRouter, HTTPException, status
+from eunomia_core import schemas
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from eunomia.db import db
 from eunomia.server import EunomiaServer
 
 router = APIRouter()
 server = EunomiaServer()
 
 
-@router.get("/check-access")
-async def check_access(principal_id: str, resource_id: str) -> bool:
+@router.post("/check-access", response_model=bool)
+async def check_access(
+    request: schemas.AccessRequest, db_session: Session = Depends(db.get_db)
+):
     try:
-        return await server.check_access(principal_id, resource_id)
+        return await server.check_access(request, db=db_session)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"OPA call failed: {exc}",
         )
-
-
-@router.get("/allowed-resources")
-async def allowed_resources(principal_id: str) -> List[str]:
-    try:
-        return await server.allowed_resources(principal_id)
-    except httpx.HTTPError as exc:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"OPA call failed: {exc}",
+            detail=f"Failed /check-access: {exc}",
         )
 
 
-@router.post("/register_resource")
-async def register_resource(payload: Dict[str, Any]) -> Dict[str, Any]:
+@router.post("/register-entity", response_model=schemas.EntityInDb)
+async def register_entity(
+    entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
+):
     try:
-        resource_metadata = payload.get("metadata", None)
-        resource_content = payload.get("content", None)
-
-        if resource_metadata is None:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Processing failed: Missing resoure metadata",
-            )
-
-        eunomia_id = await server.register_resource(resource_metadata, resource_content)
-        if eunomia_id is not None:
-            return {"status": "success", "eunomia_id": eunomia_id}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Processing failed: Internal Problem",
-            )
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Processing failed: {exc}",
-        )
+        return server.register_entity(entity, db=db_session)
     except ValueError as exc:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
         )
-
-
-@router.post("/register_principal")
-async def register_principal(payload: Dict[str, Any]) -> Dict[str, Any]:
-    try:
-        principal_metadata = payload.get("metadata", None)
-
-        if principal_metadata is None:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Processing failed: Missing resoure metadata",
-            )
-
-        eunomia_id = await server.register_principal(principal_metadata)
-        if eunomia_id is not None:
-            return {"status": "success", "eunomia_id": eunomia_id}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Processing failed: Internal Problem",
-            )
-    except httpx.HTTPError as exc:
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Processing failed: {exc}",
+            detail=f"Failed /register-entity: {exc}",
         )
+
+
+@router.post("/update-entity", response_model=schemas.EntityInDb)
+async def update_entity(
+    entity: schemas.EntityUpdate,
+    override: bool = False,
+    db_session: Session = Depends(db.get_db),
+):
+    try:
+        return server.update_entity(entity, override=override, db=db_session)
     except ValueError as exc:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /update-entity: {exc}",
+        )
+
+
+@router.post("/delete-entity")
+async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
+    try:
+        server.delete_entity(uri, db=db_session)
+        return {"uri": uri, "message": "Entity deleted successfully"}
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /delete-entity: {exc}",
+        )
+
+
+@router.post("/create-policy")
+async def create_policy(policy: schemas.Policy, filename: str = "policy.rego"):
+    try:
+        path = server.create_policy(policy, filename=filename)
+        return {"path": path, "message": "Policy created successfully at path"}
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /create-policy: {exc}",
         )

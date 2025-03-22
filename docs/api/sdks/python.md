@@ -42,9 +42,6 @@ is_allowed = client.check_access(
     principal_id=principal["id"],
     resource_id=resource["id"]
 )
-
-# Get a list of resources a principal has access to
-allowed_resources = client.allowed_resources(principal_id=principal["id"])
 ```
 
 ## SDK Docs

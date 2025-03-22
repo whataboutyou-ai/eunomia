@@ -1,6 +1,7 @@
 import asyncio
 from typing import AsyncIterator, Iterator, List
 
+from eunomia_core import enums
 from eunomia_sdk_python import EunomiaClient
 from langchain.schema import Document
 from langchain_core.document_loaders.base import BaseLoader
@@ -53,22 +54,17 @@ class EunomiaLoader:
         self._send_content = send_content
         self._client = EunomiaClient(server_host=server_host, api_key=api_key)
 
-    def _get_request_payload(self, doc: Document):
-        request_payload = {
-            "metadata": doc.metadata,
-            "content": doc.page_content if self._send_content is True else None,
-        }
-        return request_payload
-
     def _process_document_sync(
         self, doc: Document, eunomia_group: str | None = None
     ) -> Document:
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
         doc.metadata["eunomia_group"] = eunomia_group
-        payload = self._get_request_payload(doc)
-        response_data = self._client.register_resource(payload)
-        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+
+        response_data = self._client.register_entity(
+            type=enums.EntityType.resource, attributes=doc.metadata
+        )
+        doc.metadata["eunomia_uri"] = response_data.uri
         return doc
 
     async def _process_document_async(
@@ -77,13 +73,15 @@ class EunomiaLoader:
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
         doc.metadata["eunomia_group"] = eunomia_group
-        payload = self._get_request_payload(doc)
+
         loop = asyncio.get_running_loop()
-        payload = self._get_request_payload(doc)
         response_data = await loop.run_in_executor(
-            None, lambda: self._client.register_resource(payload)
+            None,
+            lambda: self._client.register_entity(
+                type=enums.EntityType.resource, attributes=doc.metadata
+            ),
         )
-        doc.metadata["eunomia_id"] = response_data.get("eunomia_id")
+        doc.metadata["eunomia_uri"] = response_data.uri
         return doc
 
     async def alazy_load(
@@ -100,7 +98,8 @@ class EunomiaLoader:
         Yields
         ------
         Document
-            Documents with Eunomia identifiers added to their metadata, yielded one by one.
+            Documents with Eunomia identifiers added to their metadata as 'eunomia_uri',
+            yielded one by one.
 
         Examples
         --------
@@ -131,7 +130,8 @@ class EunomiaLoader:
         Returns
         -------
         List[Document]
-            The list of loaded documents with Eunomia identifiers added to their metadata.
+            The list of loaded documents with Eunomia identifiers added to their metadata
+            as 'eunomia_uri'.
 
         Examples
         --------
@@ -159,7 +159,8 @@ class EunomiaLoader:
         Yields
         ------
         Document
-            Documents with Eunomia identifiers added to their metadata, yielded one by one.
+            Documents with Eunomia identifiers added to their metadata as 'eunomia_uri',
+            yielded one by one.
 
         Examples
         --------
@@ -185,7 +186,8 @@ class EunomiaLoader:
         Returns
         -------
         List[Document]
-            The list of loaded documents with Eunomia identifiers added to their metadata.
+            The list of loaded documents with Eunomia identifiers added to their metadata
+            as 'eunomia_uri'.
 
         Examples
         --------

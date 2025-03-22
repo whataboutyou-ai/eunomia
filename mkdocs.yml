@@ -25,6 +25,7 @@ theme:
     - navigation.instant.progress
     - navigation.top
     - content.code.copy
+    - content.tabs.link
     - announce.dismiss
   custom_dir: docs/overrides
 
@@ -81,18 +82,33 @@ nav:
       - get_started/index.md
       - Installation: get_started/installation.md
       - Quickstart: get_started/quickstart.md
-      - License: get_started/license.md
+      - How it works: get_started/how_it_works.md
+
+  - User Guide: 
+      - user_guide/index.md
+      - Configure Eunomia Server: user_guide/configure_server.md
+      - Create policies: user_guide/create_policies.md
+      - Register entities: user_guide/register_entities.md
+      - Update and delete entities: user_guide/upd_del_entities.md
+      - Check access at runtime: user_guide/check_access.md
+
+        
   - Docs:
-      - server/index.md
-      - APIs: server/apis.md
-      - Config: server/config.md
-      - DB: server/db.md
-      - Engine: server/engine.md
-      - Server: server/server.md
-  - SDKs:
-      - sdks/index.md
-      - Python SDK: sdks/python.md
-      - LangChain SDK: sdks/langchain.md
+      - Eunomia:
+          - Eunomia Docs: api/main/index.md
+          - APIs: api/main/apis.md
+          - Config: api/main/config.md
+          - DB: api/main/db.md
+          - Engine: api/main/engine.md
+          - Server: api/main/server.md
+      - Eunomia Core:
+          - Eunomia Core Docs: api/core/index.md
+          - Schemas: api/core/schemas.md
+      - SDKs:
+          - Eunomia SDKs: api/sdks/index.md
+          - Python SDK: api/sdks/python.md
+          - LangChain SDK: api/sdks/langchain.md
   - Community:
       - community/index.md
       - How to Contribute: community/contribute.md
+      - License: community/license.md

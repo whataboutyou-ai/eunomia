@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-ai"
-version = "0.2.0"
+version = "0.2.1"
 description = "Authorization layer for AI Agents"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -9,10 +9,11 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "eunomia-core",
     "fastapi[standard]>=0.115.9",
     "httpx>=0.28.1",
-    "pydantic>=2.10.6",
     "pydantic-settings>=2.8.1",
+    "sqlalchemy>=2.0.38",
 ]
 
 [dependency-groups]
@@ -26,6 +27,9 @@ docs = [
     "mkdocstrings[python]>=0.29.0",
 ]
 
+[project.scripts]
+eunomia = "eunomia.cli:app"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -34,4 +38,7 @@ build-backend = "hatchling.build"
 packages = ["src/eunomia"]
 
 [tool.uv.workspace]
-members = ["sdks/*"]
+members = ["pkgs/core", "pkgs/sdks/*"]
+
+[tool.uv.sources]
+eunomia-core = { workspace = true }

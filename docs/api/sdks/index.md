@@ -1,7 +1,3 @@
----
-title: Eunomia SDKs
----
-
 Eunomia provides SDKs to interact with the server from different languages and development frameworks for an easier integration into codebases.
 
 Each SDK is built and distributed as a separate package that can be installed with `pip`.
