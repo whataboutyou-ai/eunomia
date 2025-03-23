@@ -1,4 +1,4 @@
-This package contains shared functionality across the main Eunomia package and all Eunomia SDKs.
+This section contains the documentation for the _core_ package, containing shared functionality across all Eunomia packages and SDKs.
 
 It includes common data models, utility functions, and types that ensure consistency across all Eunomia components.
 

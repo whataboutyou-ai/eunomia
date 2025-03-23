@@ -90,7 +90,7 @@ nav:
           - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
           - Check Access at Runtime: get_started/user_guide/check_access.md
   - Docs:
-      - API Reference: api/index.md
+      - Documentation: api/index.md
       - Eunomia:
           - Eunomia Docs: api/main/index.md
           - APIs: api/main/apis.md
