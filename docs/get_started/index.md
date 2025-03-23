@@ -7,44 +7,39 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 !!! warning
     Eunomia is currently under active development and therefore subject to change.
 
-## How to Get Started?
+## Core Components
 
 <div class="grid cards" markdown>
 
--   :material-clock-fast:{ .lg .middle } __Set up in seconds__
+-   :material-account-multiple:{ .lg .middle } __Principals__
 
     ---
 
-    Install `eunomia` with `pip` and get up and running in seconds
-
-    [:material-arrow-right: Installation](installation.md#install-latest-release)
+    Principals are actors (human or AI) requesting access to resources.
 
 
--   :material-play-speed:{ .lg .middle } __Start with an example__
+-   :material-semantic-web:{ .lg .middle } __Resources__
 
     ---
 
-    Get started with Eunomia by following the quickstart example
+    Resources are the targets of access, including data, tools, and AI agents.
 
-    [:material-arrow-right: Quickstart](quickstart.md)
-
-
--   :material-application-brackets-outline:{ .lg .middle } __Integrate within your codebase__
-
-    ---
-
-    Use one of the available SDKs to integrate Eunomia into your project
-
-    [:material-arrow-right: Explore SDKs](../api/sdks/index.md)
+    
 
 
--   :material-scale-balance:{ .lg .middle } __Open Source__
+-   :material-police-badge:{ .lg .middle } __Attributes__
 
     ---
 
-    Eunomia is licensed under Apache 2.0 and available on [GitHub][eunomia-github]
+    Metadata of Principals and Resources, used in access policies.
 
-    [:material-arrow-right: License](../community/license.md)
+
+
+-   :material-note-edit:{ .lg .middle } __Policies__
+
+    ---
+
+    Policies are rules that explicitly allow or deny Principals access to Resources.
 
 </div>
 
