@@ -1,69 +1,66 @@
-from pydantic import BaseModel
+"""
+Rego Policy Conversion Module
 
-REGO_ALLOW_POLICY = """\
-package eunomia\n
-default allow := false\n
-{rules}"""
+This module provides functionality to convert Eunomia policy definitions into Rego language for use with OPA (Open Policy Agent).
 
-REGO_ALLOW_RULE = """\
-allow if {{
-{item_attributes}
-}}"""
+Since Eunomia uses OPA as its policy enforcement engine, policies defined using the Eunomia schema need to be
+translated into Rego - OPA's native policy language. This module handles this conversion process.
 
-REGO_EQUAL_ITEM_ATTRIBUTE = """\
-input.{type}.{attribute_name} == "{attribute_value}"\
+Example Rego Output:
+------------------------
+```
+package eunomia
+
+default allow := false
+
+# Rule allowing admin access to documents
+allow if {
+    input.principal.attributes.role == "admin"
+    input.resource.attributes.type == "document"
+}
+
+# Rule allowing members to access public documents
+allow if {
+    input.principal.attributes.role == "member"
+    input.resource.attributes.type == "document"
+    input.resource.attributes.confidentiality == "public"
+}
+```
+
+Note: In Rego, multiple allow blocks represent OR conditions, while statements within a block
+represent AND conditions. The policy evaluates to "allow := true" if any rule block is satisfied.
 """
 
+from eunomia_core import schemas
 
-class Item(BaseModel):
-    type: str
-    attributes: dict[str, str]
+EQUAL_URI_STMNT = '	input.{type}.uri == "{uri}"'
+EQUAL_ATTRIBUTE_STMNT = '	input.{type}.attributes.{key} == "{value}"'
+ALLOW_RULE_STMNT = "allow if {{\n{entity_stmts}\n}}"
+ALLOW_POLICY_STMNT = "package eunomia\n\ndefault allow := false\n\n{rules}\n"
 
-    def to_rego(self) -> str:
-        return "\n".join(
-            [
-                REGO_EQUAL_ITEM_ATTRIBUTE.format(
-                    type=self.type, attribute_name=name, attribute_value=value
-                )
-                for name, value in self.attributes.items()
-            ]
+
+def entity_to_rego(entity: schemas.EntityAccess) -> str:
+    uri_stmt = (
+        [EQUAL_URI_STMNT.format(type=entity.type.value, uri=entity.uri)]
+        if entity.uri
+        else []
+    )
+    attribute_stmts = [
+        EQUAL_ATTRIBUTE_STMNT.format(
+            type=entity.type.value, key=attribute.key, value=attribute.value
         )
+        for attribute in entity.attributes
+    ]
+    return "\n".join(uri_stmt + attribute_stmts)
 
 
-class Rule(BaseModel):
-    items: list[Item]
-
-    def to_rego(self) -> str:
-        rego_items = "\n".join([item.to_rego() for item in self.items])
-        return REGO_ALLOW_RULE.format(item_attributes=rego_items)
-
-
-class Policy(BaseModel):
-    rules: list[Rule]
-
-    def to_rego(self) -> str:
-        rego_rules = "\n\n".join([rule.to_rego() for rule in self.rules])
-        return REGO_ALLOW_POLICY.format(rules=rego_rules)
+def access_rule_to_rego(rule: schemas.AccessRequest) -> str:
+    rego_items = "\n".join(
+        [entity_to_rego(rule.principal), entity_to_rego(rule.resource)]
+    )
+    return ALLOW_RULE_STMNT.format(entity_stmts=rego_items)
 
 
-### Example usage
-# policy = Policy(
-#     rules=[
-#         Rule(
-#             items=[
-#                 Item(type="caller", attributes={"id": "orchestrator"}),
-#                 Item(type="user", attributes={"department": "hr"}),
-#                 Item(type="resource", attributes={"id": "hr-agent"}),
-#             ]
-#         ),
-#         Rule(
-#             items=[
-#                 Item(type="caller", attributes={"id": "orchestrator"}),
-#                 Item(type="user", attributes={"department": "it", "role": "admin"}),
-#                 Item(type="resource", attributes={"id": "it-agent"}),
-#             ],
-#         ),
-#     ],
-# )
-# with open("policies/agents_policy.rego", "w") as f:
-#     f.write(policy.to_rego())
+def policy_to_rego(policy: schemas.Policy) -> str:
+    rego_rules = "\n\n".join([access_rule_to_rego(rule) for rule in policy.rules])
+    return ALLOW_POLICY_STMNT.format(rules=rego_rules)

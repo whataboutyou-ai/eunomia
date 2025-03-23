@@ -1,6 +1,6 @@
 # Eunomia SDK for LangChain
 
-This package allows to streamline [LangChain's loaders][langchain-loaders-docs] resources and their metadata to the [Eunomia][eunomia-github] server for an easier policy configuration process.
+This package allows to stream [LangChain's loaders][langchain-loaders-docs] resources and their metadata to the [Eunomia][eunomia-github] server for an easier policy configuration process.
 
 ## Installation
 
@@ -53,5 +53,5 @@ All loaded documents will be automatically sent to the Eunomia server which will
 For detailed usage, check out the SDK's [documentation][docs].
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
-[docs]: https://whataboutyou-ai.github.io/eunomia/sdks/langchain/
+[docs]: https://whataboutyou-ai.github.io/eunomia/api/sdks/langchain/
 [langchain-loaders-docs]: https://python.langchain.com/docs/concepts/document_loaders/

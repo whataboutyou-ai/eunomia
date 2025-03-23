@@ -19,7 +19,7 @@ class OpaPolicyEngine:
 
     def __init__(self) -> None:
         self._server_address = f"{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}"
-        self._policy_path = settings.OPA_POLICY_PATH
+        self.policy_folder = settings.OPA_POLICY_FOLDER
         # Global variable to store the OPA process
         self._process: subprocess.Popen[bytes] | None = None
         self.url = f"http://{self._server_address}/v1/data/eunomia"
@@ -81,7 +81,7 @@ class OpaPolicyEngine:
             "--server",
             "--addr",
             self._server_address,
-            self._policy_path,
+            self.policy_folder,
         ]
 
         # Start the OPA server as a subprocess, and wait to ensure it's running

@@ -1,58 +1,35 @@
 from datetime import datetime
-from typing import Optional
 
-from sqlalchemy import ForeignKey, String
+from eunomia_core.enums import EntityType
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from eunomia.db import db
 
 
-class Resource(db.Base):
-    __tablename__ = "resources"
+class Entity(db.Base):
+    __tablename__ = "entities"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    eunomia_id: Mapped[str] = mapped_column(String, nullable=False)
-    content: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    registered_at: Mapped[datetime]
+    uri: Mapped[str] = mapped_column(primary_key=True)
+    type: Mapped[EntityType]
+    registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     # relationships
-    resources_metadatas: Mapped[list["ResourceMetadata"]] = relationship(
-        back_populates="resource"
+    attributes: Mapped[list["Attribute"]] = relationship(
+        back_populates="entity", cascade="all, delete-orphan"
     )
 
 
-class ResourceMetadata(db.Base):
-    __tablename__ = "resource_metadatas"
+class Attribute(db.Base):
+    __tablename__ = "attributes"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    resource_id: Mapped[int] = mapped_column(ForeignKey(Resource.id))
-    key: Mapped[str]
+    entity_uri: Mapped[str] = mapped_column(ForeignKey(Entity.uri), primary_key=True)
+    key: Mapped[str] = mapped_column(primary_key=True)
     value: Mapped[str]
-
-    # relationships
-    resource: Mapped["Resource"] = relationship(back_populates="resources_metadatas")
-
-
-class Principal(db.Base):
-    __tablename__ = "principals"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    eunomia_id: Mapped[str] = mapped_column(String, nullable=False)
-    registered_at: Mapped[datetime]
-
-    # relationships
-    principals_metadatas: Mapped[list["PrincipalMetadata"]] = relationship(
-        back_populates="principal"
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
     )
-
-
-class PrincipalMetadata(db.Base):
-    __tablename__ = "principal_metadatas"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    principal_id: Mapped[int] = mapped_column(ForeignKey(Principal.id))
-    key: Mapped[str]
-    value: Mapped[str]
+    registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     # relationships
-    principal: Mapped["Principal"] = relationship(back_populates="principals_metadatas")
+    entity: Mapped["Entity"] = relationship(back_populates="attributes")

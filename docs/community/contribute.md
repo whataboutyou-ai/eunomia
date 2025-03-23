@@ -38,8 +38,8 @@ Before pushing your changes, ensure the tests pass and the code style aligns:
 
 ```bash
 uv run pytest
-ruff check
-ruff format
+uv run ruff check
+uv run ruff format --check
 ```
 
 _Note: a GitHub workflow will check the tests and formatting and reject the PR if it doesn't pass, so please make sure it passes locally._

@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-sdk-langchain"
-version = "0.1.0"
+version = "0.2.1"
 description = "Eunomia SDK for LangChain"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -12,12 +12,6 @@ dependencies = [
     "eunomia-sdk-python",
     "langchain>=0.3.20",
     "langchain-core>=0.3.41",
-]
-
-[dependency-groups]
-dev = [
-    "beautifulsoup4>=4.13.3",
-    "langchain-community>=0.3.19",
 ]
 
 [build-system]
