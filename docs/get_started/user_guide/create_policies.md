@@ -1,10 +1,5 @@
----
-title: Create Policies
----
-
 To enforce access control, you need to create policies that specify the rules for granting or denying access. In general, a policy is a collection of rules that define under which conditions a principal is allowed to access a resource based on their attributes. 
  
-
 There are two ways to define policies:
 
 - **Via the API call:** Use the endpoint to create a policy from a JSON payload
@@ -45,7 +40,7 @@ Your policy JSON payload should include a **`rules`** field, which is an array o
     ```
 
     !!! info
-        To use the Python SDK, check out its [documentation](../api/sdks/python.md) for installation instructions.
+        To use the Python SDK, check out its [documentation](../../api/sdks/python.md) for installation instructions.
 
 === "Curl"
     ```bash
@@ -82,12 +77,9 @@ allow if {
 }
 ```
 
-
 ## Create a Policy manually
 
- You can define your policies directly by creating Rego files in the `OPA_POLICY_FOLDER`. 
- In this case, ensure that your Rego files start with `package eunomia` and include your `allow` (and optionally `deny`) rules appropriately.
-
-
+You can define your policies directly by creating Rego files in the `OPA_POLICY_FOLDER`. 
+In this case, ensure that your Rego files start with `package eunomia` and include your `allow` (and optionally `deny`) rules appropriately.
 
 [rego-website]: https://www.openpolicyagent.org/docs/latest/policy-language/

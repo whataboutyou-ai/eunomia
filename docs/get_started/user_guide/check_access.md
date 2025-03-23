@@ -1,7 +1,3 @@
----
-title: Check Access
----
-
 The **`POST /check-access`** endpoint verifies whether a principal is allowed to access a resource based on their attributes. The API evaluates the access rules using a combination of registered entity attributes and/or attributes provided at runtime. The endpoint returns a boolean value (`true` for allowed access, `false` for denied access).
 
 You have three options when calling this API:

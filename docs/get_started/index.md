@@ -1,7 +1,3 @@
----
-title: Welcome to Eunomia
----
-
 ## What is Eunomia?
 
 Eunomia is a Python library that allows you to decouple the authorization logic from the main architecture of your AI Agent. Eunomia is built as a standalone authorization server that can serve any application.

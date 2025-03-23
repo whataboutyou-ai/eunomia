@@ -79,21 +79,18 @@ plugins:
 nav:
   - Home: index.md
   - Getting Started:
-      - get_started/index.md
+      - Welcome to Eunomia: get_started/index.md
       - Installation: get_started/installation.md
       - Quickstart: get_started/quickstart.md
-      - How it works: get_started/how_it_works.md
-
-  - User Guide: 
-      - user_guide/index.md
-      - Configure Eunomia Server: user_guide/configure_server.md
-      - Create policies: user_guide/create_policies.md
-      - Register entities: user_guide/register_entities.md
-      - Update and delete entities: user_guide/upd_del_entities.md
-      - Check access at runtime: user_guide/check_access.md
-
-        
+      - User Guide:
+          - How Eunomia works: get_started/user_guide/index.md
+          - Run the Eunomia Server: get_started/user_guide/run_server.md
+          - Create a Policy: get_started/user_guide/create_policies.md
+          - Register an Entity: get_started/user_guide/register_entities.md
+          - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
+          - Check Access at Runtime: get_started/user_guide/check_access.md
   - Docs:
+      - API Reference: api/index.md
       - Eunomia:
           - Eunomia Docs: api/main/index.md
           - APIs: api/main/apis.md
@@ -109,6 +106,6 @@ nav:
           - Python SDK: api/sdks/python.md
           - LangChain SDK: api/sdks/langchain.md
   - Community:
-      - community/index.md
+      - Join the Community: community/index.md
       - How to Contribute: community/contribute.md
       - License: community/license.md

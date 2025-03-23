@@ -1,8 +1,4 @@
----
-title: Register Entities
----
-
-In the [Quickstart](../get_started/index.md) guide, we showed how to use the `POST /check-access` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
+In the [Quickstart](../index.md) guide, we showed how to use the `POST /check-access` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
 
 ## Register a New Entity
 
@@ -28,7 +24,6 @@ Your JSON payload must include the following fields:
 ### Response Details
 
 On success, the server responds with a JSON object that includes the **`uri`** of the entity, which can be stored locally and used at a later stage.
-
 
 ## Example Usage
 

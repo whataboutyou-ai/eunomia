@@ -1,7 +1,3 @@
----
-title: Update and Delete Entities
----
-
 In addition to registering entities, you can update or delete them using dedicated API endpoints. This section explains how to update an entity's attributes and remove an entity entirely.
 
 ## Update an Entity
@@ -16,12 +12,9 @@ The **`POST /update-entity`** endpoint allows you to update an already registere
 
 - **`override`** (default: `False`), controls whether the update should completely override existing attributes or merge with them. If override is set to `True`, only the attributes and the respective values present in the `attributes` array will be present in the new updated entity. All the previous attributes will be overwritten.
 
-
 ## Delete an Entity
 
 The **`POST /delete-entity`** endpoint allows you to delete an entity by providing its unique **`uri`**.
-
-
 
 ## Example Usage
 
