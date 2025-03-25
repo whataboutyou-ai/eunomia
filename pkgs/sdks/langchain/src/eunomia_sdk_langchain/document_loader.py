@@ -8,9 +8,10 @@ from langchain_core.document_loaders.base import BaseLoader
 
 
 class EunomiaLoader:
-    """A wrapper around LangChain loaders that sends documents to the Eunomia server.
+    """
+    A wrapper around LangChain loaders that sends documents to the Eunomia server.
 
-    This class wraps any LangChain BaseLoader and intercepts the document loading
+    This class wraps any LangChain document loader and intercepts the document loading
     process to send metadata to the Eunomia server. The Eunomia server assigns an
     identifier to each document, which can be used for policy configuration.
 
@@ -22,8 +23,6 @@ class EunomiaLoader:
         The hostname of the Eunomia server.
     api_key : str, optional
         The API key to use for the Eunomia server, only required when the server is hosted on cloud.
-    send_content : bool, default=False
-        Whether to send the content of the documents to the Eunomia server.
 
     Methods
     -------
@@ -48,10 +47,8 @@ class EunomiaLoader:
         loader: BaseLoader,
         server_host: str | None = None,
         api_key: str | None = None,
-        send_content: bool = False,
     ):
         self._loader = loader
-        self._send_content = send_content
         self._client = EunomiaClient(server_host=server_host, api_key=api_key)
 
     def _process_document_sync(
