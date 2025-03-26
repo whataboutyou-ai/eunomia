@@ -1,0 +1,7 @@
+python-dotenv>=1.0.1
+colorama>=0.4.6
+langchain>=0.3.20
+langchain-openai>=0.3.10
+tavily-python>=0.5.1
+humanlayer>=0.7.6
+eunomia-sdk-python==0.2.1
