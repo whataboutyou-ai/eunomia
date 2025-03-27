@@ -29,6 +29,8 @@ Run the agent in a loop:
 python example_parental_control.py
 ```
 
+You can stop the agent by typing `exit`, `quit` or `bye`.
+
 > [!NOTE]
 > The example in this script handles both conversation and human approval in the terminal. The human intervention could easily be replaced with a different UI through HumanLayer.
 
