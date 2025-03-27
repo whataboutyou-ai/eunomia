@@ -32,6 +32,7 @@ class EunomiaRetriever(BaseRetriever):
         server_host: str | None = None,
         api_key: str | None = None,
     ):
+        super().__init__()
         self._retriever = retriever
         self._principal = principal
         self._client = EunomiaClient(server_host=server_host, api_key=api_key)
@@ -41,7 +42,7 @@ class EunomiaRetriever(BaseRetriever):
             doc
             for doc in docs
             if self._client.check_access(
-                resource_uri=doc.metadata.pop("eunomia_uri", default=None),
+                resource_uri=doc.metadata.pop("eunomia_uri", None),
                 resource_attributes=doc.metadata,
                 principal_uri=self._principal.uri,
                 principal_attributes=self._principal.attributes,
@@ -49,7 +50,7 @@ class EunomiaRetriever(BaseRetriever):
         ]
 
     def _get_relevant_documents(self, query: str) -> list[Document]:
-        docs = self._retriever.get_relevant_documents(query)
+        docs = self._retriever.invoke(query)
         return self._check_docs_access(docs)
 
     async def _acheck_doc_access(self, doc: Document) -> tuple[Document, bool]:
@@ -69,10 +70,5 @@ class EunomiaRetriever(BaseRetriever):
         return [doc for doc, has_access in results if has_access]
 
     async def _aget_relevant_documents(self, query: str) -> list[Document]:
-        docs = await self._retriever.aget_relevant_documents(query)
+        docs = await self._retriever.ainvoke(query)
         return await self._acheck_docs_access(docs)
-
-    def __getattr__(self, name):
-        # Delegate any attribute or method lookup to the underlying retriever
-        # if not explicitly defined in this wrapper.
-        return getattr(self._retriever, name)
