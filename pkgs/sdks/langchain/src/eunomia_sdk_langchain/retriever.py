@@ -23,6 +23,25 @@ class EunomiaRetriever(BaseRetriever):
         The hostname of the Eunomia server.
     api_key : str, optional
         The API key to use for the Eunomia server, only required when the server is hosted on cloud.
+
+    Examples
+    --------
+    >>> from eunomia_core import schemas
+    >>> from eunomia_sdk_langchain.retriever import EunomiaRetriever
+    >>> from langchain_community.retrievers import BM25Retriever
+    >>> from langchain_core.documents import Document
+    >>> retriever = BM25Retriever.from_documents(
+    ...     [
+    ...         Document(page_content="foo", metadata={"confidentiality": "public"}),
+    ...         Document(page_content="bar", metadata={"confidentiality": "public"}),
+    ...         Document(page_content="foo bar", metadata={"confidentiality": "private"}),
+    ...     ]
+    ... )
+    >>> wrapped_retriever = EunomiaRetriever(
+    ...     retriever=retriever,
+    ...     principal=schemas.PrincipalAccess(uri="test-uri"),
+    ... )
+    >>> docs = wrapped_retriever.invoke("foo")
     """
 
     def __init__(
