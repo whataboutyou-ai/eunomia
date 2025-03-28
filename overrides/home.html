@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% block tabs %} {{ super() }}
+<style>
+  @media screen and (min-width: 76.25em) {
+    .md-sidebar--primary {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 60em) {
+    .md-sidebar--secondary {
+      display: none;
+    }
+  }
+  .mdx-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .mdx-hero {
+    text-align: center;
+    margin-top: 4rem;
+  }
+  .md-team {
+    margin-top: 4rem;
+  }
+</style>
+<section class="mdx-container">
+  <div class="md-grid md-typeset">
+    <div class="mdx-hero">
+      <div class="mdx-hero__image">
+        <img
+          src="assets/logo-owl.png"
+          alt=""
+          width="300"
+          height="300"
+          draggable="false"
+        />
+      </div>
+      <div class="mdx-hero__content">
+        <h2>
+          <span style="font-weight: bold">Eunomia</span><br />
+          Authorization layer for AI Agents
+        </h2>
+        <a
+          href="{{ page.next_page.url | url }}"
+          title="{{ page.next_page.title | e }}"
+          class="md-button md-button--primary"
+          >Get Started</a
+        >
+        <a
+          href="{{ 'community/' | url }}"
+          title="Join Community"
+          class="md-button"
+          >Join Community</a
+        >
+        <p class="md-team">
+          Made with ❤️ by the team at
+          <a href="https://whataboutyou.ai">What About You</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block content %}{% endblock %} {% block footer %}{% endblock
+%}
