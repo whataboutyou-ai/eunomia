@@ -8,11 +8,13 @@ from langchain_core.document_loaders.base import BaseLoader
 
 
 class EunomiaLoader:
-    """A wrapper around LangChain loaders that sends documents to the Eunomia server.
+    """
+    A wrapper around LangChain loaders that sends documents to the Eunomia server.
 
-    This class wraps any LangChain BaseLoader and intercepts the document loading
-    process to send metadata to the Eunomia server. The Eunomia server assigns an
-    identifier to each document, which can be used for policy configuration.
+    This class wraps any LangChain document loader and intercepts the document loading
+    process to send their metadata as attributes to the Eunomia server. The Eunomia server
+    assigns an identifier to each document, which can be used for checking access permissions
+    by retrieving the associated document attributes at runtime.
 
     Parameters
     ----------
@@ -22,25 +24,11 @@ class EunomiaLoader:
         The hostname of the Eunomia server.
     api_key : str, optional
         The API key to use for the Eunomia server, only required when the server is hosted on cloud.
-    send_content : bool, default=False
-        Whether to send the content of the documents to the Eunomia server.
-
-    Methods
-    -------
-    load(eunomia_group=None) -> List[Document]
-        Load the documents synchronously and register them with the Eunomia server.
-    lazy_load(eunomia_group=None) -> Iterator[Document]
-        Load the documents lazily synchronously and register them with the Eunomia server.
-    aload(eunomia_group=None) -> List[Document]
-        Load the documents asynchronously and register them with the Eunomia server.
-    alazy_load(eunomia_group=None) -> AsyncIterator[Document]
-        Load the documents lazily asynchronously and register them with the Eunomia server.
 
     Notes
     -----
-    All loaded documents will be automatically sent to the Eunomia server which will
-    assign an identifier to each document and store their metadata. The identifiers
-    and metadata can then be used to configure policies in the Eunomia server.
+    The user can add additional metadata to the documents to be sent to the
+    Eunomia server with respect to the ones obtained from the loader.
     """
 
     def __init__(
@@ -48,18 +36,16 @@ class EunomiaLoader:
         loader: BaseLoader,
         server_host: str | None = None,
         api_key: str | None = None,
-        send_content: bool = False,
     ):
         self._loader = loader
-        self._send_content = send_content
         self._client = EunomiaClient(server_host=server_host, api_key=api_key)
 
     def _process_document_sync(
-        self, doc: Document, eunomia_group: str | None = None
+        self, doc: Document, additional_metadata: dict = {}
     ) -> Document:
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
-        doc.metadata["eunomia_group"] = eunomia_group
+        doc.metadata.update(additional_metadata)
 
         response_data = self._client.register_entity(
             type=enums.EntityType.resource, attributes=doc.metadata
@@ -68,11 +54,11 @@ class EunomiaLoader:
         return doc
 
     async def _process_document_async(
-        self, doc: Document, eunomia_group: str | None = None
+        self, doc: Document, additional_metadata: dict = {}
     ) -> Document:
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
-        doc.metadata["eunomia_group"] = eunomia_group
+        doc.metadata.update(additional_metadata)
 
         loop = asyncio.get_running_loop()
         response_data = await loop.run_in_executor(
@@ -85,15 +71,14 @@ class EunomiaLoader:
         return doc
 
     async def alazy_load(
-        self, eunomia_group: str | None = None
+        self, additional_metadata: dict = {}
     ) -> AsyncIterator[Document]:
         """Load documents lazily and asynchronously, registering them with the Eunomia server.
 
         Parameters
         ----------
-        eunomia_group : str, optional
-            An optional group identifier to assign to all documents. This will be
-            stored in the document metadata as 'eunomia_group'.
+        additional_metadata : dict, optional
+            Additional metadata to be sent to the Eunomia server.
 
         Yields
         ------
@@ -109,23 +94,22 @@ class EunomiaLoader:
         >>> async def process_docs():
         ...     loader = CSVLoader("data.csv")
         ...     wrapped_loader = EunomiaLoader(loader)
-        ...     async for doc in wrapped_loader.alazy_load(eunomia_group="financial_data"):
+        ...     async for doc in wrapped_loader.alazy_load(additional_metadata={"group": "financials"}):
         ...         await process_document(doc)
         >>>
         >>> asyncio.run(process_docs())
         """
         async for doc in self._loader.alazy_load():
-            processed_doc = await self._process_document_async(doc, eunomia_group)
+            processed_doc = await self._process_document_async(doc, additional_metadata)
             yield processed_doc
 
-    async def aload(self, eunomia_group: str | None = None) -> List[Document]:
+    async def aload(self, additional_metadata: dict = {}) -> List[Document]:
         """Load documents asynchronously and register them with the Eunomia server.
 
         Parameters
         ----------
-        eunomia_group : str, optional
-            An optional group identifier to assign to all documents. This will be
-            stored in the document metadata as 'eunomia_group'.
+        additional_metadata : dict, optional
+            Additional metadata to be sent to the Eunomia server.
 
         Returns
         -------
@@ -139,22 +123,22 @@ class EunomiaLoader:
         >>> from langchain_community.document_loaders.csv_loader import CSVLoader
         >>> loader = CSVLoader("data.csv")
         >>> wrapped_loader = EunomiaLoader(loader)
-        >>> docs = asyncio.run(wrapped_loader.aload(eunomia_group="financial_data"))
+        >>> docs = asyncio.run(wrapped_loader.aload(additional_metadata={"group": "financials"}))
         """
         documents = await self._loader.aload()
         processed_docs = [
-            await self._process_document_async(doc, eunomia_group) for doc in documents
+            await self._process_document_async(doc, additional_metadata)
+            for doc in documents
         ]
         return processed_docs
 
-    def lazy_load(self, eunomia_group: str | None = None) -> Iterator[Document]:
+    def lazy_load(self, additional_metadata: dict = {}) -> Iterator[Document]:
         """Load documents lazily and synchronously, registering them with the Eunomia server.
 
         Parameters
         ----------
-        eunomia_group : str, optional
-            An optional group identifier to assign to all documents. This will be
-            stored in the document metadata as 'eunomia_group'.
+        additional_metadata : dict, optional
+            Additional metadata to be sent to the Eunomia server.
 
         Yields
         ------
@@ -167,21 +151,20 @@ class EunomiaLoader:
         >>> from langchain_community.document_loaders.csv_loader import CSVLoader
         >>> loader = CSVLoader("data.csv")
         >>> wrapped_loader = EunomiaLoader(loader)
-        >>> for doc in wrapped_loader.lazy_load(eunomia_group="financial_data"):
+        >>> for doc in wrapped_loader.lazy_load(additional_metadata={"group": "financials"}):
         ...     process_document(doc)
         """
         for doc in self._loader.lazy_load():
-            processed_doc = self._process_document_sync(doc, eunomia_group)
+            processed_doc = self._process_document_sync(doc, additional_metadata)
             yield processed_doc
 
-    def load(self, eunomia_group: str | None = None) -> List[Document]:
+    def load(self, additional_metadata: dict = {}) -> List[Document]:
         """Load documents synchronously and register them with the Eunomia server.
 
         Parameters
         ----------
-        eunomia_group : str, optional
-            An optional group identifier to assign to all documents. This will be
-            stored in the document metadata as 'eunomia_group'.
+        additional_metadata : dict, optional
+            Additional metadata to be sent to the Eunomia server.
 
         Returns
         -------
@@ -194,11 +177,11 @@ class EunomiaLoader:
         >>> from langchain_community.document_loaders.csv_loader import CSVLoader
         >>> loader = CSVLoader("data.csv")
         >>> wrapped_loader = EunomiaLoader(loader)
-        >>> docs = wrapped_loader.load(eunomia_group="financial_data")
+        >>> docs = wrapped_loader.load(additional_metadata={"group": "financials"})
         """
         documents = self._loader.load()
         processed_docs = [
-            self._process_document_sync(doc, eunomia_group) for doc in documents
+            self._process_document_sync(doc, additional_metadata) for doc in documents
         ]
         return processed_docs
 
