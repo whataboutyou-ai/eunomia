@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from eunomia_core import schemas
 from eunomia_sdk_langchain import EunomiaLoader
 from eunomia_sdk_langchain.retriever import EunomiaRetriever
