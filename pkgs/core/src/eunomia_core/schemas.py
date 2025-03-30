@@ -3,8 +3,7 @@ from typing import Literal, Optional
 
 from eunomia_core.enums import EntityType
 from eunomia_core.utils import generate_uri
-from pydantic import (BaseModel, ConfigDict, Field, field_validator,
-                      model_validator)
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class Attribute(BaseModel):
