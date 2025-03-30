@@ -1,0 +1,6 @@
+langchain>=0.3.21
+langchain-community>=0.3.20
+datasets>=3.5.0
+rank_bm25>=0.2.2
+eunomia-sdk-python==0.2.2
+eunomia-sdk-langchain==0.2.2

@@ -24,23 +24,27 @@ You can then use the client to interact with the Eunomia server:
 
 ```python
 # Register a resource with metadata
-resource = client.register_resource({
-    "name": "sensitive_document",
-    "type": "document",
-    "classification": "confidential"
-})
+resource = client.register_entity(
+    type=schemas.EntityType.resource,
+    attributes={
+        "name": "sensitive_document",
+        "type": "document",
+        "classification": "confidential"}
+    )
 
 # Register a principal with metadata
-principal = client.register_principal({
-    "name": "user_123",
-    "role": "analyst",
-    "department": "research"
-})
+principal = client.register_entity(
+    type=schemas.EntityType.principal,
+    attributes={
+        "name": "user_123",
+        "role": "analyst",
+        "department": "research"}
+    )
 
 # Check if a principal has access to a resource
 is_allowed = client.check_access(
-    principal_id=principal["id"],
-    resource_id=resource["id"]
+    principal_uri=principal.uri,
+    resource_uri=resource.uri
 )
 ```
 
