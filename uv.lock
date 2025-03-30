@@ -228,7 +228,7 @@ wheels = [
 
 [[package]]
 name = "eunomia-ai"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "eunomia-core" },
@@ -271,7 +271,7 @@ docs = [
 
 [[package]]
 name = "eunomia-core"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "pkgs/core" }
 dependencies = [
     { name = "pydantic" },
@@ -282,7 +282,7 @@ requires-dist = [{ name = "pydantic", specifier = ">=2.10.6" }]
 
 [[package]]
 name = "eunomia-sdk-langchain"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "pkgs/sdks/langchain" }
 dependencies = [
     { name = "eunomia-sdk-python" },
@@ -299,7 +299,7 @@ requires-dist = [
 
 [[package]]
 name = "eunomia-sdk-python"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "pkgs/sdks/python" }
 dependencies = [
     { name = "eunomia-core" },

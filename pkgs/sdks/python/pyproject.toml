@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-sdk-python"
-version = "0.2.1"
+version = "0.2.2"
 description = "Eunomia SDK for Python"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
