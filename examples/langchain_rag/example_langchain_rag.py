@@ -54,6 +54,6 @@ director_retriever = EunomiaRetriever(
 
 
 ## RETRIEVE INFO WITH PERMISSIONS
-print(analyst_financial_fraud_retriever.invoke("unauthorized transaction"))
+#print(analyst_financial_fraud_retriever.invoke("unauthorized transaction"))
 print(analyst_media_fraud_retriever.invoke("facebook group"))
-print(analyst_media_fraud_retriever.invoke("robbery"))
+print(director_retriever.invoke("robbery"))
