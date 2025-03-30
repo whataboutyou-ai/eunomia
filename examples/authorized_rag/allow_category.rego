@@ -13,5 +13,5 @@ allow if {
 }
 
 allow if {
-	input.principal.attributes.department == "Central"
+	input.principal.attributes.role == "Director"
 }

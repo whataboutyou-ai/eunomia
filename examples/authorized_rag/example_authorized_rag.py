@@ -7,25 +7,22 @@ from langchain_community.retrievers import BM25Retriever
 
 client = EunomiaClient()
 
-## LOAD RESOURCES
+# Load dataset from HuggingFace
 dataset_name = "Dev523/Crime-Reports-Dataset"
 page_content_column = "crimeaditionalinfo"
 loader = HuggingFaceDatasetLoader(dataset_name, page_content_column)
 eunomia_loader = EunomiaLoader(loader)
 docs = eunomia_loader.load()
 
-## DEFINE PRINCIPALS
+# Register different principals with varying access levels
 analyst_financial_fraud = client.register_entity(
     type=schemas.EntityType.principal,
-    attributes={"role": "Analyst - Financial Fraud", "department": "Financial Fraud"},
+    attributes={"role": "Analyst", "department": "Financial Fraud"},
 )
 
 analyst_media_fraud = client.register_entity(
     type=schemas.EntityType.principal,
-    attributes={
-        "role": "Analyst - Media Related Fraud",
-        "department": "Media Related Crime",
-    },
+    attributes={"role": "Analyst", "department": "Media Related Crime"},
 )
 
 director = client.register_entity(
@@ -33,10 +30,10 @@ director = client.register_entity(
     attributes={"role": "Director", "department": "Central"},
 )
 
-
-## DEFINE RETRIEVER
+# Create base retriever
 bm25_retriever = BM25Retriever.from_documents(docs)
 
+# Create role-specific retrievers with different permissions
 analyst_financial_fraud_retriever = EunomiaRetriever(
     retriever=bm25_retriever,
     principal=schemas.PrincipalAccess(uri=analyst_financial_fraud.uri),
@@ -52,8 +49,7 @@ director_retriever = EunomiaRetriever(
     principal=schemas.PrincipalAccess(uri=director.uri),
 )
 
-
-## RETRIEVE INFO WITH PERMISSIONS
-#print(analyst_financial_fraud_retriever.invoke("unauthorized transaction"))
-print(analyst_media_fraud_retriever.invoke("facebook group"))
-print(director_retriever.invoke("robbery"))
+# Test retrieval with different user roles
+print(analyst_financial_fraud_retriever.invoke("Unauthorized transaction"))
+print(analyst_media_fraud_retriever.invoke("Facebook group"))
+print(director_retriever.invoke("Robbery"))
