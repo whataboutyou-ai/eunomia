@@ -59,22 +59,14 @@ def run():
         policy = schemas.Policy(
             rules=[
                 schemas.AccessRequest(
-                    principal=schemas.EntityAccess(
-                        uri=principal.uri,
-                        attributes={},
-                        type=enums.EntityType.principal,
-                    ),
-                    resource=schemas.EntityAccess(
-                        uri=resource.uri,
-                        attributes={},
-                        type=enums.EntityType.resource,
-                    ),
+                    principal=schemas.PrincipalAccess(uri=principal.uri),
+                    resource=schemas.ResourceAccess(uri=resource.uri),
                 ),
             ],
         )
         client.create_policy(
             policy=policy,
-            filename="policy-2.rego",
+            filename="policy-example.rego",
         )
         print("Policy created")
 

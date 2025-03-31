@@ -73,7 +73,7 @@ async function run() {
           },
         ],
       },
-      filename: "policy.rego",
+      filename: "policy-example.rego",
     });
     console.log("Policy created");
   } catch (error) {

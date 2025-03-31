@@ -91,7 +91,6 @@ def delete_entity(db_entity: models.Entity, db: Session) -> None:
     delete_entity_attributes(db_entity, db)
     db.delete(db_entity)
     db.commit()
-    db.refresh(db_entity)
     return
 
 
@@ -110,7 +109,6 @@ def delete_entity_attributes(db_entity: models.Entity, db: Session) -> None:
         models.Attribute.entity_uri == db_entity.uri
     ).delete()
     db.commit()
-    db.refresh(db_entity)
 
 
 def get_entity(uri: str, db: Session) -> models.Entity | None:
