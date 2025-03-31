@@ -6,3 +6,4 @@
 dist/
 local_testing/
 policies/
+node_modules/

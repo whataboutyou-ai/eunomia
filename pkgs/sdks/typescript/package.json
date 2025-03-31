@@ -1,0 +1,36 @@
+{
+  "name": "eunomia-sdk-typescript",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Eunomia",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0"
+  },
+  "keywords": [
+    "eunomia",
+    "sdk",
+    "typescript"
+  ],
+  "author": "What About You team <info@whataboutyou.ai>",
+  "license": "Apache-2.0"
+}
