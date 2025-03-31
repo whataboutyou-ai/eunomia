@@ -1,19 +1,29 @@
+## Install Eunomia
 
-## Install latest release
+### Install latest release
+
 You can install the latest release of `eunomia` with `pip`:
 
 ```bash
 pip install eunomia-ai
 ```
 
-## Install latest version
-You can install the latest version of `eunomia` on the repository's main branch:
+### Install for development
+
+See the [contributing documentation](../community/contribute.md) for instructions on how to install `eunomia` for development.
+
+## Install a SDK
+
+To install specific SDKs for different integrations, use:
 
 ```bash
-pip install git+https://github.com/whataboutyou-ai/eunomia.git@main
+pip install eunomia-sdk-<SDK_NAME>
 ```
 
-This can be useful, for instance, when some changes have been merged but not yet released.
+For example:
 
-## Install for development
-See the [contributing documentation](../community/contribute.md) for instructions on how to install `eunomia` for development.
+```bash
+pip install eunomia-sdk-python
+```
+
+For a complete list of available SDKs and their documentation, see the [SDKs documentation](../api/sdks/index.md).

@@ -4,13 +4,15 @@
 
 First, [fork][github-fork] the `eunomia` repository and then clone your forked repository locally:
 
-```bash
-# HTTPS
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/eunomia.git
+=== "HTTPS"
+    ```bash
+    git clone https://github.com/<YOUR_GITHUB_USERNAME>/eunomia.git
+    ```
 
-# SSH
-git clone git@github.com:<YOUR_GITHUB_USERNAME>/eunomia.git
-```
+=== "SSH"
+    ```bash
+    git clone git@github.com:<YOUR_GITHUB_USERNAME>/eunomia.git
+    ```
 
 Once in the cloned repository directory, make a branch with your username and description of the pull request:
 
@@ -29,7 +31,7 @@ uv sync
 If you are developing one of the SDKs, which are built as separate packages, you can install the dependencies for that specific package:
 
 ```bash
-uv sync --package eunomia-sdk-<NAME>
+uv sync --package eunomia-sdk-<SDK_NAME>
 ```
 
 ### Testing and formatting
