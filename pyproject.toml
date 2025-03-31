@@ -38,7 +38,7 @@ build-backend = "hatchling.build"
 packages = ["src/eunomia"]
 
 [tool.uv.workspace]
-members = ["pkgs/core", "pkgs/sdks/*"]
+members = ["pkgs/core", "pkgs/sdks/python", "pkgs/sdks/langchain"]
 
 [tool.uv.sources]
 eunomia-core = { workspace = true }

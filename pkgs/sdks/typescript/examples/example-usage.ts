@@ -1,14 +1,12 @@
 import { EunomiaClient, EntityType } from "../src";
 
 async function run() {
-  // Create a client instance
   const client = new EunomiaClient({
     serverHost: "http://localhost:8000",
-    apiKey: process.env.WAY_API_KEY || "your-api-key-here",
   });
 
   try {
-    // Register a principal
+    // // Register a principal
     console.log("Registering principal...");
     const principal = await client.registerEntity({
       type: EntityType.Principal,
@@ -51,7 +49,12 @@ async function run() {
     });
     console.log("Resource updated");
 
-    // Create policy
+    // Delete entity
+    console.log("Deleting entity...");
+    await client.deleteEntity(principal.uri);
+    console.log("Entities deleted");
+
+    // // Create policy
     console.log("Creating policy...");
     await client.createPolicy({
       policy: {
@@ -70,15 +73,9 @@ async function run() {
           },
         ],
       },
-      filename: "example-policy.json",
+      filename: "policy.rego",
     });
     console.log("Policy created");
-
-    // Delete entity
-    console.log("Deleting entities...");
-    await client.deleteEntity(resource.uri);
-    await client.deleteEntity(principal.uri);
-    console.log("Entities deleted");
   } catch (error) {
     console.error("Error:", error);
   }
