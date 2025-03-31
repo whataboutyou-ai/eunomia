@@ -29,7 +29,7 @@ uv sync
 If you are developing one of the SDKs, which are built as separate packages, you can install the dependencies for that specific package:
 
 ```bash
-uv sync --package eunomia-sdk-<NAME>
+uv sync --package eunomia-sdk-<SDK_NAME>
 ```
 
 ### Testing and formatting
