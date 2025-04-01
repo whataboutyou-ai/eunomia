@@ -105,6 +105,7 @@ nav:
           - Eunomia SDKs: api/sdks/index.md
           - Python SDK: api/sdks/python.md
           - LangChain SDK: api/sdks/langchain.md
+          - TypeScript SDK: api/sdks/typescript.md
   - Community:
       - Join the Community: community/index.md
       - How to Contribute: community/contribute.md

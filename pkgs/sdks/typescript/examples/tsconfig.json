@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "eunomia-sdk-typescript": ["src"]
+    }
+  },
+  "include": ["./**/*"],
+  "rules": {
+    "no-console": "off"
+  }
+}
