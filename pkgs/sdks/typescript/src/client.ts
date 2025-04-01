@@ -1,12 +1,12 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
-  EntityType,
   AccessRequest,
   EntityCreate,
   EntityInDb,
+  EntityType,
   EntityUpdate,
   Policy,
-} from "./index";
+} from './index';
 
 /**
  * Options for configuring the EunomiaClient
@@ -35,12 +35,12 @@ export class EunomiaClient {
    * @param options.apiKey - The API key for authenticating with the server (defaults to process.env.WAY_API_KEY)
    */
   constructor(options: EunomiaClientOptions = {}) {
-    this.serverHost = options.serverHost || "http://localhost:8000";
+    this.serverHost = options.serverHost || 'http://localhost:8000';
     this.apiKey = options.apiKey || process.env.WAY_API_KEY;
 
     const headers: Record<string, string> = {};
     if (this.apiKey) {
-      headers["WAY-API-KEY"] = this.apiKey;
+      headers['WAY-API-KEY'] = this.apiKey;
     }
 
     this.client = axios.create({
@@ -92,14 +92,14 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<boolean>(
-        "/check-access",
-        request
+        '/check-access',
+        request,
       );
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
-          `HTTP ${error.response.status}: ${error.response.data}`
+          `HTTP ${error.response.status}: ${error.response.data}`,
         );
       }
       throw error;
@@ -128,14 +128,14 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/register-entity",
-        entity
+        '/register-entity',
+        entity,
       );
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
-          `HTTP ${error.response.status}: ${error.response.data}`
+          `HTTP ${error.response.status}: ${error.response.data}`,
         );
       }
       throw error;
@@ -163,17 +163,17 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/update-entity",
+        '/update-entity',
         entity,
         {
           params: { override: options.override || false },
-        }
+        },
       );
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
-          `HTTP ${error.response.status}: ${error.response.data}`
+          `HTTP ${error.response.status}: ${error.response.data}`,
         );
       }
       throw error;
@@ -188,13 +188,13 @@ export class EunomiaClient {
    */
   async deleteEntity(uri: string): Promise<void> {
     try {
-      await this.client.post("/delete-entity", null, {
+      await this.client.post('/delete-entity', null, {
         params: { uri },
       });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
-          `HTTP ${error.response.status}: ${error.response.data}`
+          `HTTP ${error.response.status}: ${error.response.data}`,
         );
       }
       throw error;
@@ -219,13 +219,13 @@ export class EunomiaClient {
     }
 
     try {
-      await this.client.post("/create-policy", options.policy, {
+      await this.client.post('/create-policy', options.policy, {
         params,
       });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
-          `HTTP ${error.response.status}: ${error.response.data}`
+          `HTTP ${error.response.status}: ${error.response.data}`,
         );
       }
       throw error;

@@ -2,16 +2,32 @@
   "name": "eunomia-sdk-typescript",
   "version": "0.2.2",
   "description": "TypeScript SDK for Eunomia",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "keywords": [
+    "eunomia",
+    "sdk",
+    "typescript"
+  ],
+  "homepage": "https://github.com/whataboutyou-ai/eunomia#readme",
+  "bugs": {
+    "url": "https://github.com/whataboutyou-ai/eunomia/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whataboutyou-ai/eunomia.git"
+  },
+  "license": "Apache-2.0",
+  "author": "What About You team <info@whataboutyou.ai>",
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
   "files": [
-    "dist"
+    "./src"
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "lint": "eslint src/**/*.ts",
-    "prepare": "npm run build"
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
     "axios": "^1.8.0"
@@ -22,12 +38,5 @@
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.0.0",
     "typescript": "^5.8.0"
-  },
-  "keywords": [
-    "eunomia",
-    "sdk",
-    "typescript"
-  ],
-  "author": "What About You team <info@whataboutyou.ai>",
-  "license": "Apache-2.0"
+  }
 }

@@ -1,3 +1,4 @@
-export { EntityType } from "./enums";
-export * from "./schemas";
-export { EunomiaClient, EunomiaClientOptions } from "./client";
+export { EunomiaClient, EunomiaClientOptions } from './client';
+export { EntityType } from './enums';
+export * from './schemas';
+
