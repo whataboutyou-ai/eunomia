@@ -12,18 +12,6 @@ pip install eunomia-ai
 
 See the [contributing documentation](../community/contribute.md) for instructions on how to install `eunomia` for development.
 
-## Install a SDK
+## Install SDKs
 
-To install specific SDKs for different integrations, use:
-
-```bash
-pip install eunomia-sdk-<SDK_NAME>
-```
-
-For example:
-
-```bash
-pip install eunomia-sdk-python
-```
-
-For a complete list of available SDKs and their documentation, see the [SDKs documentation](../api/sdks/index.md).
+All SDKs are published as separate packages, explore the [available SDKs](../api/sdks/index.md) and follow the specific installation instructions for each.
