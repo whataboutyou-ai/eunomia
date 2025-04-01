@@ -12,7 +12,7 @@ pip install eunomia-sdk-python
 
 ## Usage
 
-The `EunomiaClient` class is the main class to interact with the Eunomia server.
+Create an instance of the `EunomiaClient` class to interact with the Eunomia server.
 
 ```python
 from eunomia_sdk_python import EunomiaClient
@@ -23,10 +23,12 @@ client = EunomiaClient()
 You can then call any server endpoint through the client. For example, you can check the access of a principal to a resource:
 
 ```python
-is_allowed = client.check_access(
-    principal_id="principal_123",
-    resource_id="resource_456",
+has_access = client.check_access(
+    principal_attributes={"role": "admin"},
+    resource_attributes={"type": "confidential"},
 )
+
+print(f"Has access: {has_access}")
 ```
 
 ## Documentation
