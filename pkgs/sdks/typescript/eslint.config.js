@@ -35,7 +35,7 @@ module.exports = [
 
       // Style
       semi: ["error", "always"],
-      quotes: ["error", "single", { avoidEscape: true }],
+      quotes: ["error", "double", { avoidEscape: true }],
       indent: ["error", 2],
       "comma-dangle": ["error", "always-multiline"],
     },

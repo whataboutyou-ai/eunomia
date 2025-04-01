@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import {
   AccessRequest,
   EntityCreate,
@@ -6,7 +6,7 @@ import {
   EntityType,
   EntityUpdate,
   Policy,
-} from './index';
+} from "./index";
 
 /**
  * Options for configuring the EunomiaClient
@@ -35,12 +35,12 @@ export class EunomiaClient {
    * @param options.apiKey - The API key for authenticating with the server (defaults to process.env.WAY_API_KEY)
    */
   constructor(options: EunomiaClientOptions = {}) {
-    this.serverHost = options.serverHost || 'http://localhost:8000';
+    this.serverHost = options.serverHost || "http://localhost:8000";
     this.apiKey = options.apiKey || process.env.WAY_API_KEY;
 
     const headers: Record<string, string> = {};
     if (this.apiKey) {
-      headers['WAY-API-KEY'] = this.apiKey;
+      headers["WAY-API-KEY"] = this.apiKey;
     }
 
     this.client = axios.create({
@@ -92,7 +92,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<boolean>(
-        '/check-access',
+        "/check-access",
         request,
       );
       return this.handleResponse(response);
@@ -128,7 +128,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        '/register-entity',
+        "/register-entity",
         entity,
       );
       return this.handleResponse(response);
@@ -163,7 +163,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        '/update-entity',
+        "/update-entity",
         entity,
         {
           params: { override: options.override || false },
@@ -188,7 +188,7 @@ export class EunomiaClient {
    */
   async deleteEntity(uri: string): Promise<void> {
     try {
-      await this.client.post('/delete-entity', null, {
+      await this.client.post("/delete-entity", null, {
         params: { uri },
       });
     } catch (error) {
@@ -219,7 +219,7 @@ export class EunomiaClient {
     }
 
     try {
-      await this.client.post('/create-policy', options.policy, {
+      await this.client.post("/create-policy", options.policy, {
         params,
       });
     } catch (error) {
