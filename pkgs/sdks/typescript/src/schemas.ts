@@ -1,4 +1,4 @@
-import { EntityType } from './enums';
+import { EntityType } from "./enums";
 
 /**
  * Represents an attribute with key-value pair
@@ -28,7 +28,7 @@ export interface EntityBase {
 /**
  * Request body for creating a new entity
  */
-export interface EntityCreate extends EntityBase {}
+export interface EntityCreate extends EntityBase { }
 
 /**
  * Request body for updating an existing entity
@@ -77,7 +77,7 @@ export interface PrincipalAccess extends EntityAccess {
 export interface AccessRequest {
   principal: PrincipalAccess;
   resource: ResourceAccess;
-  action?: 'allow';
+  action?: "allow";
 }
 
 /**
