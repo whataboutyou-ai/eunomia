@@ -51,8 +51,7 @@ export class MyMCP extends McpAgent<Props, Env> {
       },
     );
 
-    // Dynamically add tools based on the user's login. In this case, I want to limit
-    // access to my Image Generation tool to just me
+    // Dynamically add tools based on the user's login
     const hasAccess = await this.eunomia.checkAccess({
       principalAttributes: { email: this.props.email },
       resourceAttributes: { type: "tool", name: "generateImage" },
