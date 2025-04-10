@@ -38,7 +38,7 @@ async def register_entity(
     entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
 ):
     try:
-        return server.register_entity(entity, db=db_session)
+        return server.fetcher.register_entity(entity, db=db_session)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -58,7 +58,7 @@ async def update_entity(
     db_session: Session = Depends(db.get_db),
 ):
     try:
-        return server.update_entity(entity, override=override, db=db_session)
+        return server.fetcher.update_entity(entity, override=override, db=db_session)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -74,7 +74,7 @@ async def update_entity(
 @router.post("/delete-entity")
 async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
     try:
-        server.delete_entity(uri, db=db_session)
+        server.fetcher.delete_entity(uri, db=db_session)
         return {"uri": uri, "message": "Entity deleted successfully"}
     except ValueError as exc:
         raise HTTPException(
