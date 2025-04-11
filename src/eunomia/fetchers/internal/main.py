@@ -1,8 +1,9 @@
 from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.db import crud
 from eunomia.fetchers.base import BaseFetcher, BaseFetcherConfig
+from eunomia.fetchers.internal.db import crud
+from eunomia.fetchers.internal.db.db import SessionLocal
 
 
 class EunomiaInternalFetcherConfig(BaseFetcherConfig):
@@ -10,7 +11,7 @@ class EunomiaInternalFetcherConfig(BaseFetcherConfig):
 
 
 class EunomiaInternalFetcher(BaseFetcher):
-    def __init__(self, config: EunomiaInternalFetcherConfig):
+    def __init__(self, config: EunomiaInternalFetcherConfig = {}):
         super().__init__(config)
 
     def register_entity(
@@ -108,7 +109,7 @@ class EunomiaInternalFetcher(BaseFetcher):
         crud.delete_entity(db_entity, db=db)
         return
 
-    def fetch_attributes(self, uri: str, db: Session) -> dict:
+    def fetch_attributes(self, uri: str) -> dict:
         """
         Fetch the attributes of an entity.
 
@@ -116,12 +117,11 @@ class EunomiaInternalFetcher(BaseFetcher):
         ----------
         uri : str
             The uri of the entity to fetch the attributes of.
-        db : Session
-            The SQLAlchemy database session.
 
         Returns
         -------
         dict
             The attributes of the entity.
         """
-        return crud.get_entity_attributes(uri, db=db)
+        with SessionLocal() as db:
+            return crud.get_entity_attributes(uri, db=db)

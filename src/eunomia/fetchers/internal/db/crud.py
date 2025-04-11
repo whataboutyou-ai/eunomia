@@ -1,7 +1,7 @@
 from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.db import models
+from eunomia.fetchers.internal.db import models
 
 
 def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:

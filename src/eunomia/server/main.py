@@ -1,10 +1,8 @@
 import logging
 import os
-from typing import List
 
 import httpx
 from eunomia_core import schemas
-from sqlalchemy.orm import Session
 
 from eunomia.engine.opa import OpaPolicyEngine
 from eunomia.engine.rego import policy_to_rego
@@ -21,13 +19,13 @@ class EunomiaServer:
 
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
-        self.fetcher = EunomiaInternalFetcher()
+        self._fetcher = EunomiaInternalFetcher()
 
-    def _get_merged_attributes(self, entity: schemas.EntityAccess, db: Session) -> dict:
+    def _get_merged_attributes(self, entity: schemas.EntityAccess) -> dict:
         attributes = {}
 
         if entity.uri is not None:
-            registered_attributes = self.fetcher.fetch_attributes(entity.uri, db=db)
+            registered_attributes = self._fetcher.fetch_attributes(entity.uri)
             # if any attribute is colliding with the registered attributes, raise an error
             for attribute in entity.attributes:
                 if (
@@ -43,7 +41,7 @@ class EunomiaServer:
             attributes.update({item.key: item.value for item in entity.attributes})
         return attributes
 
-    async def check_access(self, request: schemas.AccessRequest, db: Session) -> bool:
+    async def check_access(self, request: schemas.AccessRequest) -> bool:
         """
         Check if a principal has access to a specific resource.
 
@@ -56,8 +54,6 @@ class EunomiaServer:
         request : schemas.AccessRequest
             The access request to check, containing the principal requesting access and the resource being accessed.
             Both entities can be specified either by their registered identifier, by their attributes or by both.
-        db : Session
-            The SQLAlchemy database session.
 
         Returns
         -------
@@ -71,8 +67,8 @@ class EunomiaServer:
         ValueError
             If there is a discrepancy between the provided attributes and the registered attributes.
         """
-        principal_attributes = self._get_merged_attributes(request.principal, db=db)
-        resource_attributes = self._get_merged_attributes(request.resource, db=db)
+        principal_attributes = self._get_merged_attributes(request.principal)
+        resource_attributes = self._get_merged_attributes(request.resource)
 
         input_data = {
             "input": {
@@ -95,9 +91,6 @@ class EunomiaServer:
             result = response.json()
             decision = result.get("result", False)
             return bool(decision)
-
-    async def allowed_resources(self, principal_uri: str) -> List[str]:
-        raise NotImplementedError("Allowed resources not implemented")
 
     def create_policy(self, policy: schemas.Policy, filename: str) -> str:
         """
