@@ -3,7 +3,7 @@
 .DS_Store
 .vscode/
 .venv/
+.db/
 dist/
-local_testing/
 policies/
 node_modules/
