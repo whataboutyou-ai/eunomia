@@ -1,5 +1,5 @@
 from eunomia_core import schemas
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from eunomia.fetchers.internal.db import models
 
@@ -128,6 +128,33 @@ def get_entity(uri: str, db: Session) -> models.Entity | None:
         The entity as a SQLAlchemy model or None if it does not exist.
     """
     return db.query(models.Entity).filter(models.Entity.uri == uri).first()
+
+
+def get_entities(offset: int, limit: int, db: Session) -> list[models.Entity]:
+    """
+    Retrieve a list of entities from the database.
+
+    Parameters
+    ----------
+    offset : int
+        The number of entities to skip.
+    limit : int
+        The number of entities to retrieve.
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    list[models.Entity]
+        A list of entities with their attributes eagerly loaded.
+    """
+    return (
+        db.query(models.Entity)
+        .options(joinedload(models.Entity.attributes))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
 
 
 def get_attribute(uri: str, key: str, db: Session) -> models.Attribute | None:

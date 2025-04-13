@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from eunomia.fetchers.internal import EunomiaInternalFetcher
-from eunomia.fetchers.internal.db import db
+from eunomia.fetchers.internal.db import crud, db
 
 fetcher_router = APIRouter()
 fetcher = EunomiaInternalFetcher()
@@ -61,4 +61,17 @@ async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed /delete-entity: {exc}",
+        )
+
+
+@fetcher_router.get("/entities")
+async def get_entities(
+    offset: int = 0, limit: int = 10, db_session: Session = Depends(db.get_db)
+):
+    try:
+        return crud.get_entities(offset=offset, limit=limit, db=db_session)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /entities: {exc}",
         )
