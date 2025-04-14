@@ -1,6 +1,9 @@
 # Eunomia SDK for LangChain
 
-This package allows to stream [LangChain's loaders][langchain-loaders-docs] resources and their metadata to the [Eunomia][eunomia-github] server for an easier policy configuration process.
+This package provides integrations between [LangChain][langchain-website] and [Eunomia][eunomia-github], allowing you to:
+
+- Register documents loaded by any [LangChain's loader][langchain-loaders-docs] to the Eunomia server
+- Enforce authorization policies on documents retrieved by any [LangChain retriever][langchain-retriever-docs]
 
 ## Installation
 
@@ -12,41 +15,52 @@ pip install eunomia-sdk-langchain
 
 ## Usage
 
-The `EunomiaLoader` class is a wrapper around any loader class from LangChain.
+### Document Loader
 
-Assume you want to use the `CSVLoader`, you can do the following:
+The `EunomiaLoader` class is a wrapper around any loader class from LangChain that sends documents to the Eunomia server.
 
 ```python
 from eunomia_sdk_langchain import EunomiaLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 
-loader = CSVLoader(...)
-wrapped_loader = EunomiaLoader(loader, server_url="http://localhost:8000")
+# Create a document loader
+loader = CSVLoader("data.csv")
+
+# Wrap the loader with Eunomia
+wrapped_loader = EunomiaLoader(loader)
+
+# Load documents and register them with the Eunomia server
+docs = wrapped_loader.load(additional_metadata={"group": "financials"})
 ```
 
-You can then call any of the load methods:
+All loaded documents will be automatically sent to the Eunomia server which will assign an identifier to each document and store their metadata. The identifiers and metadata can then be used to configure or reference policies in the Eunomia server.
+
+### Document Retriever
+
+The `EunomiaRetriever` class wraps any LangChain retriever and filters allowed documents using the Eunomia server.
 
 ```python
-# Synchronous loading
-docs = wrapped_loader.load()
+from eunomia_core import schemas
+from eunomia_sdk_langchain import EunomiaRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_core.documents import Document
 
-# Synchronous lazy loading
-docs = []
-for doc in wrapped_loader.lazy_load():
-    docs.append(doc)
+# Create a retriever with some documents
+retriever = BM25Retriever.from_documents([
+    Document(page_content="foo", metadata={"confidentiality": "public"}),
+    Document(page_content="bar", metadata={"confidentiality": "public"}),
+    Document(page_content="foo bar", metadata={"confidentiality": "private"}),
+])
 
-# Asynchronous loading
-import asyncio
+# Wrap the retriever with Eunomia
+wrapped_retriever = EunomiaRetriever(
+    retriever=retriever,
+    principal=schemas.PrincipalAccess(uri="test-uri"),
+)
 
-asyncio.run(wrapped_loader.aload())
-
-# Asynchronous lazy loading
-docs = []
-async for doc in wrapped_loader.alazy_load():
-    docs.append(doc)
+# Only documents the principal has access to will be returned
+docs = wrapped_retriever.invoke("foo")
 ```
-
-All loaded documents will be automatically sent to the Eunomia server which will assign an identifier to each document and store their metadata. The identifiers and metadata can then be used to configure policies in the Eunomia server.
 
 ## Documentation
 
@@ -54,4 +68,6 @@ For detailed usage, check out the SDK's [documentation][docs].
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [docs]: https://whataboutyou-ai.github.io/eunomia/api/sdks/langchain/
+[langchain-website]: https://www.langchain.com/
 [langchain-loaders-docs]: https://python.langchain.com/docs/concepts/document_loaders/
+[langchain-retriever-docs]: https://python.langchain.com/docs/concepts/retrievers/
