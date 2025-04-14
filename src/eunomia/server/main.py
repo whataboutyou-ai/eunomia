@@ -124,7 +124,7 @@ class EunomiaServer:
 
         path = os.path.join(self._engine.policy_folder, filename)
         if os.path.exists(path):
-            raise ValueError(
+            logging.warning(
                 f"Policy file '{filename}' already exists at {self._engine.policy_folder}"
             )
 
