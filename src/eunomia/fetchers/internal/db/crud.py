@@ -130,6 +130,23 @@ def get_entity(uri: str, db: Session) -> models.Entity | None:
     return db.query(models.Entity).filter(models.Entity.uri == uri).first()
 
 
+def get_entities_count(db: Session) -> int:
+    """
+    Retrieve the total number of entities in the database.
+
+    Parameters
+    ----------
+    db : Session
+        SQLAlchemy database session.
+
+    Returns
+    -------
+    int
+        The total number of entities in the database.
+    """
+    return db.query(models.Entity).count()
+
+
 def get_entities(offset: int, limit: int, db: Session) -> list[models.Entity]:
     """
     Retrieve a list of entities from the database.

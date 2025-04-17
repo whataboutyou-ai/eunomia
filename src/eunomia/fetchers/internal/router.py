@@ -64,7 +64,7 @@ async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
         )
 
 
-@fetcher_router.get("/entities")
+@fetcher_router.get("/entities", response_model=list[schemas.EntityInDb])
 async def get_entities(
     offset: int = 0, limit: int = 10, db_session: Session = Depends(db.get_db)
 ):
@@ -74,4 +74,15 @@ async def get_entities(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed /entities: {exc}",
+        )
+
+
+@fetcher_router.get("/entities/count")
+async def get_entities_count(db_session: Session = Depends(db.get_db)) -> int:
+    try:
+        return crud.get_entities_count(db=db_session)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed /entities/count: {exc}",
         )
