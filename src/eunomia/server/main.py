@@ -4,9 +4,10 @@ import os
 import httpx
 from eunomia_core import schemas
 
+from eunomia.config import settings
 from eunomia.engine.opa import OpaPolicyEngine
 from eunomia.engine.rego import policy_to_rego
-from eunomia.fetchers import EunomiaInternalFetcher
+from eunomia.fetchers import FetcherFactory
 
 
 class EunomiaServer:
@@ -19,27 +20,24 @@ class EunomiaServer:
 
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
-        self._fetcher = EunomiaInternalFetcher()
+        self._fetchers = FetcherFactory.initialize_fetchers(settings.FETCHERS)
 
     def _get_merged_attributes(self, entity: schemas.EntityAccess) -> dict:
-        attributes = {}
+        merged_attributes = {item.key: item.value for item in entity.attributes}
 
         if entity.uri is not None:
-            registered_attributes = self._fetcher.fetch_attributes(entity.uri)
-            # if any attribute is colliding with the registered attributes, raise an error
-            for attribute in entity.attributes:
-                if (
-                    attribute.key in registered_attributes
-                    and registered_attributes[attribute.key] != attribute.value
-                ):
-                    raise ValueError(
-                        f"For entity '{entity.uri}', attribute '{attribute.key}' has a collision with the registered attributes"
-                    )
-            attributes.update(registered_attributes)
+            for fetcher in self._fetchers.values():
+                registered_attributes = fetcher.fetch_attributes(entity.uri)
 
-        if entity.attributes:
-            attributes.update({item.key: item.value for item in entity.attributes})
-        return attributes
+                # if any attribute is colliding with the registered attributes, raise an error
+                for key, value in registered_attributes.items():
+                    if key in merged_attributes and merged_attributes[key] != value:
+                        raise ValueError(
+                            f"For entity '{entity.uri}', attribute '{key}' has more than one value"
+                        )
+                merged_attributes.update(registered_attributes)
+
+        return merged_attributes
 
     async def check_access(self, request: schemas.AccessRequest) -> bool:
         """
