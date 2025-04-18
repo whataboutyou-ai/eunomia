@@ -6,13 +6,13 @@ from eunomia.fetchers.internal.db import crud
 from eunomia.fetchers.internal.db.db import SessionLocal
 
 
-class EunomiaInternalFetcherConfig(BaseFetcherConfig):
-    id: str = "internal"
+class InternalFetcherConfig(BaseFetcherConfig):
+    SQL_DATABASE_URL: str
 
 
-class EunomiaInternalFetcher(BaseFetcher):
-    def __init__(self, config: EunomiaInternalFetcherConfig = {}):
-        super().__init__(config)
+class InternalFetcher(BaseFetcher):
+    def __init__(self, config: InternalFetcherConfig):
+        pass
 
     def register_entity(
         self, entity: schemas.EntityCreate, db: Session

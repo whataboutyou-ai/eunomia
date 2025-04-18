@@ -3,12 +3,14 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from eunomia.config import settings
 
+database_url = settings.FETCHERS["internal"]["SQL_DATABASE_URL"]
+if not database_url:
+    raise ValueError("Environment variable INTERNAL__SQL_DATABASE_URL must be provided")
+
 engine = create_engine(
-    settings.INTERNAL_SQL_DATABASE_URL,
+    database_url,
     connect_args=(
-        {"check_same_thread": False}
-        if settings.INTERNAL_SQL_DATABASE_URL.startswith("sqlite")
-        else {}
+        {"check_same_thread": False} if database_url.startswith("sqlite") else {}
     ),
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

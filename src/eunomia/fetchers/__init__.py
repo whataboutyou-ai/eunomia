@@ -1,3 +1,3 @@
-from eunomia.fetchers.internal import EunomiaInternalFetcher
+from eunomia.fetchers.factory import FetcherFactory
 
-__all__ = ["EunomiaInternalFetcher"]
+__all__ = ["FetcherFactory"]

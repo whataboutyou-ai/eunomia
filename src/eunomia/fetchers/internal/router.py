@@ -2,11 +2,12 @@ from eunomia_core import schemas
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from eunomia.fetchers.internal import EunomiaInternalFetcher
+from eunomia.config import settings
+from eunomia.fetchers.internal import InternalFetcher
 from eunomia.fetchers.internal.db import crud, db
 
 fetcher_router = APIRouter()
-fetcher = EunomiaInternalFetcher()
+fetcher = InternalFetcher(config=settings.FETCHERS["internal"])
 
 
 @fetcher_router.post("/register-entity", response_model=schemas.EntityInDb)

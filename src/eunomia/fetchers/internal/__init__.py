@@ -1,3 +1,3 @@
-from .main import EunomiaInternalFetcher
+from .main import InternalFetcher, InternalFetcherConfig
 
-__all__ = ["EunomiaInternalFetcher"]
+__all__ = ["InternalFetcher", "InternalFetcherConfig"]
