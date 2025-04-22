@@ -20,7 +20,8 @@ class EunomiaServer:
 
     def __init__(self) -> None:
         self._engine = OpaPolicyEngine()
-        self._fetchers = FetcherFactory.initialize_fetchers(settings.FETCHERS)
+        FetcherFactory.initialize_fetchers(settings.FETCHERS)
+        self._fetchers = FetcherFactory.get_all_fetchers()
 
     def _get_merged_attributes(self, entity: schemas.EntityAccess) -> dict:
         merged_attributes = {item.key: item.value for item in entity.attributes}

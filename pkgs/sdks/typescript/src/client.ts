@@ -128,7 +128,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/register-entity",
+        "/fetchers/internal/register-entity",
         entity,
       );
       return this.handleResponse(response);
@@ -163,7 +163,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/update-entity",
+        "/fetchers/internal/update-entity",
         entity,
         {
           params: { override: options.override || false },
@@ -188,7 +188,7 @@ export class EunomiaClient {
    */
   async deleteEntity(uri: string): Promise<void> {
     try {
-      await this.client.post("/delete-entity", null, {
+      await this.client.post("/fetchers/internal/delete-entity", null, {
         params: { uri },
       });
     } catch (error) {

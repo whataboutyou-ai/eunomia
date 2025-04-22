@@ -2,8 +2,7 @@ from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
 from eunomia.fetchers.base import BaseFetcher, BaseFetcherConfig
-from eunomia.fetchers.internal.db import crud
-from eunomia.fetchers.internal.db.db import SessionLocal
+from eunomia.fetchers.internal.db import crud, db
 
 
 class InternalFetcherConfig(BaseFetcherConfig):
@@ -12,7 +11,8 @@ class InternalFetcherConfig(BaseFetcherConfig):
 
 class InternalFetcher(BaseFetcher):
     def __init__(self, config: InternalFetcherConfig):
-        pass
+        self._config = config
+        db.init_db(self._config.SQL_DATABASE_URL)
 
     def register_entity(
         self, entity: schemas.EntityCreate, db: Session
@@ -123,5 +123,5 @@ class InternalFetcher(BaseFetcher):
         dict
             The attributes of the entity.
         """
-        with SessionLocal() as db:
-            return crud.get_entity_attributes(uri, db=db)
+        with db.SessionLocal() as db_session:
+            return crud.get_entity_attributes(uri, db=db_session)

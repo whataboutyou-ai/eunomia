@@ -5,8 +5,7 @@ from fastapi.responses import JSONResponse
 
 from eunomia.config import settings
 from eunomia.engine.opa import OpaPolicyEngine
-from eunomia.fetchers.internal.db import db
-from eunomia.fetchers.internal.router import fetcher_router
+from eunomia.fetchers.factory import FetcherFactory
 from eunomia.server.router import server_router
 
 
@@ -15,15 +14,17 @@ async def lifespan(app: FastAPI):
     engine = OpaPolicyEngine()
     try:
         engine.start()
-        db.init_db()
         yield
     finally:
         engine.stop()
 
 
 app = FastAPI(lifespan=lifespan, title=settings.PROJECT_NAME, debug=settings.DEBUG)
+
 app.include_router(server_router)
-app.include_router(fetcher_router)
+
+for fetcher_id, router in FetcherFactory.get_all_routers().items():
+    app.include_router(router, prefix=f"/fetchers/{fetcher_id}", tags=[fetcher_id])
 
 
 @app.exception_handler(ValueError)
