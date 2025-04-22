@@ -2,7 +2,7 @@ In addition to registering entities, you can update or delete them using dedicat
 
 ## Update an Entity
 
-The **`POST /update-entity`** endpoint allows you to update an already registered entity. The JSON payload must conform to the **EntityUpdate** schema. In this schema:
+The **`POST /fetchers/internal/update-entity`** endpoint allows you to update an already registered entity. The JSON payload must conform to the **EntityUpdate** schema. In this schema:
 
 - **`uri`** (required):  
   The unique identifier for the entity that you want to update.
@@ -14,14 +14,18 @@ The **`POST /update-entity`** endpoint allows you to update an already registere
 
 ## Delete an Entity
 
-The **`POST /delete-entity`** endpoint allows you to delete an entity by providing its unique **`uri`**.
+The **`POST /fetchers/internal/delete-entity`** endpoint allows you to delete an entity by providing its unique **`uri`**.
 
 ## Example Usage
 
 === "Python"
     ```python
+    from eunomia_sdk_python import EunomiaClient
+
+    eunomia = EunomiaClient()
+
     # Update an entity's attributes
-    updated_entity = client.update_entity(
+    updated_entity = eunomia.update_entity(
         type="resource",  # Optional: if not provided, defaults to "any"
         attributes={
             "name": "sensitive_document_updated",
@@ -33,14 +37,14 @@ The **`POST /delete-entity`** endpoint allows you to delete an entity by providi
     print("Updated Entity:", updated_entity)
 
     # Delete an entity
-    delete_response = client.delete_entity(uri="generated-uri-123")
+    delete_response = eunomia.delete_entity(uri="generated-uri-123")
     print("Delete Response:", delete_response)
     ```
 
 === "Curl"
     ```bash
     # Update an entity
-    curl -X POST 'http://localhost:8000/update-entity?override=false' \
+    curl -X POST 'http://localhost:8000/fetchers/internal/update-entity?override=false' \
          -H "Content-Type: application/json" \
          -d '{
                "uri": "generated-uri-123",
@@ -53,7 +57,7 @@ The **`POST /delete-entity`** endpoint allows you to delete an entity by providi
              }'
 
     # Delete an entity
-    curl -X POST 'http://localhost:8000/delete-entity' \
+    curl -X POST 'http://localhost:8000/fetchers/internal/delete-entity' \
          -H "Content-Type: application/json" \
          -d '{"uri": "generated-uri-123"}'
     ```

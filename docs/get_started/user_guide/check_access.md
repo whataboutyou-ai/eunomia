@@ -19,6 +19,10 @@ In this option, you provide only the **`uri`** for both the principal and resour
 
 === "Python"
     ```python
+    from eunomia_sdk_python import EunomiaClient
+
+    eunomia = EunomiaClient()
+
     # Option 1: Using identifiers only.
     # Assume that the entities are already registered in the system.
     # Allowed access (the registered principal's attributes satisfy the policy)
