@@ -1,11 +1,16 @@
 import logging
+import os
 import platform
 import shutil
 import subprocess
 import sys
 import time
 
+import httpx
+from eunomia_core import schemas
+
 from eunomia.config import settings
+from eunomia.engine.rego import policy_to_rego
 
 
 class OpaPolicyEngine:
@@ -19,10 +24,11 @@ class OpaPolicyEngine:
 
     def __init__(self) -> None:
         self._server_address = f"{settings.OPA_SERVER_HOST}:{settings.OPA_SERVER_PORT}"
-        self.policy_folder = settings.OPA_POLICY_FOLDER
+        self._url = f"http://{self._server_address}/v1/data/eunomia"
+        self._policy_folder = settings.OPA_POLICY_FOLDER
+
         # Global variable to store the OPA process
         self._process: subprocess.Popen[bytes] | None = None
-        self.url = f"http://{self._server_address}/v1/data/eunomia"
 
     def _check_installation(self) -> str:
         # Check if the OPA binary is available; if not, attempt to install it.
@@ -81,7 +87,7 @@ class OpaPolicyEngine:
             "--server",
             "--addr",
             self._server_address,
-            self.policy_folder,
+            self._policy_folder,
         ]
 
         # Start the OPA server as a subprocess, and wait to ensure it's running
@@ -98,3 +104,44 @@ class OpaPolicyEngine:
         if self._process:
             self._process.terminate()
             self._process.wait()
+
+    async def check_access(self, request: schemas.AccessRequest) -> bool:
+        input_data = {
+            "input": {
+                "principal": {
+                    "uri": request.principal.uri,
+                    "attributes": request.principal.attributes,
+                },
+                "resource": {
+                    "uri": request.resource.uri,
+                    "attributes": request.resource.attributes,
+                },
+            }
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{self._url}/{request.action}", json=input_data
+            )
+            response.raise_for_status()
+            result = response.json()
+            decision = result.get("result", False)
+            return bool(decision)
+
+    def create_policy(self, policy: schemas.Policy, filename: str) -> str:
+        if not os.path.exists(self._policy_folder):
+            os.makedirs(self._policy_folder)
+            logging.info(
+                f"Policy folder did not exist, created it at {self._policy_folder}"
+            )
+
+        path = os.path.join(self._policy_folder, filename)
+        if os.path.exists(path):
+            logging.warning(
+                f"Policy file '{filename}' already exists at {self._policy_folder}, "
+                "overwriting it"
+            )
+
+        policy_rego = policy_to_rego(policy)
+        with open(path, "w") as f:
+            f.write(policy_rego)
+        return path

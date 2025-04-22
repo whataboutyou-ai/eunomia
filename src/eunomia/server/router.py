@@ -1,6 +1,5 @@
-import httpx
 from eunomia_core import schemas
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter
 
 from eunomia.server import EunomiaServer
 
@@ -10,13 +9,7 @@ server = EunomiaServer()
 
 @server_router.post("/check-access", response_model=bool)
 async def check_access(request: schemas.AccessRequest):
-    try:
-        return await server.check_access(request)
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"OPA call failed: {exc}",
-        )
+    return await server.check_access(request)
 
 
 @server_router.post("/create-policy")
