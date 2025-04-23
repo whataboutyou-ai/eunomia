@@ -2,7 +2,7 @@ In the [Quickstart](../index.md) guide, we showed how to use the `POST /check-ac
 
 ## Register a New Entity
 
-You can register a new entity using the `POST /register-entity` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
+You can register a new entity using the `POST /fetchers/internal/register-entity` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
 
 ### Payload Requirements
 
@@ -10,9 +10,10 @@ Your JSON payload must include the following fields:
 
 - **`attributes`** (required):  
   An array of attribute objects. Each attribute must include:
-  - **`key`** (*string*): The attribute's key.
-  - **`value`** (*string*): The attribute's value.  
-  
+
+    - **`key`** (*string*): The attribute's key.
+    - **`value`** (*string*): The attribute's value.  
+    
   *Note: The attributes array must not be empty, and duplicate keys are not allowed.*
 
 - **`type`** (required):  
@@ -30,9 +31,12 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 === "Python"
     ```python
     from eunomia_core import enums
+    from eunomia_sdk_python import EunomiaClient
+
+    eunomia = EunomiaClient()
 
     # Register a resource with metadata
-    resource = client.register_entity(
+    resource = eunomia.register_entity(
         type=enums.EntityType.resource,
         attributes={
             "name": "sensitive_document",
@@ -43,7 +47,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
     print("Resource:", resource)
 
     # Register a principal with metadata
-    principal = client.register_entity(
+    principal = eunomia.register_entity(
         type=enums.EntityType.principal,
         attributes={
             "name": "user_123",
@@ -56,7 +60,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/register-entity' \
+    curl -X POST 'http://localhost:8000/fetchers/internal/register-entity' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "resource",
@@ -67,7 +71,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
                }
              }'
 
-    curl -X POST 'http://localhost:8000/register-entity' \
+    curl -X POST 'http://localhost:8000/fetchers/internal/register-entity' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "principal",

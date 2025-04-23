@@ -4,7 +4,7 @@ from eunomia_core.enums import EntityType
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from eunomia.db import db
+from eunomia.fetchers.internal.db import db
 
 
 class Entity(db.Base):

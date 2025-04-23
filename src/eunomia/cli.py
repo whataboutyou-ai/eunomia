@@ -15,7 +15,7 @@ def get_version():
 @app.command()
 def server(host: str = "127.0.0.1", port: int = 8000, reload: bool = False):
     """Run the Eunomia API server"""
-    uvicorn.run("eunomia.api.main:app", host=host, port=port, reload=reload)
+    uvicorn.run("eunomia.api:app", host=host, port=port, reload=reload)
 
 
 if __name__ == "__main__":

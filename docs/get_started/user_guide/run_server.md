@@ -6,14 +6,14 @@ In this guide, you'll learn how to **configure** and **run** the Eunomia server.
 
 To run the Eunomia server, you must configure the following parameters:
 
-| **Parameter**       | **Description**                                            | **Default Value**       |
-| ------------------- | ---------------------------------------------------------- | ----------------------- |
-| `PROJECT_NAME`      | Name of the project                                        | `Eunomia Server`        |
-| `DEBUG`             | Flag to enable debug mode                                  | `False`                 |
-| `LOCAL_DB_HOST`     | Database connection string                                 | `sqlite:///db.sqlite`   |
-| `OPA_SERVER_HOST`   | Host address for the Open Policy Agent server              | `127.0.0.1`             |
-| `OPA_SERVER_PORT`   | Port for the Open Policy Agent server                      | `8181`                  |
-| `OPA_POLICY_FOLDER` | Path to the folder where the Rego policy files are stored. | _Required (no default)_ |
+| **Parameter**       | **Description**                                           | **Default Value**                                                        |
+| ------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `PROJECT_NAME`      | Name of the project                                       | `Eunomia Server`                                                         |
+| `DEBUG`             | Flag to enable debug mode                                 | `False`                                                                  |
+| `FETCHERS`          | Dictionary of fetchers to use                             | `{"internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}}` |
+| `OPA_SERVER_HOST`   | Host address for the Open Policy Agent server             | `127.0.0.1`                                                              |
+| `OPA_SERVER_PORT`   | Port for the Open Policy Agent server                     | `8181`                                                                   |
+| `OPA_POLICY_FOLDER` | Path to the folder where the Rego policy files are stored | _Required (no default)_                                                  |
 
 All parameters have default values except **`OPA_POLICY_FOLDER`**, which must be provided by the user.
 

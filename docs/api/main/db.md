@@ -1,1 +1,1 @@
-::: eunomia.db.crud
+::: eunomia.fetchers.internal.db.crud
