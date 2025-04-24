@@ -10,7 +10,6 @@ import httpx
 from eunomia_core import schemas
 
 from eunomia.config import settings
-from eunomia.engine.rego import policy_to_rego
 
 
 class OpaPolicyEngine:
@@ -127,7 +126,44 @@ class OpaPolicyEngine:
             decision = result.get("result", False)
             return bool(decision)
 
+    def _entity_to_rego(self, entity: schemas.EntityAccess) -> str:
+        EQUAL_URI_STMNT = '	input.{type}.uri == "{uri}"'
+        EQUAL_ATTRIBUTE_STMNT = '	input.{type}.attributes.{key} == "{value}"'
+
+        uri_stmt = (
+            [EQUAL_URI_STMNT.format(type=entity.type.value, uri=entity.uri)]
+            if entity.uri
+            else []
+        )
+        attribute_stmts = [
+            EQUAL_ATTRIBUTE_STMNT.format(
+                type=entity.type.value, key=attribute.key, value=attribute.value
+            )
+            for attribute in entity.attributes
+        ]
+        return "\n".join(uri_stmt + attribute_stmts)
+
+    def _access_rule_to_rego(self, rule: schemas.AccessRequest) -> str:
+        ALLOW_RULE_STMNT = "allow if {{\n{entity_stmts}\n}}"
+
+        rego_items = "\n".join(
+            [self._entity_to_rego(rule.principal), self._entity_to_rego(rule.resource)]
+        )
+        return ALLOW_RULE_STMNT.format(entity_stmts=rego_items)
+
+    def _policy_to_rego(self, policy: schemas.Policy) -> str:
+        ALLOW_POLICY_STMNT = "package eunomia\n\ndefault allow := false\n\n{rules}\n"
+
+        rego_rules = "\n\n".join(
+            [self._access_rule_to_rego(rule) for rule in policy.rules]
+        )
+        return ALLOW_POLICY_STMNT.format(rules=rego_rules)
+
     def create_policy(self, policy: schemas.Policy, filename: str) -> str:
+        """
+        Create a policy from Eunomia's Policy schema object
+        to a Rego (OPA's native policy language) file.
+        """
         if not os.path.exists(self._policy_folder):
             os.makedirs(self._policy_folder)
             logging.info(
@@ -141,7 +177,7 @@ class OpaPolicyEngine:
                 "overwriting it"
             )
 
-        policy_rego = policy_to_rego(policy)
+        policy_rego = self._policy_to_rego(policy)
         with open(path, "w") as f:
             f.write(policy_rego)
         return path
