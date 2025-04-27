@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Literal, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -37,9 +37,7 @@ class PolicyRule(BaseModel):
     resource_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to resource"
     )
-    action: Literal["allow"] = Field(
-        default="allow", description="Action being evaluated"
-    )
+    action: str = Field(..., description="Action being evaluated")
 
 
 class Policy(BaseModel):

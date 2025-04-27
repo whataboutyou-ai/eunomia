@@ -46,6 +46,7 @@ def role_based_access_example():
                         value={"key": "visibility", "value": "public"},
                     )
                 ],
+                action="allow",
             )
         ],
         default_effect=models.PolicyEffect.DENY,
