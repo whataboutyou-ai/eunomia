@@ -74,7 +74,7 @@ def evaluate_conditions(conditions: list[Condition], obj: Any) -> bool:
 
 def evaluate_rule(rule: PolicyRule, request: AccessRequest) -> bool:
     """Evaluate if a rule matches the access request."""
-    # Check action match (currently only "allow" is supported)
+    # Check action match
     if rule.action != request.action:
         return False
 

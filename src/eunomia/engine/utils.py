@@ -68,7 +68,7 @@ def create_simple_policy(
         effect=effect,
         principal_conditions=principal_conditions,
         resource_conditions=resource_conditions,
-        action="allow",
+        action="access",
     )
 
     return Policy(

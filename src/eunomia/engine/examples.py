@@ -45,7 +45,7 @@ def role_based_access_example():
                         value="public",
                     )
                 ],
-                action="allow",
+                action="access",
             )
         ],
         default_effect=models.PolicyEffect.DENY,
@@ -62,7 +62,7 @@ def role_based_access_example():
             type=EntityType.resource,
             attributes={"name": "secret-project", "visibility": "private"},
         ),
-        action="allow",
+        action="access",
     )
 
     # Evaluate the admin request
@@ -79,7 +79,7 @@ def role_based_access_example():
             type=EntityType.resource,
             attributes={"name": "public-dashboard", "visibility": "public"},
         ),
-        action="allow",
+        action="access",
     )
 
     # Evaluate the read-only request with public resource
@@ -96,7 +96,7 @@ def role_based_access_example():
             type=EntityType.resource,
             attributes={"name": "secret-project", "visibility": "private"},
         ),
-        action="allow",
+        action="access",
     )
 
     # Evaluate the read-only request with private resource

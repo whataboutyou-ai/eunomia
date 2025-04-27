@@ -137,10 +137,8 @@ class AccessRequest(BaseModel):
         ..., description="The principal requesting access"
     )
     resource: ResourceAccess = Field(..., description="The resource being accessed")
-    action: Literal["allow"] = Field(
-        default="allow",
-        description="Action to be performed on the resource. "
-        "Currently only 'allow' is supported.",
+    action: str = Field(
+        default="access", description="Action to be performed on the resource"
     )
 
 
