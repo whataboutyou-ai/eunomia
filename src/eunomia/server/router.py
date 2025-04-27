@@ -13,6 +13,6 @@ async def check_access(request: schemas.AccessRequest):
 
 
 @server_router.post("/create-policy")
-async def create_policy(policy: schemas.Policy, filename: str = "policy.rego"):
-    path = server.create_policy(policy, filename=filename)
+async def create_policy(policy: schemas.Policy):
+    path = server.create_policy(policy)
     return {"path": path, "message": "Policy created successfully at path"}

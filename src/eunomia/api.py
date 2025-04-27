@@ -1,25 +1,11 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 
 from eunomia.config import settings
-from eunomia.engine.opa import OpaPolicyEngine
 from eunomia.fetchers.factory import FetcherFactory
 from eunomia.server.router import server_router
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    engine = OpaPolicyEngine()
-    try:
-        engine.start()
-        yield
-    finally:
-        engine.stop()
-
-
-app = FastAPI(lifespan=lifespan, title=settings.PROJECT_NAME, debug=settings.DEBUG)
+app = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG)
 
 app.include_router(server_router)
 

@@ -2,8 +2,8 @@ from typing import Optional
 
 from eunomia_core.schemas import AccessRequest
 
-from eunomia.engine.internal.evaluator import evaluate_policy
-from eunomia.engine.internal.models import Policy, PolicyEffect, PolicyEvaluationResult
+from eunomia.engine.evaluator import evaluate_policy
+from eunomia.engine.models import Policy, PolicyEffect, PolicyEvaluationResult
 
 
 class PolicyEngine:

@@ -1,7 +1,7 @@
 from eunomia_core import schemas
 
 from eunomia.config import settings
-from eunomia.engine.opa import OpaPolicyEngine
+from eunomia.engine import PolicyEffect, PolicyEngine, utils
 from eunomia.fetchers import FetcherFactory
 
 
@@ -13,7 +13,7 @@ class EunomiaServer:
     """
 
     def __init__(self) -> None:
-        self._engine = OpaPolicyEngine()
+        self._engine = PolicyEngine()
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
@@ -34,7 +34,7 @@ class EunomiaServer:
 
         return merged_attributes
 
-    async def check_access(self, request: schemas.AccessRequest) -> bool:
+    def check_access(self, request: schemas.AccessRequest) -> bool:
         """
         Check if a principal has access to a specific resource.
 
@@ -72,9 +72,9 @@ class EunomiaServer:
                 ),
             )
         )
-        return await self._engine.check_access(updated_request)
+        return self._engine.evaluate_all(updated_request).effect == PolicyEffect.ALLOW
 
-    def create_policy(self, policy: schemas.Policy, filename: str) -> str:
+    def create_policy(self, policy: schemas.Policy) -> str:
         """
         Create a new policy and store it in the engine.
 
@@ -85,8 +85,6 @@ class EunomiaServer:
             Rules are evaluated with OR logic (access is granted if ANY rule matches).
             Within each rule, attributes for both principal and resource are evaluated
             with AND logic (all specified attributes must match).
-        filename : str
-            The filename of the policy to create.
 
         Returns
         -------
@@ -98,4 +96,12 @@ class EunomiaServer:
         ValueError
             If the policy file already exists.
         """
-        return self._engine.create_policy(policy, filename)
+        # TODO: provide a better interface for policy creation
+        converted_policy = utils.create_simple_policy(
+            name="access",
+            principal_attributes=policy.rules[0].principal.attributes,
+            resource_attributes=policy.rules[0].resource.attributes,
+            effect=PolicyEffect.ALLOW,
+        )
+        self._engine.add_policy(converted_policy)
+        return "/"

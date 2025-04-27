@@ -186,9 +186,7 @@ class EunomiaClient:
         self._handle_response(response)
         return
 
-    def create_policy(
-        self, policy: schemas.Policy, filename: str | None = None
-    ) -> None:
+    def create_policy(self, policy: schemas.Policy) -> None:
         """
         Create a new policy and save it to the local file system.
 
@@ -196,17 +194,12 @@ class EunomiaClient:
         ----------
         policy : schemas.Policy
             The policy to create.
-        filename : str, optional
-            The filename of the policy to create.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        params = {} if filename is None else {"filename": filename}
-        response = self.client.post(
-            "/create-policy", json=policy.model_dump(), params=params
-        )
+        response = self.client.post("/create-policy", json=policy.model_dump())
         self._handle_response(response)
         return

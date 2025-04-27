@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from eunomia.engine.internal.models import (
+from eunomia.engine.models import (
     Condition,
     ConditionOperator,
     Policy,

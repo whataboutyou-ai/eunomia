@@ -22,11 +22,6 @@ class Settings(BaseSettings):
         "internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}
     }
 
-    # Engine configs
-    OPA_SERVER_HOST: str = "127.0.0.1"
-    OPA_SERVER_PORT: int = 8181
-    OPA_POLICY_FOLDER: str
-
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=True, extra="ignore"
     )

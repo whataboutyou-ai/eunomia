@@ -2,7 +2,7 @@ from typing import Any
 
 from eunomia_core.schemas import AccessRequest
 
-from eunomia.engine.internal.models import (
+from eunomia.engine.models import (
     Condition,
     ConditionOperator,
     Policy,

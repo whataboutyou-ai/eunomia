@@ -206,22 +206,13 @@ export class EunomiaClient {
    *
    * @param options - Options for creating the policy
    * @param options.policy - The policy to create
-   * @param options.filename - The filename of the policy to create (optional)
    * @returns A promise that resolves when the policy is created
    */
   async createPolicy(options: {
     policy: Policy;
-    filename?: string;
   }): Promise<void> {
-    const params: Record<string, string> = {};
-    if (options.filename) {
-      params.filename = options.filename;
-    }
-
     try {
-      await this.client.post("/create-policy", options.policy, {
-        params,
-      });
+      await this.client.post("/create-policy", options.policy);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(

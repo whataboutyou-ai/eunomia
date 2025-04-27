@@ -5,7 +5,7 @@ from eunomia_core.schemas import (
     ResourceAccess,
 )
 
-from eunomia.engine.internal import PolicyEngine, models, utils
+from eunomia.engine import PolicyEngine, models, utils
 
 
 def role_based_access_example():
