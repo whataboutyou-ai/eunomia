@@ -27,7 +27,7 @@ class PolicyEngine:
                 return policy
         return None
 
-    def evaluate(self, request: AccessRequest) -> list[PolicyEvaluationResult]:
+    def _evaluate(self, request: AccessRequest) -> list[PolicyEvaluationResult]:
         """Evaluate all policies against the access request."""
         results = []
 
@@ -44,7 +44,7 @@ class PolicyEngine:
         Otherwise, if at least one policy explicitly ALLOWS, the result is ALLOW.
         If no policies match, the default result is DENY.
         """
-        results = self.evaluate(request)
+        results = self._evaluate(request)
 
         # If any policy denies, the overall result is deny
         for result in results:

@@ -1,7 +1,5 @@
 from typing import Any, Optional
 
-from eunomia_core.schemas import Attribute
-
 from eunomia.engine.internal.models import (
     Condition,
     ConditionOperator,
@@ -28,15 +26,8 @@ def create_attribute_condition(
         A condition that can be used in a policy rule
     """
     return Condition(
-        path="attributes",
-        operator=operator,
-        value={"key": attribute_key, "value": str(value)},
+        path=f"attributes.{attribute_key}", operator=operator, value=str(value)
     )
-
-
-def extract_attributes_dict(attributes: list[Attribute]) -> dict[str, str]:
-    """Convert a list of attributes to a dictionary."""
-    return {attr.key: attr.value for attr in attributes}
 
 
 def create_simple_policy(

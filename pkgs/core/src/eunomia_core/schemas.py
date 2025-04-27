@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Literal, Optional
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
 from eunomia_core.enums import EntityType
 from eunomia_core.utils import generate_uri
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class Attribute(BaseModel):
@@ -79,26 +80,36 @@ class EntityUpdate(EntityBase):
         return v
 
 
-class EntityAccess(EntityBase):
+class EntityInDb(EntityBase):
+    attributes: list[AttributeInDb] = Field(..., description="Entity attributes")
+    registered_at: datetime = Field(description="Time when this entity was registered")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EntityAccess(BaseModel):
     uri: Optional[str] = Field(
         default=None, description="Unique identifier for the entity"
     )
-    attributes: Optional[list[Attribute]] = Field(
-        default_factory=list, description="Entity attributes"
+    attributes: Optional[dict[str, str]] = Field(
+        default_factory=dict, description="Entity attributes"
     )
+    type: EntityType = Field(..., description="Type of entity")
+
+    @field_validator("attributes", mode="before")
+    @classmethod
+    def from_list(cls, v: list[Attribute] | dict) -> dict[str, str]:
+        if isinstance(v, list) and all(isinstance(attr, Attribute) for attr in v):
+            return {attr.key: attr.value for attr in v}
+        elif isinstance(v, list):
+            return {attr["key"]: attr["value"] for attr in v}
+        return v
 
     @model_validator(mode="after")
     def either_uri_or_attributes(self) -> "EntityAccess":
         if not self.uri and not self.attributes:
             raise ValueError("Either 'uri' or non-empty 'attributes' must be provided")
         return self
-
-
-class EntityInDb(EntityBase):
-    attributes: list[AttributeInDb] = Field(..., description="Entity attributes")
-    registered_at: datetime = Field(description="Time when this entity was registered")
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ResourceAccess(EntityAccess):

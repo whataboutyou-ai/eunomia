@@ -1,6 +1,5 @@
 from eunomia_core.schemas import (
     AccessRequest,
-    Attribute,
     EntityType,
     PrincipalAccess,
     ResourceAccess,
@@ -34,16 +33,16 @@ def role_based_access_example():
                 effect=models.PolicyEffect.ALLOW,
                 principal_conditions=[
                     models.Condition(
-                        path="attributes",
+                        path="attributes.role",
                         operator=models.ConditionOperator.EQUALS,
-                        value={"key": "role", "value": "read-only"},
+                        value="read-only",
                     )
                 ],
                 resource_conditions=[
                     models.Condition(
-                        path="attributes",
+                        path="attributes.visibility",
                         operator=models.ConditionOperator.EQUALS,
-                        value={"key": "visibility", "value": "public"},
+                        value="public",
                     )
                 ],
                 action="allow",
@@ -57,17 +56,11 @@ def role_based_access_example():
     admin_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
-            attributes=[
-                Attribute(key="role", value="admin"),
-                Attribute(key="department", value="engineering"),
-            ],
+            attributes={"role": "admin", "department": "engineering"},
         ),
         resource=ResourceAccess(
             type=EntityType.resource,
-            attributes=[
-                Attribute(key="name", value="secret-project"),
-                Attribute(key="visibility", value="private"),
-            ],
+            attributes={"name": "secret-project", "visibility": "private"},
         ),
         action="allow",
     )
@@ -80,17 +73,11 @@ def role_based_access_example():
     readonly_public_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
-            attributes=[
-                Attribute(key="role", value="read-only"),
-                Attribute(key="department", value="marketing"),
-            ],
+            attributes={"role": "read-only", "department": "marketing"},
         ),
         resource=ResourceAccess(
             type=EntityType.resource,
-            attributes=[
-                Attribute(key="name", value="public-dashboard"),
-                Attribute(key="visibility", value="public"),
-            ],
+            attributes={"name": "public-dashboard", "visibility": "public"},
         ),
         action="allow",
     )
@@ -103,17 +90,11 @@ def role_based_access_example():
     readonly_private_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
-            attributes=[
-                Attribute(key="role", value="read-only"),
-                Attribute(key="department", value="marketing"),
-            ],
+            attributes={"role": "read-only", "department": "marketing"},
         ),
         resource=ResourceAccess(
             type=EntityType.resource,
-            attributes=[
-                Attribute(key="name", value="secret-project"),
-                Attribute(key="visibility", value="private"),
-            ],
+            attributes={"name": "secret-project", "visibility": "private"},
         ),
         action="allow",
     )
