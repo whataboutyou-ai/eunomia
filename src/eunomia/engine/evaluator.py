@@ -2,13 +2,8 @@ from typing import Any
 
 from eunomia_core.schemas import AccessRequest
 
-from eunomia.engine.models import (
-    Condition,
-    ConditionOperator,
-    Policy,
-    PolicyEvaluationResult,
-    PolicyRule,
-)
+from eunomia.engine import schemas
+from eunomia.engine.enums import ConditionOperator
 
 
 def get_attribute_value(obj: Any, path: str) -> Any:
@@ -62,13 +57,13 @@ def apply_operator(operator_type: ConditionOperator, value: Any, target: Any) ->
     return False
 
 
-def evaluate_condition(condition: Condition, obj: Any) -> bool:
+def evaluate_condition(condition: schemas.Condition, obj: Any) -> bool:
     """Evaluate a single condition against an object."""
     target_value = get_attribute_value(obj, condition.path)
     return apply_operator(condition.operator, condition.value, target_value)
 
 
-def evaluate_conditions(conditions: list[Condition], obj: Any) -> bool:
+def evaluate_conditions(conditions: list[schemas.Condition], obj: Any) -> bool:
     """Evaluate a list of conditions against an object (AND logic)."""
     if not conditions:
         return True
@@ -76,7 +71,7 @@ def evaluate_conditions(conditions: list[Condition], obj: Any) -> bool:
     return all(evaluate_condition(condition, obj) for condition in conditions)
 
 
-def evaluate_rule(rule: PolicyRule, request: AccessRequest) -> bool:
+def evaluate_rule(rule: schemas.Rule, request: AccessRequest) -> bool:
     """Evaluate if a rule matches the access request."""
     # Check action match
     if rule.action != request.action:
@@ -95,15 +90,17 @@ def evaluate_rule(rule: PolicyRule, request: AccessRequest) -> bool:
     return True
 
 
-def evaluate_policy(policy: Policy, request: AccessRequest) -> PolicyEvaluationResult:
+def evaluate_policy(
+    policy: schemas.Policy, request: AccessRequest
+) -> schemas.PolicyEvaluationResult:
     """Evaluate a policy against an access request."""
     for rule in policy.rules:
         if evaluate_rule(rule, request):
-            return PolicyEvaluationResult(
+            return schemas.PolicyEvaluationResult(
                 effect=rule.effect, matched_rule=rule, policy_name=policy.name
             )
 
     # If no rules matched, return the default effect
-    return PolicyEvaluationResult(
+    return schemas.PolicyEvaluationResult(
         effect=policy.default_effect, matched_rule=None, policy_name=policy.name
     )

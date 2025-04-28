@@ -5,7 +5,7 @@ from eunomia_core.schemas import (
     ResourceAccess,
 )
 
-from eunomia.engine import PolicyEngine, models, utils
+from eunomia.engine import PolicyEngine, schemas, utils
 
 
 def test_role_based_access():
@@ -16,35 +16,35 @@ def test_role_based_access():
         name="admin-access",
         description="Administrators can access all resources",
         principal_attributes={"role": "admin"},
-        effect=models.PolicyEffect.ALLOW,
+        effect=schemas.PolicyEffect.ALLOW,
     )
     engine.add_policy(admin_policy)
 
-    read_only_policy = models.Policy(
+    read_only_policy = schemas.Policy(
         name="read-only-access",
         description="Users with read-only role can only access resources with 'public' visibility",
         rules=[
-            models.PolicyRule(
+            schemas.Rule(
                 description="Allow read-only users to access public resources",
-                effect=models.PolicyEffect.ALLOW,
+                effect=schemas.PolicyEffect.ALLOW,
                 principal_conditions=[
-                    models.Condition(
+                    schemas.Condition(
                         path="attributes.role",
-                        operator=models.ConditionOperator.EQUALS,
+                        operator=schemas.ConditionOperator.EQUALS,
                         value="read-only",
                     )
                 ],
                 resource_conditions=[
-                    models.Condition(
+                    schemas.Condition(
                         path="attributes.visibility",
-                        operator=models.ConditionOperator.EQUALS,
+                        operator=schemas.ConditionOperator.EQUALS,
                         value="public",
                     )
                 ],
                 action="access",
             )
         ],
-        default_effect=models.PolicyEffect.DENY,
+        default_effect=schemas.PolicyEffect.DENY,
     )
     engine.add_policy(read_only_policy)
 
@@ -61,7 +61,7 @@ def test_role_based_access():
     )
 
     admin_result = engine.evaluate_all(admin_request)
-    assert admin_result.effect == models.PolicyEffect.ALLOW
+    assert admin_result.effect == schemas.PolicyEffect.ALLOW
     assert admin_result.matched_rule is not None
     assert admin_result.policy_name == "admin-access"
 
@@ -78,7 +78,7 @@ def test_role_based_access():
     )
 
     readonly_public_result = engine.evaluate_all(readonly_public_request)
-    assert readonly_public_result.effect == models.PolicyEffect.ALLOW
+    assert readonly_public_result.effect == schemas.PolicyEffect.ALLOW
     assert readonly_public_result.matched_rule is not None
     assert readonly_public_result.policy_name == "read-only-access"
 
@@ -95,6 +95,6 @@ def test_role_based_access():
     )
 
     readonly_private_result = engine.evaluate_all(readonly_private_request)
-    assert readonly_private_result.effect == models.PolicyEffect.DENY
+    assert readonly_private_result.effect == schemas.PolicyEffect.DENY
     assert readonly_private_result.matched_rule is None
     assert readonly_private_result.policy_name == "read-only-access"

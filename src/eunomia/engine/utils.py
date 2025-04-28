@@ -1,19 +1,14 @@
 from typing import Any, Optional
 
-from eunomia.engine.models import (
-    Condition,
-    ConditionOperator,
-    Policy,
-    PolicyEffect,
-    PolicyRule,
-)
+from eunomia.engine import schemas
+from eunomia.engine.enums import ConditionOperator, PolicyEffect
 
 
 def create_attribute_condition(
     attribute_key: str,
     value: Any,
     operator: ConditionOperator = ConditionOperator.EQUALS,
-) -> Condition:
+) -> schemas.Condition:
     """
     Create a condition that matches against an entity attribute.
 
@@ -25,7 +20,7 @@ def create_attribute_condition(
     Returns:
         A condition that can be used in a policy rule
     """
-    return Condition(
+    return schemas.Condition(
         path=f"attributes.{attribute_key}", operator=operator, value=str(value)
     )
 
@@ -37,7 +32,7 @@ def create_simple_policy(
     resource_attributes: Optional[dict[str, str]] = None,
     effect: PolicyEffect = PolicyEffect.ALLOW,
     default_effect: PolicyEffect = PolicyEffect.DENY,
-) -> Policy:
+) -> schemas.Policy:
     """
     Create a simple policy with a single rule based on attribute matching.
 
@@ -52,8 +47,8 @@ def create_simple_policy(
     Returns:
         A policy with a single rule
     """
-    principal_conditions: list[Condition] = []
-    resource_conditions: list[Condition] = []
+    principal_conditions: list[schemas.Condition] = []
+    resource_conditions: list[schemas.Condition] = []
 
     if principal_attributes:
         for key, value in principal_attributes.items():
@@ -63,7 +58,7 @@ def create_simple_policy(
         for key, value in resource_attributes.items():
             resource_conditions.append(create_attribute_condition(key, value))
 
-    rule = PolicyRule(
+    rule = schemas.Rule(
         description=f"Automatically generated rule for {name}",
         effect=effect,
         principal_conditions=principal_conditions,
@@ -71,6 +66,6 @@ def create_simple_policy(
         action="access",
     )
 
-    return Policy(
+    return schemas.Policy(
         name=name, description=description, rules=[rule], default_effect=default_effect
     )

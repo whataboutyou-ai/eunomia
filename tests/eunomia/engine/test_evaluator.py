@@ -5,7 +5,7 @@ from eunomia_core.schemas import (
     ResourceAccess,
 )
 
-from eunomia.engine import models
+from eunomia.engine import schemas
 from eunomia.engine.evaluator import (
     apply_operator,
     evaluate_condition,
@@ -37,29 +37,29 @@ def test_get_attribute_value():
 
 
 def test_apply_operator():
-    assert apply_operator(models.ConditionOperator.EQUALS, "test", "test") is True
-    assert apply_operator(models.ConditionOperator.EQUALS, "test", "other") is False
-    assert apply_operator(models.ConditionOperator.NOT_EQUALS, "test", "other") is True
-    assert apply_operator(models.ConditionOperator.NOT_EQUALS, "test", "test") is False
-    assert apply_operator(models.ConditionOperator.CONTAINS, "est", "test") is True
-    assert apply_operator(models.ConditionOperator.CONTAINS, "xyz", "test") is False
-    assert apply_operator(models.ConditionOperator.STARTS_WITH, "te", "test") is True
-    assert apply_operator(models.ConditionOperator.STARTS_WITH, "st", "test") is False
-    assert apply_operator(models.ConditionOperator.ENDS_WITH, "st", "test") is True
-    assert apply_operator(models.ConditionOperator.ENDS_WITH, "te", "test") is False
+    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", "test") is True
+    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", "other") is False
+    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, "test", "other") is True
+    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, "test", "test") is False
+    assert apply_operator(schemas.ConditionOperator.CONTAINS, "est", "test") is True
+    assert apply_operator(schemas.ConditionOperator.CONTAINS, "xyz", "test") is False
+    assert apply_operator(schemas.ConditionOperator.STARTS_WITH, "te", "test") is True
+    assert apply_operator(schemas.ConditionOperator.STARTS_WITH, "st", "test") is False
+    assert apply_operator(schemas.ConditionOperator.ENDS_WITH, "st", "test") is True
+    assert apply_operator(schemas.ConditionOperator.ENDS_WITH, "te", "test") is False
 
-    assert apply_operator(models.ConditionOperator.EQUALS, 1, 1) is True
-    assert apply_operator(models.ConditionOperator.EQUALS, 1, 2) is False
-    assert apply_operator(models.ConditionOperator.NOT_EQUALS, 1, 2) is True
-    assert apply_operator(models.ConditionOperator.NOT_EQUALS, 1, 1) is False
+    assert apply_operator(schemas.ConditionOperator.EQUALS, 1, 1) is True
+    assert apply_operator(schemas.ConditionOperator.EQUALS, 1, 2) is False
+    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, 1, 2) is True
+    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, 1, 1) is False
 
-    assert apply_operator(models.ConditionOperator.EQUALS, None, "test") is False
-    assert apply_operator(models.ConditionOperator.EQUALS, "test", None) is False
+    assert apply_operator(schemas.ConditionOperator.EQUALS, None, "test") is False
+    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", None) is False
 
 
 def test_evaluate_condition():
-    condition = models.Condition(
-        path="attributes.role", operator=models.ConditionOperator.EQUALS, value="admin"
+    condition = schemas.Condition(
+        path="attributes.role", operator=schemas.ConditionOperator.EQUALS, value="admin"
     )
     obj = DummyObject(attributes={"role": "admin"})
     assert evaluate_condition(condition, obj) is True
@@ -70,14 +70,14 @@ def test_evaluate_condition():
 
 def test_evaluate_conditions():
     conditions = [
-        models.Condition(
+        schemas.Condition(
             path="attributes.role",
-            operator=models.ConditionOperator.EQUALS,
+            operator=schemas.ConditionOperator.EQUALS,
             value="admin",
         ),
-        models.Condition(
+        schemas.Condition(
             path="attributes.department",
-            operator=models.ConditionOperator.EQUALS,
+            operator=schemas.ConditionOperator.EQUALS,
             value="engineering",
         ),
     ]
@@ -91,20 +91,20 @@ def test_evaluate_conditions():
 
 
 def test_evaluate_rule():
-    rule = models.PolicyRule(
+    rule = schemas.Rule(
         description="Test rule",
-        effect=models.PolicyEffect.ALLOW,
+        effect=schemas.PolicyEffect.ALLOW,
         principal_conditions=[
-            models.Condition(
+            schemas.Condition(
                 path="attributes.role",
-                operator=models.ConditionOperator.EQUALS,
+                operator=schemas.ConditionOperator.EQUALS,
                 value="admin",
             )
         ],
         resource_conditions=[
-            models.Condition(
+            schemas.Condition(
                 path="attributes.type",
-                operator=models.ConditionOperator.EQUALS,
+                operator=schemas.ConditionOperator.EQUALS,
                 value="document",
             )
         ],
@@ -165,17 +165,17 @@ def test_evaluate_rule():
 
 
 def test_evaluate_policy():
-    policy = models.Policy(
+    policy = schemas.Policy(
         name="test-policy",
         description="Test policy",
         rules=[
-            models.PolicyRule(
+            schemas.Rule(
                 description="Test rule",
-                effect=models.PolicyEffect.ALLOW,
+                effect=schemas.PolicyEffect.ALLOW,
                 principal_conditions=[
-                    models.Condition(
+                    schemas.Condition(
                         path="attributes.role",
-                        operator=models.ConditionOperator.EQUALS,
+                        operator=schemas.ConditionOperator.EQUALS,
                         value="admin",
                     )
                 ],
@@ -183,7 +183,7 @@ def test_evaluate_policy():
                 action="access",
             )
         ],
-        default_effect=models.PolicyEffect.DENY,
+        default_effect=schemas.PolicyEffect.DENY,
     )
 
     request = AccessRequest(
@@ -198,7 +198,7 @@ def test_evaluate_policy():
         action="access",
     )
     result = evaluate_policy(policy, request)
-    assert result.effect == models.PolicyEffect.ALLOW
+    assert result.effect == schemas.PolicyEffect.ALLOW
     assert result.matched_rule is not None
     assert result.policy_name == "test-policy"
 
@@ -214,6 +214,6 @@ def test_evaluate_policy():
         action="access",
     )
     result = evaluate_policy(policy, request)
-    assert result.effect == models.PolicyEffect.DENY
+    assert result.effect == schemas.PolicyEffect.DENY
     assert result.matched_rule is None
     assert result.policy_name == "test-policy"

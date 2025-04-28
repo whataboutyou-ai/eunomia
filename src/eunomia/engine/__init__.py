@@ -1,4 +1,4 @@
 from .engine import PolicyEngine
-from .models import PolicyEffect
+from .schemas import PolicyEffect
 
 __all__ = ["PolicyEngine", "PolicyEffect"]

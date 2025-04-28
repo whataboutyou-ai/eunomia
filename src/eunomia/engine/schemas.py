@@ -1,20 +1,8 @@
-from enum import Enum
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-
-class PolicyEffect(str, Enum):
-    ALLOW = "allow"
-    DENY = "deny"
-
-
-class ConditionOperator(str, Enum):
-    EQUALS = "equals"
-    NOT_EQUALS = "not_equals"
-    CONTAINS = "contains"
-    STARTS_WITH = "starts_with"
-    ENDS_WITH = "ends_with"
+from eunomia.engine.enums import ConditionOperator, PolicyEffect
 
 
 class Condition(BaseModel):
@@ -26,7 +14,7 @@ class Condition(BaseModel):
     value: Any = Field(..., description="Value to compare against")
 
 
-class PolicyRule(BaseModel):
+class Rule(BaseModel):
     description: Optional[str] = Field(
         None, description="Human-readable description of the rule"
     )
@@ -45,7 +33,7 @@ class Policy(BaseModel):
     description: Optional[str] = Field(
         None, description="Human-readable description of the policy"
     )
-    rules: list[PolicyRule] = Field(..., description="list of rules to evaluate")
+    rules: list[Rule] = Field(..., description="list of rules to evaluate")
     default_effect: PolicyEffect = Field(
         PolicyEffect.DENY, description="Default effect if no rules match"
     )
@@ -55,7 +43,7 @@ class PolicyEvaluationResult(BaseModel):
     effect: PolicyEffect = Field(
         ..., description="The resulting effect (allow or deny)"
     )
-    matched_rule: Optional[PolicyRule] = Field(
+    matched_rule: Optional[Rule] = Field(
         None, description="The rule that determined the effect, if any"
     )
     policy_name: str = Field(

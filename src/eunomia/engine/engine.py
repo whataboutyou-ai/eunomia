@@ -2,15 +2,16 @@ from typing import Optional
 
 from eunomia_core.schemas import AccessRequest
 
+from eunomia.engine import schemas
+from eunomia.engine.enums import PolicyEffect
 from eunomia.engine.evaluator import evaluate_policy
-from eunomia.engine.models import Policy, PolicyEffect, PolicyEvaluationResult
 
 
 class PolicyEngine:
     def __init__(self):
-        self.policies: list[Policy] = []
+        self.policies: list[schemas.Policy] = []
 
-    def add_policy(self, policy: Policy) -> None:
+    def add_policy(self, policy: schemas.Policy) -> None:
         """Add a policy to the engine."""
         self.policies.append(policy)
 
@@ -20,14 +21,14 @@ class PolicyEngine:
         self.policies = [p for p in self.policies if p.name != policy_name]
         return len(self.policies) < initial_count
 
-    def get_policy(self, policy_name: str) -> Optional[Policy]:
+    def get_policy(self, policy_name: str) -> Optional[schemas.Policy]:
         """Retrieve a policy by name."""
         for policy in self.policies:
             if policy.name == policy_name:
                 return policy
         return None
 
-    def _evaluate(self, request: AccessRequest) -> list[PolicyEvaluationResult]:
+    def _evaluate(self, request: AccessRequest) -> list[schemas.PolicyEvaluationResult]:
         """Evaluate all policies against the access request."""
         results = []
 
@@ -37,7 +38,7 @@ class PolicyEngine:
 
         return results
 
-    def evaluate_all(self, request: AccessRequest) -> PolicyEvaluationResult:
+    def evaluate_all(self, request: AccessRequest) -> schemas.PolicyEvaluationResult:
         """
         Evaluate all policies and return a single result.
 
@@ -66,6 +67,6 @@ class PolicyEngine:
             return default_deny
 
         # If no policies matched or there are no policies, deny by default
-        return PolicyEvaluationResult(
+        return schemas.PolicyEvaluationResult(
             effect=PolicyEffect.DENY, matched_rule=None, policy_name="default"
         )
