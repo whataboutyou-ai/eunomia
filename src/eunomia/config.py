@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Eunomia Server"
     DEBUG: bool = False
 
+    # Engine config
+    ENGINE_SQL_DATABASE_URL: str = "sqlite:///.db/engine_db.sqlite"
+
     # Fetcher config
     FETCHERS: dict[str, dict] = {
         "internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}

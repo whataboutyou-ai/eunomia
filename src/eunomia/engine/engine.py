@@ -2,7 +2,9 @@ from typing import Optional
 
 from eunomia_core.schemas import AccessRequest
 
+from eunomia.config import settings
 from eunomia.engine import schemas
+from eunomia.engine.db import crud, db
 from eunomia.engine.enums import PolicyEffect
 from eunomia.engine.evaluator import evaluate_policy
 
@@ -10,19 +12,30 @@ from eunomia.engine.evaluator import evaluate_policy
 class PolicyEngine:
     def __init__(self):
         self.policies: list[schemas.Policy] = []
+        db.init_db(settings.ENGINE_SQL_DATABASE_URL)
+        self._load_policies()
+
+    def _load_policies(self) -> None:
+        """Load policies from the database into memory."""
+        with db.SessionLocal() as db_session:
+            db_policies = crud.get_all_policies(db=db_session)
+            self.policies = [crud.db_policy_to_schema(p) for p in db_policies]
 
     def add_policy(self, policy: schemas.Policy) -> None:
-        """Add a policy to the engine."""
+        """Add a policy to the engine and persist it to the database."""
         self.policies.append(policy)
+        with db.SessionLocal() as db_session:
+            crud.create_policy(policy, db=db_session)
 
     def remove_policy(self, policy_name: str) -> bool:
-        """Remove a policy by name."""
-        initial_count = len(self.policies)
+        """Remove a policy by name from the engine and database."""
         self.policies = [p for p in self.policies if p.name != policy_name]
-        return len(self.policies) < initial_count
+        with db.SessionLocal() as db_session:
+            is_deleted = crud.delete_policy(policy_name, db=db_session)
+        return is_deleted
 
     def get_policy(self, policy_name: str) -> Optional[schemas.Policy]:
-        """Retrieve a policy by name."""
+        """Retrieve a policy by name from memory."""
         for policy in self.policies:
             if policy.name == policy_name:
                 return policy
