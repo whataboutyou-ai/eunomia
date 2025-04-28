@@ -77,7 +77,6 @@ def create_simple_policy(
             resource_conditions.append(create_attribute_condition(key, value))
 
     rule = schemas.Rule(
-        description=f"Automatically generated rule for {name}",
         effect=effect,
         principal_conditions=principal_conditions,
         resource_conditions=resource_conditions,

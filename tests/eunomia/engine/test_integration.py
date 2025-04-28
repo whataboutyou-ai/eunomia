@@ -25,7 +25,6 @@ def test_role_based_access():
         description="Users with read-only role can only access resources with 'public' visibility",
         rules=[
             schemas.Rule(
-                description="Allow read-only users to access public resources",
                 effect=schemas.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

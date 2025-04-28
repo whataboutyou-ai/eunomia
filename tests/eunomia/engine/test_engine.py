@@ -21,7 +21,6 @@ def sample_policy() -> schemas.Policy:
         description="Test policy",
         rules=[
             schemas.Rule(
-                description="Test rule",
                 effect=schemas.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

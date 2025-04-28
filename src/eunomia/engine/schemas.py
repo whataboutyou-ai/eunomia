@@ -15,9 +15,6 @@ class Condition(BaseModel):
 
 
 class Rule(BaseModel):
-    description: Optional[str] = Field(
-        None, description="Human-readable description of the rule"
-    )
     effect: PolicyEffect = Field(..., description="Effect when the rule matches")
     principal_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to principal"
