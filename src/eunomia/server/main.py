@@ -17,8 +17,9 @@ class EunomiaServer:
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
-    def _get_merged_attributes(self, entity: schemas.EntityAccess) -> dict:
-        merged_attributes = {item.key: item.value for item in entity.attributes}
+    def _merge_attributes(self, entity: schemas.EntityAccess) -> None:
+        if entity.attributes is None:
+            entity.attributes = {}
 
         if entity.uri is not None:
             for fetcher in self._fetchers.values():
@@ -26,13 +27,11 @@ class EunomiaServer:
 
                 # if any attribute is colliding with the registered attributes, raise an error
                 for key, value in registered_attributes.items():
-                    if key in merged_attributes and merged_attributes[key] != value:
+                    if key in entity.attributes and entity.attributes[key] != value:
                         raise ValueError(
                             f"For entity '{entity.uri}', attribute '{key}' has more than one value"
                         )
-                merged_attributes.update(registered_attributes)
-
-        return merged_attributes
+                entity.attributes.update(registered_attributes)
 
     def check_access(self, request: schemas.AccessRequest) -> bool:
         """
@@ -58,21 +57,9 @@ class EunomiaServer:
         ValueError
             If there is a discrepancy between the provided attributes and the registered attributes.
         """
-        updated_request = request.model_copy(
-            update=schemas.AccessRequest(
-                principal=request.principal.model_copy(
-                    update=schemas.PrincipalAccess(
-                        attributes=self._get_merged_attributes(request.principal)
-                    )
-                ),
-                resource=request.resource.model_copy(
-                    update=schemas.ResourceAccess(
-                        attributes=self._get_merged_attributes(request.resource)
-                    )
-                ),
-            )
-        )
-        return self._engine.evaluate_all(updated_request).effect == PolicyEffect.ALLOW
+        self._merge_attributes(request.principal)
+        self._merge_attributes(request.resource)
+        return self._engine.evaluate_all(request).effect == PolicyEffect.ALLOW
 
     def create_policy(self, policy: schemas.Policy) -> str:
         """

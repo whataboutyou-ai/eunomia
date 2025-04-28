@@ -9,7 +9,7 @@ server = EunomiaServer()
 
 @server_router.post("/check-access", response_model=bool)
 async def check_access(request: schemas.AccessRequest):
-    return await server.check_access(request)
+    return server.check_access(request)
 
 
 @server_router.post("/create-policy")

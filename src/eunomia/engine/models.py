@@ -20,7 +20,7 @@ class ConditionOperator(str, Enum):
 class Condition(BaseModel):
     path: str = Field(
         ...,
-        description="Path to the attribute in dot notation (e.g., 'principal.attributes.role')",
+        description="Path to the attribute in dot notation (e.g., 'attributes.role')",
     )
     operator: ConditionOperator = Field(..., description="Comparison operator")
     value: Any = Field(..., description="Value to compare against")
