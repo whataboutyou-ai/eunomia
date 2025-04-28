@@ -67,7 +67,14 @@ def role_based_access_example():
 
     # Evaluate the admin request
     admin_result = engine.evaluate_all(admin_request)
-    print(f"Admin accessing private resource: {admin_result.effect}")
+    print(
+        f"Admin accessing private resource: {admin_result.effect}"
+        + (
+            f" from rule {admin_result.matched_rule.description}"
+            if admin_result.matched_rule
+            else " from default"
+        )
+    )
 
     # Create an access request for read-only user with public resource
     readonly_public_request = AccessRequest(
@@ -84,7 +91,14 @@ def role_based_access_example():
 
     # Evaluate the read-only request with public resource
     readonly_public_result = engine.evaluate_all(readonly_public_request)
-    print(f"Read-only user accessing public resource: {readonly_public_result.effect}")
+    print(
+        f"Read-only user accessing public resource: {readonly_public_result.effect}"
+        + (
+            f" from rule {readonly_public_result.matched_rule.description}"
+            if readonly_public_result.matched_rule
+            else " from default"
+        )
+    )
 
     # Create an access request for read-only user with private resource
     readonly_private_request = AccessRequest(
@@ -103,6 +117,11 @@ def role_based_access_example():
     readonly_private_result = engine.evaluate_all(readonly_private_request)
     print(
         f"Read-only user accessing private resource: {readonly_private_result.effect}"
+        + (
+            f" from rule {readonly_private_result.matched_rule.description}"
+            if readonly_private_result.matched_rule
+            else " from default"
+        )
     )
 
 

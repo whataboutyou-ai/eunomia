@@ -40,21 +40,30 @@ class PolicyEngine:
     def evaluate_all(self, request: AccessRequest) -> PolicyEvaluationResult:
         """
         Evaluate all policies and return a single result.
-        If any policy explicitly DENIES, the result is DENY.
-        Otherwise, if at least one policy explicitly ALLOWS, the result is ALLOW.
-        If no policies match, the default result is DENY.
+
+        If any policy explicitly matches a rule with DENY effect, the result is DENY.
+        If any policy explicitly matches a rule with ALLOW effect, the result is ALLOW.
+        If no explicit rule matches, and any policy returns a default DENY, the result is DENY.
+        If no policies matched or there are no policies, deny by default.
         """
         results = self._evaluate(request)
 
-        # If any policy denies, the overall result is deny
+        explicit_deny, explicit_allow, default_deny = None, None, None
         for result in results:
-            if result.effect == PolicyEffect.DENY:
-                return result
+            if result.matched_rule:
+                if result.effect == PolicyEffect.DENY:
+                    explicit_deny = result
+                elif result.effect == PolicyEffect.ALLOW:
+                    explicit_allow = result
+            elif result.effect == PolicyEffect.DENY:
+                default_deny = result
 
-        # If any policy allows, the overall result is allow
-        for result in results:
-            if result.effect == PolicyEffect.ALLOW:
-                return result
+        if explicit_deny:
+            return explicit_deny
+        if explicit_allow:
+            return explicit_allow
+        if default_deny:
+            return default_deny
 
         # If no policies matched or there are no policies, deny by default
         return PolicyEvaluationResult(
