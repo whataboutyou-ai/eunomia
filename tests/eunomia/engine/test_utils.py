@@ -30,7 +30,7 @@ def test_create_simple_policy():
 
     rule = policy.rules[0]
     assert rule.effect == schemas.PolicyEffect.ALLOW
-    assert rule.action == "access"
+    assert rule.actions == ["access"]
     assert len(rule.principal_conditions) == 1
     assert len(rule.resource_conditions) == 1
 
@@ -55,6 +55,6 @@ def test_create_simple_policy_with_minimal_params():
 
     rule = policy.rules[0]
     assert rule.effect == schemas.PolicyEffect.ALLOW
-    assert rule.action == "access"
+    assert rule.actions == ["access"]
     assert len(rule.principal_conditions) == 0
     assert len(rule.resource_conditions) == 0

@@ -25,7 +25,7 @@ class Rule(BaseModel):
     resource_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to resource"
     )
-    action: str = Field(..., description="Action being evaluated")
+    actions: list[str] = Field(..., description="All actions evaluated by the rule")
 
 
 class Policy(BaseModel):

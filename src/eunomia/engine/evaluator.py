@@ -74,7 +74,7 @@ def evaluate_conditions(conditions: list[schemas.Condition], obj: Any) -> bool:
 def evaluate_rule(rule: schemas.Rule, request: AccessRequest) -> bool:
     """Evaluate if a rule matches the access request."""
     # Check action match
-    if rule.action != request.action:
+    if request.action not in rule.actions:
         return False
 
     # Evaluate principal conditions

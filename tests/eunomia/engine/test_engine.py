@@ -31,7 +31,7 @@ def sample_policy() -> schemas.Policy:
                     )
                 ],
                 resource_conditions=[],
-                action="access",
+                actions=["access"],
             )
         ],
         default_effect=schemas.PolicyEffect.DENY,

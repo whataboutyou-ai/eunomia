@@ -41,7 +41,7 @@ def test_role_based_access():
                         value="public",
                     )
                 ],
-                action="access",
+                actions=["access"],
             )
         ],
         default_effect=schemas.PolicyEffect.DENY,

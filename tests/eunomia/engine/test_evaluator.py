@@ -108,7 +108,7 @@ def test_evaluate_rule():
                 value="document",
             )
         ],
-        action="access",
+        actions=["access"],
     )
 
     request = AccessRequest(
@@ -180,7 +180,7 @@ def test_evaluate_policy():
                     )
                 ],
                 resource_conditions=[],
-                action="access",
+                actions=["access"],
             )
         ],
         default_effect=schemas.PolicyEffect.DENY,
