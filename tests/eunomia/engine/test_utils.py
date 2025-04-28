@@ -1,0 +1,60 @@
+from eunomia.engine import models, utils
+
+
+def test_create_attribute_condition():
+    condition = utils.create_attribute_condition("role", "admin")
+    assert condition.path == "attributes.role"
+    assert condition.operator == models.ConditionOperator.EQUALS
+    assert condition.value == "admin"
+
+    condition = utils.create_attribute_condition(
+        "role", "admin", operator=models.ConditionOperator.CONTAINS
+    )
+    assert condition.operator == models.ConditionOperator.CONTAINS
+
+
+def test_create_simple_policy():
+    policy = utils.create_simple_policy(
+        name="test-policy",
+        description="Test policy",
+        principal_attributes={"role": "admin"},
+        resource_attributes={"type": "document"},
+        effect=models.PolicyEffect.ALLOW,
+        default_effect=models.PolicyEffect.DENY,
+    )
+
+    assert policy.name == "test-policy"
+    assert policy.description == "Test policy"
+    assert policy.default_effect == models.PolicyEffect.DENY
+    assert len(policy.rules) == 1
+
+    rule = policy.rules[0]
+    assert rule.effect == models.PolicyEffect.ALLOW
+    assert rule.action == "access"
+    assert len(rule.principal_conditions) == 1
+    assert len(rule.resource_conditions) == 1
+
+    principal_condition = rule.principal_conditions[0]
+    assert principal_condition.path == "attributes.role"
+    assert principal_condition.operator == models.ConditionOperator.EQUALS
+    assert principal_condition.value == "admin"
+
+    resource_condition = rule.resource_conditions[0]
+    assert resource_condition.path == "attributes.type"
+    assert resource_condition.operator == models.ConditionOperator.EQUALS
+    assert resource_condition.value == "document"
+
+
+def test_create_simple_policy_with_minimal_params():
+    policy = utils.create_simple_policy(name="test-policy")
+
+    assert policy.name == "test-policy"
+    assert policy.description is None
+    assert policy.default_effect == models.PolicyEffect.DENY
+    assert len(policy.rules) == 1
+
+    rule = policy.rules[0]
+    assert rule.effect == models.PolicyEffect.ALLOW
+    assert rule.action == "access"
+    assert len(rule.principal_conditions) == 0
+    assert len(rule.resource_conditions) == 0

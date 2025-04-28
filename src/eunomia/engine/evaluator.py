@@ -21,7 +21,11 @@ def get_attribute_value(obj: Any, path: str) -> Any:
             current = getattr(current, component)
         elif isinstance(current, dict) and component in current:
             current = current[component]
-        elif isinstance(current, list) and component.isdigit():
+        elif (
+            isinstance(current, list)
+            and component.isdigit()
+            and int(component) < len(current)
+        ):
             current = current[int(component)]
         else:
             return None

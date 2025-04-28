@@ -8,13 +8,10 @@ from eunomia_core.schemas import (
 from eunomia.engine import PolicyEngine, models, utils
 
 
-def role_based_access_example():
-    """Example of role-based access control policies."""
-
-    # Create a policy engine
+def test_role_based_access():
+    """Test role-based access control policies."""
     engine = PolicyEngine()
 
-    # Add an admin policy
     admin_policy = utils.create_simple_policy(
         name="admin-access",
         description="Administrators can access all resources",
@@ -23,7 +20,6 @@ def role_based_access_example():
     )
     engine.add_policy(admin_policy)
 
-    # Add a more specific policy with conditions
     read_only_policy = models.Policy(
         name="read-only-access",
         description="Users with read-only role can only access resources with 'public' visibility",
@@ -52,7 +48,6 @@ def role_based_access_example():
     )
     engine.add_policy(read_only_policy)
 
-    # Create an access request for admin user
     admin_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
@@ -65,18 +60,11 @@ def role_based_access_example():
         action="access",
     )
 
-    # Evaluate the admin request
     admin_result = engine.evaluate_all(admin_request)
-    print(
-        f"Admin accessing private resource: {admin_result.effect}"
-        + (
-            f" from rule {admin_result.matched_rule.description}"
-            if admin_result.matched_rule
-            else " from default"
-        )
-    )
+    assert admin_result.effect == models.PolicyEffect.ALLOW
+    assert admin_result.matched_rule is not None
+    assert admin_result.policy_name == "admin-access"
 
-    # Create an access request for read-only user with public resource
     readonly_public_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
@@ -89,18 +77,11 @@ def role_based_access_example():
         action="access",
     )
 
-    # Evaluate the read-only request with public resource
     readonly_public_result = engine.evaluate_all(readonly_public_request)
-    print(
-        f"Read-only user accessing public resource: {readonly_public_result.effect}"
-        + (
-            f" from rule {readonly_public_result.matched_rule.description}"
-            if readonly_public_result.matched_rule
-            else " from default"
-        )
-    )
+    assert readonly_public_result.effect == models.PolicyEffect.ALLOW
+    assert readonly_public_result.matched_rule is not None
+    assert readonly_public_result.policy_name == "read-only-access"
 
-    # Create an access request for read-only user with private resource
     readonly_private_request = AccessRequest(
         principal=PrincipalAccess(
             type=EntityType.principal,
@@ -113,17 +94,7 @@ def role_based_access_example():
         action="access",
     )
 
-    # Evaluate the read-only request with private resource
     readonly_private_result = engine.evaluate_all(readonly_private_request)
-    print(
-        f"Read-only user accessing private resource: {readonly_private_result.effect}"
-        + (
-            f" from rule {readonly_private_result.matched_rule.description}"
-            if readonly_private_result.matched_rule
-            else " from default"
-        )
-    )
-
-
-if __name__ == "__main__":
-    role_based_access_example()
+    assert readonly_private_result.effect == models.PolicyEffect.DENY
+    assert readonly_private_result.matched_rule is None
+    assert readonly_private_result.policy_name == "read-only-access"
