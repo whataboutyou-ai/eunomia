@@ -1,6 +1,7 @@
+import json
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from eunomia.engine.enums import ConditionOperator, PolicyEffect
 
@@ -13,6 +14,18 @@ class Condition(BaseModel):
     operator: ConditionOperator = Field(..., description="Comparison operator")
     value: Any = Field(..., description="Value to compare against")
 
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def parse_json(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return v
+        return v
+
 
 class Rule(BaseModel):
     effect: PolicyEffect = Field(..., description="Effect when the rule matches")
@@ -23,6 +36,15 @@ class Rule(BaseModel):
         default_factory=list, description="Conditions applied to resource"
     )
     actions: list[str] = Field(..., description="All actions evaluated by the rule")
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("actions", mode="before")
+    @classmethod
+    def parse_json(cls, v: list[str] | str) -> list[str]:
+        if isinstance(v, str):
+            return json.loads(v)
+        return v
 
 
 class Policy(BaseModel):
@@ -35,11 +57,11 @@ class Policy(BaseModel):
         PolicyEffect.DENY, description="Default effect if no rules match"
     )
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class PolicyEvaluationResult(BaseModel):
-    effect: PolicyEffect = Field(
-        ..., description="The resulting effect (allow or deny)"
-    )
+    effect: PolicyEffect = Field(..., description="The resulting effect")
     matched_rule: Optional[Rule] = Field(
         None, description="The rule that determined the effect, if any"
     )

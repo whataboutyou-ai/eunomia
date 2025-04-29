@@ -19,7 +19,7 @@ class PolicyEngine:
         """Load policies from the database into memory."""
         with db.SessionLocal() as db_session:
             db_policies = crud.get_all_policies(db=db_session)
-            self.policies = [crud.db_policy_to_schema(p) for p in db_policies]
+            self.policies = [schemas.Policy.model_validate(p) for p in db_policies]
 
     def add_policy(self, policy: schemas.Policy) -> None:
         """Add a policy to the engine and persist it to the database."""

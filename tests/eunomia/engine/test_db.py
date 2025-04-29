@@ -79,7 +79,7 @@ def test_db_policy_to_schema(fixture_db: Session):
                     schemas.Condition(
                         path="attributes.type",
                         operator=schemas.ConditionOperator.EQUALS,
-                        value="document",
+                        value={"foo": {"bar": 123}},
                     )
                 ],
                 actions=["read", "write"],
@@ -92,7 +92,7 @@ def test_db_policy_to_schema(fixture_db: Session):
     db_policy = crud.create_policy(original_policy, fixture_db)
 
     # Convert back to schema
-    schema_policy = crud.db_policy_to_schema(db_policy)
+    schema_policy = schemas.Policy.model_validate(db_policy)
 
     # Verify conversion was correct
     assert schema_policy.name == original_policy.name
@@ -111,3 +111,17 @@ def test_db_policy_to_schema(fixture_db: Session):
     assert len(schema_rule.resource_conditions) == len(
         original_rule.resource_conditions
     )
+
+    # Check principal condition
+    schema_principal_condition = schema_rule.principal_conditions[0]
+    original_principal_condition = original_rule.principal_conditions[0]
+    assert schema_principal_condition.path == original_principal_condition.path
+    assert schema_principal_condition.operator == original_principal_condition.operator
+    assert schema_principal_condition.value == original_principal_condition.value
+
+    # Check resource condition
+    schema_resource_condition = schema_rule.resource_conditions[0]
+    original_resource_condition = original_rule.resource_conditions[0]
+    assert schema_resource_condition.path == original_resource_condition.path
+    assert schema_resource_condition.operator == original_resource_condition.operator
+    assert schema_resource_condition.value == original_resource_condition.value
