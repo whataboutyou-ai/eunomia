@@ -5,20 +5,19 @@ from eunomia_core.schemas import (
     ResourceAccess,
 )
 
-from eunomia.engine import PolicyEngine, schemas, utils
+from eunomia.engine import schemas, utils
+from eunomia.engine.engine import PolicyEngine
 
 
-def test_role_based_access():
+def test_role_based_access(fixture_engine: PolicyEngine):
     """Test role-based access control policies."""
-    engine = PolicyEngine()
-
     admin_policy = utils.create_simple_policy(
         name="admin-access",
         description="Administrators can access all resources",
         principal_attributes={"role": "admin"},
         effect=schemas.PolicyEffect.ALLOW,
     )
-    engine.add_policy(admin_policy)
+    fixture_engine.add_policy(admin_policy)
 
     read_only_policy = schemas.Policy(
         name="read-only-access",
@@ -45,7 +44,7 @@ def test_role_based_access():
         ],
         default_effect=schemas.PolicyEffect.DENY,
     )
-    engine.add_policy(read_only_policy)
+    fixture_engine.add_policy(read_only_policy)
 
     admin_request = AccessRequest(
         principal=PrincipalAccess(
@@ -59,7 +58,7 @@ def test_role_based_access():
         action="access",
     )
 
-    admin_result = engine.evaluate_all(admin_request)
+    admin_result = fixture_engine.evaluate_all(admin_request)
     assert admin_result.effect == schemas.PolicyEffect.ALLOW
     assert admin_result.matched_rule is not None
     assert admin_result.policy_name == "admin-access"
@@ -76,7 +75,7 @@ def test_role_based_access():
         action="access",
     )
 
-    readonly_public_result = engine.evaluate_all(readonly_public_request)
+    readonly_public_result = fixture_engine.evaluate_all(readonly_public_request)
     assert readonly_public_result.effect == schemas.PolicyEffect.ALLOW
     assert readonly_public_result.matched_rule is not None
     assert readonly_public_result.policy_name == "read-only-access"
@@ -93,7 +92,7 @@ def test_role_based_access():
         action="access",
     )
 
-    readonly_private_result = engine.evaluate_all(readonly_private_request)
+    readonly_private_result = fixture_engine.evaluate_all(readonly_private_request)
     assert readonly_private_result.effect == schemas.PolicyEffect.DENY
     assert readonly_private_result.matched_rule is None
     assert readonly_private_result.policy_name == "read-only-access"

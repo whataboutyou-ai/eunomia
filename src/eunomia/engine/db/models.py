@@ -38,11 +38,13 @@ class Rule(db.Base):
         foreign_keys="[Condition.rule_id, Condition.entity_type]",
         primaryjoin="and_(Rule.id==Condition.rule_id, Condition.entity_type=='principal')",
         cascade="all, delete-orphan",
+        overlaps="resource_conditions",
     )
     resource_conditions: Mapped[list["Condition"]] = relationship(
         foreign_keys="[Condition.rule_id, Condition.entity_type]",
         primaryjoin="and_(Rule.id==Condition.rule_id, Condition.entity_type=='resource')",
         cascade="all, delete-orphan",
+        overlaps="principal_conditions",
     )
 
 
