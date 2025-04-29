@@ -70,7 +70,7 @@ class EntityCreate(EntityBase):
 
 
 class EntityUpdate(EntityBase):
-    type: EntityType = EntityType.any  # type is not required for the attributes update
+    type: Optional[EntityType] = None  # type is not required for the attributes update
 
     @field_validator("attributes", mode="before")
     @classmethod

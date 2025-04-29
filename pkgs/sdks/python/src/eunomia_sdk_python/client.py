@@ -107,7 +107,7 @@ class EunomiaClient:
         Parameters
         ----------
         type : enums.EntityType
-            The type of entity to register. Either "resource", "principal" or "any".
+            The type of entity to register. Either "resource" or "principal".
         attributes : dict
             The attributes to associate with the entity.
         uri : str | None, optional

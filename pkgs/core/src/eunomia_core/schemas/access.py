@@ -32,23 +32,11 @@ class EntityAccess(BaseModel):
 
 
 class ResourceAccess(EntityAccess):
-    type: Literal[EntityType.resource, EntityType.any] = EntityType.resource
-
-    # The type is always overridden to "resource", although it can accept "any" as input.
-    @field_validator("type", mode="after")
-    @classmethod
-    def override_type(cls, v):
-        return EntityType.resource
+    type: Literal[EntityType.resource] = EntityType.resource
 
 
 class PrincipalAccess(EntityAccess):
-    type: Literal[EntityType.principal, EntityType.any] = EntityType.principal
-
-    # The type is always overridden to "principal", although it can accept "any" as input.
-    @field_validator("type", mode="after")
-    @classmethod
-    def override_type(cls, v):
-        return EntityType.principal
+    type: Literal[EntityType.principal] = EntityType.principal
 
 
 class AccessRequest(BaseModel):

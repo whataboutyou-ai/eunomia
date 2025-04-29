@@ -61,14 +61,14 @@ export interface EntityAccess {
  * Resource in an access control request
  */
 export interface ResourceAccess extends EntityAccess {
-  type: EntityType.Resource | EntityType.Any;
+  type: EntityType.Resource;
 }
 
 /**
  * Principal in an access control request
  */
 export interface PrincipalAccess extends EntityAccess {
-  type: EntityType.Principal | EntityType.Any;
+  type: EntityType.Principal;
 }
 
 /**

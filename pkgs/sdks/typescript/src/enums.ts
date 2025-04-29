@@ -4,5 +4,4 @@
 export enum EntityType {
   Resource = "resource",
   Principal = "principal",
-  Any = "any",
 }
