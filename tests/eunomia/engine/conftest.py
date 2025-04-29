@@ -1,10 +1,6 @@
 import pytest
-from eunomia_core.schemas import (
-    AccessRequest,
-    EntityType,
-    PrincipalAccess,
-    ResourceAccess,
-)
+from eunomia_core.enums import EntityType
+from eunomia_core.schemas import AccessRequest, PrincipalAccess, ResourceAccess
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
