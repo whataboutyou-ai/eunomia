@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from eunomia_core.enums import EntityType
+from eunomia_core.enums.entity import EntityType
 from eunomia_core.utils import generate_uri
 
 

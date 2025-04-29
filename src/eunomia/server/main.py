@@ -1,7 +1,7 @@
-from eunomia_core import schemas
+from eunomia_core import enums, schemas
 
 from eunomia.config import settings
-from eunomia.engine import PolicyEffect, PolicyEngine, utils
+from eunomia.engine import PolicyEngine, utils
 from eunomia.fetchers import FetcherFactory
 
 
@@ -59,7 +59,7 @@ class EunomiaServer:
         """
         self._merge_attributes(request.principal)
         self._merge_attributes(request.resource)
-        return self._engine.evaluate_all(request).effect == PolicyEffect.ALLOW
+        return self._engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW
 
     def create_policy(self, policy: schemas.Policy) -> str:
         """
@@ -88,7 +88,7 @@ class EunomiaServer:
             name="access",
             principal_attributes=policy.rules[0].principal.attributes,
             resource_attributes=policy.rules[0].resource.attributes,
-            effect=PolicyEffect.ALLOW,
+            effect=enums.PolicyEffect.ALLOW,
         )
         self._engine.add_policy(converted_policy)
         return "/"

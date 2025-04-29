@@ -1,11 +1,9 @@
 from typing import Optional
 
-from eunomia_core.schemas import AccessRequest
+from eunomia_core import enums, schemas
 
 from eunomia.config import settings
-from eunomia.engine import schemas
 from eunomia.engine.db import crud, db
-from eunomia.engine.enums import PolicyEffect
 from eunomia.engine.evaluator import evaluate_policy
 
 
@@ -41,7 +39,9 @@ class PolicyEngine:
                 return policy
         return None
 
-    def _evaluate(self, request: AccessRequest) -> list[schemas.PolicyEvaluationResult]:
+    def _evaluate(
+        self, request: schemas.AccessRequest
+    ) -> list[schemas.PolicyEvaluationResult]:
         """Evaluate all policies against the access request."""
         results = []
 
@@ -51,7 +51,9 @@ class PolicyEngine:
 
         return results
 
-    def evaluate_all(self, request: AccessRequest) -> schemas.PolicyEvaluationResult:
+    def evaluate_all(
+        self, request: schemas.AccessRequest
+    ) -> schemas.PolicyEvaluationResult:
         """
         Evaluate all policies and return a single result.
 
@@ -65,11 +67,11 @@ class PolicyEngine:
         explicit_deny, explicit_allow, default_deny = None, None, None
         for result in results:
             if result.matched_rule:
-                if result.effect == PolicyEffect.DENY:
+                if result.effect == enums.PolicyEffect.DENY:
                     explicit_deny = result
-                elif result.effect == PolicyEffect.ALLOW:
+                elif result.effect == enums.PolicyEffect.ALLOW:
                     explicit_allow = result
-            elif result.effect == PolicyEffect.DENY:
+            elif result.effect == enums.PolicyEffect.DENY:
                 default_deny = result
 
         if explicit_deny:
@@ -81,5 +83,5 @@ class PolicyEngine:
 
         # If no policies matched or there are no policies, deny by default
         return schemas.PolicyEvaluationResult(
-            effect=PolicyEffect.DENY, matched_rule=None, policy_name="default"
+            effect=enums.PolicyEffect.DENY, matched_rule=None, policy_name="default"
         )

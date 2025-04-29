@@ -1,13 +1,12 @@
 from typing import Any, Optional
 
-from eunomia.engine import schemas
-from eunomia.engine.enums import ConditionOperator, PolicyEffect
+from eunomia_core import enums, schemas
 
 
 def create_attribute_condition(
     attribute_key: str,
     value: Any,
-    operator: ConditionOperator = ConditionOperator.EQUALS,
+    operator: enums.ConditionOperator = enums.ConditionOperator.EQUALS,
 ) -> schemas.Condition:
     """
     Create a condition that matches against an entity attribute.
@@ -37,8 +36,8 @@ def create_simple_policy(
     principal_attributes: Optional[dict[str, str]] = None,
     resource_attributes: Optional[dict[str, str]] = None,
     actions: list[str] = ["access"],
-    effect: PolicyEffect = PolicyEffect.ALLOW,
-    default_effect: PolicyEffect = PolicyEffect.DENY,
+    effect: enums.PolicyEffect = enums.PolicyEffect.ALLOW,
+    default_effect: enums.PolicyEffect = enums.PolicyEffect.DENY,
 ) -> schemas.Policy:
     """
     Create a simple policy with a single rule based on attribute matching.

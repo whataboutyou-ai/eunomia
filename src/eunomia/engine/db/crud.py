@@ -1,8 +1,8 @@
 import json
 
+from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.engine import schemas
 from eunomia.engine.db import models
 
 

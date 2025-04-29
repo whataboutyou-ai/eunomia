@@ -2,7 +2,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from eunomia_core.enums import EntityType
+from eunomia_core.enums.entity import EntityType
 from eunomia_core.schemas.entity import Attribute
 
 

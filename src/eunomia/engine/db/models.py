@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Any, Literal, Optional
 
+from eunomia_core import enums
 from sqlalchemy import JSON, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from eunomia.engine.db import db
-from eunomia.engine.enums import ConditionOperator, PolicyEffect
 
 
 class Policy(db.Base):
@@ -14,7 +14,7 @@ class Policy(db.Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     description: Mapped[Optional[str]]
-    default_effect: Mapped[PolicyEffect]
+    default_effect: Mapped[enums.PolicyEffect]
     registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     # relationships
@@ -28,7 +28,7 @@ class Rule(db.Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     policy_id: Mapped[int] = mapped_column(ForeignKey(Policy.id))
-    effect: Mapped[PolicyEffect]
+    effect: Mapped[enums.PolicyEffect]
     actions: Mapped[list[str]] = mapped_column(JSON)
     registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
@@ -55,6 +55,6 @@ class Condition(db.Base):
     rule_id: Mapped[int] = mapped_column(ForeignKey(Rule.id))
     entity_type: Mapped[Literal["principal", "resource"]]
     path: Mapped[str]
-    operator: Mapped[ConditionOperator]
+    operator: Mapped[enums.ConditionOperator]
     value: Mapped[Any] = mapped_column(JSON)
     registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
