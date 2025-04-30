@@ -32,6 +32,10 @@ class PolicyEngine:
             is_deleted = crud.delete_policy(policy_name, db=db_session)
         return is_deleted
 
+    def get_policies(self) -> list[schemas.Policy]:
+        """Retrieve all policies from memory."""
+        return self.policies
+
     def get_policy(self, policy_name: str) -> Optional[schemas.Policy]:
         """Retrieve a policy by name from memory."""
         for policy in self.policies:

@@ -1,7 +1,7 @@
 from eunomia_core import enums, schemas
 
 from eunomia.config import settings
-from eunomia.engine import PolicyEngine, utils
+from eunomia.engine import PolicyEngine
 from eunomia.fetchers import FetcherFactory
 
 
@@ -13,7 +13,7 @@ class EunomiaServer:
     """
 
     def __init__(self) -> None:
-        self._engine = PolicyEngine()
+        self.engine = PolicyEngine()
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
@@ -59,20 +59,4 @@ class EunomiaServer:
         """
         self._merge_attributes(request.principal)
         self._merge_attributes(request.resource)
-        return self._engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW
-
-    def create_policy(
-        self, request: schemas.AccessRequest, name: str
-    ) -> schemas.Policy:
-        """
-        Create a new policy and store it in the engine.
-        """
-        policy = utils.create_simple_policy(
-            name=name,
-            principal_attributes=request.principal.attributes,
-            resource_attributes=request.resource.attributes,
-            actions=[request.action],
-            effect=enums.PolicyEffect.ALLOW,
-        )
-        self._engine.add_policy(policy)
-        return policy
+        return self.engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW

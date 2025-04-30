@@ -3,15 +3,12 @@ from fastapi import APIRouter
 
 from eunomia.server import EunomiaServer
 
-server_router = APIRouter()
-server = EunomiaServer()
 
+def server_router_factory(server: EunomiaServer) -> APIRouter:
+    router = APIRouter(tags=["server"])
 
-@server_router.post("/check-access", response_model=bool)
-async def check_access(request: schemas.AccessRequest):
-    return server.check_access(request)
+    @router.post("/check-access", response_model=bool)
+    async def check_access(request: schemas.AccessRequest):
+        return server.check_access(request)
 
-
-@server_router.post("/create-policy", response_model=schemas.Policy)
-async def create_policy(request: schemas.AccessRequest, name: str):
-    return server.create_policy(request, name)
+    return router

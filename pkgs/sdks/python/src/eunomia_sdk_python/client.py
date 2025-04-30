@@ -205,7 +205,7 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         response = self.client.post(
-            "/create-policy", json=request.model_dump(), params={"name": name}
+            "/policies", json=request.model_dump(), params={"name": name}
         )
         self._handle_response(response)
         return schemas.Policy.model_validate(response.json())
