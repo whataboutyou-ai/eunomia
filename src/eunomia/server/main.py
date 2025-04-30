@@ -61,34 +61,18 @@ class EunomiaServer:
         self._merge_attributes(request.resource)
         return self._engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW
 
-    def create_policy(self, policy: schemas.Policy) -> str:
+    def create_policy(
+        self, request: schemas.AccessRequest, name: str
+    ) -> schemas.Policy:
         """
         Create a new policy and store it in the engine.
-
-        Parameters
-        ----------
-        policy : schemas.Policy
-            The policy to create, containing a list of access rules.
-            Rules are evaluated with OR logic (access is granted if ANY rule matches).
-            Within each rule, attributes for both principal and resource are evaluated
-            with AND logic (all specified attributes must match).
-
-        Returns
-        -------
-        str
-            The path to the created policy.
-
-        Raises
-        ------
-        ValueError
-            If the policy file already exists.
         """
-        # TODO: provide a better interface for policy creation
-        converted_policy = utils.create_simple_policy(
-            name="access",
-            principal_attributes=policy.rules[0].principal.attributes,
-            resource_attributes=policy.rules[0].resource.attributes,
+        policy = utils.create_simple_policy(
+            name=name,
+            principal_attributes=request.principal.attributes,
+            resource_attributes=request.resource.attributes,
+            actions=[request.action],
             effect=enums.PolicyEffect.ALLOW,
         )
-        self._engine.add_policy(converted_policy)
-        return "/"
+        self._engine.add_policy(policy)
+        return policy

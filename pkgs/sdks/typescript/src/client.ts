@@ -202,17 +202,22 @@ export class EunomiaClient {
   }
 
   /**
-   * Create a new policy and save it to the local file system.
+   * Create a new policy and store it in the Eunomia server.
    *
-   * @param options - Options for creating the policy
-   * @param options.policy - The policy to create
-   * @returns A promise that resolves when the policy is created
+   * @param request - The access request to create the policy from
+   * @param name - The name of the policy
+   * @returns A promise that resolves to the created policy
    */
-  async createPolicy(options: {
-    policy: Policy;
-  }): Promise<void> {
+  async createPolicy(request: AccessRequest, name: string): Promise<Policy> {
     try {
-      await this.client.post("/create-policy", options.policy);
+      const response = await this.client.post<Policy>(
+        "/create-policy",
+        request,
+        {
+          params: { name },
+        },
+      );
+      return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(

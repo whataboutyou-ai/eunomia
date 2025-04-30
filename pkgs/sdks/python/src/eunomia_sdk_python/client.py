@@ -186,20 +186,26 @@ class EunomiaClient:
         self._handle_response(response)
         return
 
-    def create_policy(self, policy: schemas.Policy) -> None:
+    def create_policy(
+        self, request: schemas.AccessRequest, name: str
+    ) -> schemas.Policy:
         """
-        Create a new policy and save it to the local file system.
+        Create a new policy and store it in the Eunomia server.
 
         Parameters
         ----------
-        policy : schemas.Policy
-            The policy to create.
+        request : schemas.AccessRequest
+            The request to create the policy from.
+        name : str
+            The name of the policy.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.post("/create-policy", json=policy.model_dump())
+        response = self.client.post(
+            "/create-policy", json=request.model_dump(), params={"name": name}
+        )
         self._handle_response(response)
-        return
+        return schemas.Policy.model_validate(response.json())
