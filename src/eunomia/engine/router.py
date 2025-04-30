@@ -5,7 +5,7 @@ from eunomia.engine import PolicyEngine, utils
 
 
 def engine_router_factory(engine: PolicyEngine) -> APIRouter:
-    router = APIRouter(tags=["engine"])
+    router = APIRouter()
 
     @router.get("/policies", response_model=list[schemas.Policy])
     async def get_policies():

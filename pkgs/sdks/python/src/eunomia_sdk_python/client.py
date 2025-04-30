@@ -125,7 +125,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post(
-            "/fetchers/internal/register-entity", json=entity.model_dump()
+            "/fetchers/internal/entities", json=entity.model_dump()
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
@@ -158,15 +158,15 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         entity = schemas.EntityUpdate(uri=uri, attributes=attributes)
-        response = self.client.post(
-            "/fetchers/internal/update-entity",
+        response = self.client.put(
+            f"/fetchers/internal/entities/{uri}",
             json=entity.model_dump(),
             params={"override": override},
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
 
-    def delete_entity(self, uri: str) -> None:
+    def delete_entity(self, uri: str) -> bool:
         """
         Delete an entity from the Eunomia server.
 
@@ -180,11 +180,9 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.post(
-            "/fetchers/internal/delete-entity", params={"uri": uri}
-        )
+        response = self.client.delete(f"/fetchers/internal/entities/{uri}")
         self._handle_response(response)
-        return
+        return response.json()
 
     def create_policy(
         self, request: schemas.AccessRequest, name: str

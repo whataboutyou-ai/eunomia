@@ -128,7 +128,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/fetchers/internal/register-entity",
+        "/fetchers/internal/entities",
         entity,
       );
       return this.handleResponse(response);
@@ -162,8 +162,8 @@ export class EunomiaClient {
     };
 
     try {
-      const response = await this.client.post<EntityInDb>(
-        "/fetchers/internal/update-entity",
+      const response = await this.client.put<EntityInDb>(
+        `/fetchers/internal/entities/${options.uri}`,
         entity,
         {
           params: { override: options.override || false },
@@ -186,11 +186,12 @@ export class EunomiaClient {
    * @param uri - The URI of the entity to delete
    * @returns A promise that resolves when the entity is deleted
    */
-  async deleteEntity(uri: string): Promise<void> {
+  async deleteEntity(uri: string): Promise<boolean> {
     try {
-      await this.client.post("/fetchers/internal/delete-entity", null, {
-        params: { uri },
-      });
+      const response = await this.client.delete(
+        `/fetchers/internal/entities/${uri}`,
+      );
+      return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
@@ -211,7 +212,7 @@ export class EunomiaClient {
   async createPolicy(request: AccessRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
-        "/create-policy",
+        "/policies",
         request,
         {
           params: { name },
