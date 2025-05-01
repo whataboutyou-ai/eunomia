@@ -21,15 +21,16 @@ class PolicyEngine:
 
     def add_policy(self, policy: schemas.Policy) -> None:
         """Add a policy to the engine and persist it to the database."""
-        self.policies.append(policy)
         with db.SessionLocal() as db_session:
             crud.create_policy(policy, db=db_session)
+        self.policies.append(policy)
 
     def remove_policy(self, policy_name: str) -> bool:
         """Remove a policy by name from the engine and database."""
-        self.policies = [p for p in self.policies if p.name != policy_name]
         with db.SessionLocal() as db_session:
             is_deleted = crud.delete_policy(policy_name, db=db_session)
+        if is_deleted:
+            self.policies = [p for p in self.policies if p.name != policy_name]
         return is_deleted
 
     def get_policies(self) -> list[schemas.Policy]:
