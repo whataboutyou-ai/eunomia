@@ -15,7 +15,7 @@ def internal_router_factory(fetcher: InternalFetcher) -> APIRouter:
     ):
         return crud.get_entities(offset=offset, limit=limit, db=db_session)
 
-    @router.get("/entities/count")
+    @router.get("/entities/$count")
     async def get_entities_count(db_session: Session = Depends(db.get_db)) -> int:
         return crud.get_entities_count(db=db_session)
 
@@ -24,6 +24,15 @@ def internal_router_factory(fetcher: InternalFetcher) -> APIRouter:
         entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
     ):
         return fetcher.register_entity(entity, db=db_session)
+
+    @router.get("/entities/{uri}", response_model=schemas.EntityInDb)
+    async def get_entity(uri: str, db_session: Session = Depends(db.get_db)):
+        entity = crud.get_entity(uri, db=db_session)
+        if entity is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Entity not found"
+            )
+        return entity
 
     @router.put("/entities/{uri}", response_model=schemas.EntityInDb)
     async def update_entity(
