@@ -1,6 +1,6 @@
+from eunomia_core import enums, schemas
 from sqlalchemy.orm import Session
 
-from eunomia.engine import schemas
 from eunomia.engine.db import crud
 
 
@@ -10,11 +10,11 @@ def test_create_and_get_policy(fixture_db: Session):
         description="Test database policy",
         rules=[
             schemas.Rule(
-                effect=schemas.PolicyEffect.ALLOW,
+                effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
                         path="attributes.role",
-                        operator=schemas.ConditionOperator.EQUALS,
+                        operator=enums.ConditionOperator.EQUALS,
                         value="admin",
                     )
                 ],
@@ -22,7 +22,7 @@ def test_create_and_get_policy(fixture_db: Session):
                 actions=["access"],
             )
         ],
-        default_effect=schemas.PolicyEffect.DENY,
+        default_effect=enums.PolicyEffect.DENY,
     )
 
     # Create policy
@@ -46,7 +46,7 @@ def test_delete_policy(fixture_db: Session):
         name="policy-to-delete",
         description="Policy to be deleted",
         rules=[],
-        default_effect=schemas.PolicyEffect.DENY,
+        default_effect=enums.PolicyEffect.DENY,
     )
 
     # Create and then delete
@@ -67,25 +67,25 @@ def test_db_policy_to_schema(fixture_db: Session):
         description="Test conversion between DB and schema",
         rules=[
             schemas.Rule(
-                effect=schemas.PolicyEffect.ALLOW,
+                effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
                         path="attributes.role",
-                        operator=schemas.ConditionOperator.EQUALS,
+                        operator=enums.ConditionOperator.EQUALS,
                         value="admin",
                     )
                 ],
                 resource_conditions=[
                     schemas.Condition(
                         path="attributes.type",
-                        operator=schemas.ConditionOperator.EQUALS,
+                        operator=enums.ConditionOperator.EQUALS,
                         value={"foo": {"bar": 123}},
                     )
                 ],
                 actions=["read", "write"],
             )
         ],
-        default_effect=schemas.PolicyEffect.DENY,
+        default_effect=enums.PolicyEffect.DENY,
     )
 
     # Create policy in DB

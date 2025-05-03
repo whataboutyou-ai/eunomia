@@ -74,7 +74,7 @@ def update_entity_attributes(
     return db_entity
 
 
-def delete_entity(db_entity: models.Entity, db: Session) -> None:
+def delete_entity(db_entity: models.Entity, db: Session) -> bool:
     """
     Delete an entity from the database.
 
@@ -87,11 +87,16 @@ def delete_entity(db_entity: models.Entity, db: Session) -> None:
         The entity to delete.
     db : Session
         SQLAlchemy database session.
+
+    Returns
+    -------
+    bool
+        True if the entity was deleted successfully, False otherwise.
     """
     delete_entity_attributes(db_entity, db)
     db.delete(db_entity)
     db.commit()
-    return
+    return True
 
 
 def delete_entity_attributes(db_entity: models.Entity, db: Session) -> None:

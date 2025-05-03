@@ -106,8 +106,7 @@ class InternalFetcher(BaseFetcher):
         if db_entity is None:
             raise ValueError(f"Entity with uri '{uri}' is not registered")
 
-        crud.delete_entity(db_entity, db=db)
-        return
+        return crud.delete_entity(db_entity, db=db)
 
     def fetch_attributes(self, uri: str) -> dict:
         """

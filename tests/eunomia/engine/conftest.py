@@ -1,14 +1,8 @@
 import pytest
-from eunomia_core.schemas import (
-    AccessRequest,
-    EntityType,
-    PrincipalAccess,
-    ResourceAccess,
-)
+from eunomia_core import enums, schemas
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from eunomia.engine import schemas
 from eunomia.engine.db import db
 from eunomia.engine.engine import PolicyEngine
 
@@ -68,11 +62,11 @@ def sample_policy():
         description="Test policy",
         rules=[
             schemas.Rule(
-                effect=schemas.PolicyEffect.ALLOW,
+                effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
                         path="attributes.role",
-                        operator=schemas.ConditionOperator.EQUALS,
+                        operator=enums.ConditionOperator.EQUALS,
                         value="admin",
                     )
                 ],
@@ -80,19 +74,19 @@ def sample_policy():
                 actions=["access"],
             )
         ],
-        default_effect=schemas.PolicyEffect.DENY,
+        default_effect=enums.PolicyEffect.DENY,
     )
 
 
 @pytest.fixture
 def sample_access_request():
-    return AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    return schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),
         action="access",

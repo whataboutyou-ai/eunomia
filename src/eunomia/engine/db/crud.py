@@ -1,8 +1,8 @@
 import json
 
+from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
-from eunomia.engine import schemas
 from eunomia.engine.db import models
 
 
@@ -10,6 +10,9 @@ def create_policy(policy: schemas.Policy, db: Session) -> models.Policy:
     """
     Create a new policy in the database.
     """
+    if get_policy(policy.name, db) is not None:
+        raise ValueError(f"Policy with name {policy.name} already exists")
+
     db_policy = models.Policy(
         name=policy.name,
         description=policy.description,

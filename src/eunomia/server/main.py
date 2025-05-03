@@ -1,7 +1,7 @@
-from eunomia_core import schemas
+from eunomia_core import enums, schemas
 
 from eunomia.config import settings
-from eunomia.engine import PolicyEffect, PolicyEngine, utils
+from eunomia.engine import PolicyEngine
 from eunomia.fetchers import FetcherFactory
 
 
@@ -13,7 +13,7 @@ class EunomiaServer:
     """
 
     def __init__(self) -> None:
-        self._engine = PolicyEngine()
+        self.engine = PolicyEngine()
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
@@ -59,36 +59,4 @@ class EunomiaServer:
         """
         self._merge_attributes(request.principal)
         self._merge_attributes(request.resource)
-        return self._engine.evaluate_all(request).effect == PolicyEffect.ALLOW
-
-    def create_policy(self, policy: schemas.Policy) -> str:
-        """
-        Create a new policy and store it in the engine.
-
-        Parameters
-        ----------
-        policy : schemas.Policy
-            The policy to create, containing a list of access rules.
-            Rules are evaluated with OR logic (access is granted if ANY rule matches).
-            Within each rule, attributes for both principal and resource are evaluated
-            with AND logic (all specified attributes must match).
-
-        Returns
-        -------
-        str
-            The path to the created policy.
-
-        Raises
-        ------
-        ValueError
-            If the policy file already exists.
-        """
-        # TODO: provide a better interface for policy creation
-        converted_policy = utils.create_simple_policy(
-            name="access",
-            principal_attributes=policy.rules[0].principal.attributes,
-            resource_attributes=policy.rules[0].resource.attributes,
-            effect=PolicyEffect.ALLOW,
-        )
-        self._engine.add_policy(converted_policy)
-        return "/"
+        return self.engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW

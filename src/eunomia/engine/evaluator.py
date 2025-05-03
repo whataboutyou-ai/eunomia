@@ -1,9 +1,6 @@
 from typing import Any
 
-from eunomia_core.schemas import AccessRequest
-
-from eunomia.engine import schemas
-from eunomia.engine.enums import ConditionOperator
+from eunomia_core import enums, schemas
 
 
 def get_attribute_value(obj: Any, path: str) -> Any:
@@ -31,27 +28,29 @@ def get_attribute_value(obj: Any, path: str) -> Any:
     return current
 
 
-def apply_operator(operator_type: ConditionOperator, value: Any, target: Any) -> bool:
+def apply_operator(
+    operator_type: enums.ConditionOperator, value: Any, target: Any
+) -> bool:
     """Apply the specified operator with the value against the target."""
     if value is None or target is None:
         return False
 
     if isinstance(value, str) and isinstance(target, str):
-        if operator_type == ConditionOperator.EQUALS:
+        if operator_type == enums.ConditionOperator.EQUALS:
             return value == target
-        elif operator_type == ConditionOperator.NOT_EQUALS:
+        elif operator_type == enums.ConditionOperator.NOT_EQUALS:
             return value != target
-        elif operator_type == ConditionOperator.CONTAINS:
+        elif operator_type == enums.ConditionOperator.CONTAINS:
             return value in target
-        elif operator_type == ConditionOperator.STARTS_WITH:
+        elif operator_type == enums.ConditionOperator.STARTS_WITH:
             return target.startswith(value)
-        elif operator_type == ConditionOperator.ENDS_WITH:
+        elif operator_type == enums.ConditionOperator.ENDS_WITH:
             return target.endswith(value)
 
     # For non-string types, only equality operators make sense
-    if operator_type == ConditionOperator.EQUALS:
+    if operator_type == enums.ConditionOperator.EQUALS:
         return value == target
-    elif operator_type == ConditionOperator.NOT_EQUALS:
+    elif operator_type == enums.ConditionOperator.NOT_EQUALS:
         return value != target
 
     return False
@@ -71,7 +70,7 @@ def evaluate_conditions(conditions: list[schemas.Condition], obj: Any) -> bool:
     return all(evaluate_condition(condition, obj) for condition in conditions)
 
 
-def evaluate_rule(rule: schemas.Rule, request: AccessRequest) -> bool:
+def evaluate_rule(rule: schemas.Rule, request: schemas.AccessRequest) -> bool:
     """Evaluate if a rule matches the access request."""
     # Check action match
     if request.action not in rule.actions:
@@ -91,7 +90,7 @@ def evaluate_rule(rule: schemas.Rule, request: AccessRequest) -> bool:
 
 
 def evaluate_policy(
-    policy: schemas.Policy, request: AccessRequest
+    policy: schemas.Policy, request: schemas.AccessRequest
 ) -> schemas.PolicyEvaluationResult:
     """Evaluate a policy against an access request."""
     for rule in policy.rules:

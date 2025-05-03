@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from eunomia.engine.enums import ConditionOperator, PolicyEffect
+from eunomia_core.enums.policy import ConditionOperator, PolicyEffect
 
 
 class Condition(BaseModel):

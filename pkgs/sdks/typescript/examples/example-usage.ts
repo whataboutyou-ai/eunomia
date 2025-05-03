@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { EntityType, EunomiaClient } from "eunomia-sdk-typescript";
+import { AccessRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
@@ -55,28 +55,27 @@ async function run(): Promise<void> {
     await client.deleteEntity(principal.uri);
     console.log("Entities deleted");
 
-    // // Create policy
+    // Create policy
     console.log("Creating policy...");
-    await client.createPolicy({
-      policy: {
-        rules: [
-          {
-            principal: {
-              uri: principal.uri,
-              attributes: {},
-              type: EntityType.Principal,
-            },
-            resource: {
-              uri: resource.uri,
-              attributes: {},
-              type: EntityType.Resource,
-            },
-          },
-        ],
+    const request: AccessRequest = {
+      principal: {
+        type: EntityType.Principal,
+        attributes: {
+          role: "admin",
+          department: "engineering",
+        },
       },
-      filename: "policy-example.rego",
-    });
-    console.log("Policy created");
+      resource: {
+        type: EntityType.Resource,
+        attributes: {
+          type: "document",
+          classification: "confidential",
+        },
+      },
+      action: "access",
+    };
+    const policy = await client.createPolicy(request, "policy-example");
+    console.log(`Policy created: ${policy.name}`);
   } catch (error) {
     console.error("Error:", error);
   }
