@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from eunomia_core.enums import EntityType
+from eunomia_core.enums.entity import EntityType
 from eunomia_core.utils import generate_uri
 
 
@@ -70,7 +70,7 @@ class EntityCreate(EntityBase):
 
 
 class EntityUpdate(EntityBase):
-    type: EntityType = EntityType.any  # type is not required for the attributes update
+    type: Optional[EntityType] = None  # type is not required for the attributes update
 
     @field_validator("attributes", mode="before")
     @classmethod
@@ -85,62 +85,3 @@ class EntityInDb(EntityBase):
     registered_at: datetime = Field(description="Time when this entity was registered")
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class EntityAccess(BaseModel):
-    uri: Optional[str] = Field(
-        default=None, description="Unique identifier for the entity"
-    )
-    attributes: Optional[dict[str, str]] = Field(
-        default_factory=dict, description="Entity attributes"
-    )
-    type: EntityType = Field(..., description="Type of entity")
-
-    @field_validator("attributes", mode="before")
-    @classmethod
-    def from_list(cls, v: list[Attribute] | dict) -> dict[str, str]:
-        if isinstance(v, list) and all(isinstance(attr, Attribute) for attr in v):
-            return {attr.key: attr.value for attr in v}
-        elif isinstance(v, list):
-            return {attr["key"]: attr["value"] for attr in v}
-        return v
-
-    @model_validator(mode="after")
-    def either_uri_or_attributes(self) -> "EntityAccess":
-        if not self.uri and not self.attributes:
-            raise ValueError("Either 'uri' or non-empty 'attributes' must be provided")
-        return self
-
-
-class ResourceAccess(EntityAccess):
-    type: Literal[EntityType.resource, EntityType.any] = EntityType.resource
-
-    # The type is always overridden to "resource", although it can accept "any" as input.
-    @field_validator("type", mode="after")
-    @classmethod
-    def override_type(cls, v):
-        return EntityType.resource
-
-
-class PrincipalAccess(EntityAccess):
-    type: Literal[EntityType.principal, EntityType.any] = EntityType.principal
-
-    # The type is always overridden to "principal", although it can accept "any" as input.
-    @field_validator("type", mode="after")
-    @classmethod
-    def override_type(cls, v):
-        return EntityType.principal
-
-
-class AccessRequest(BaseModel):
-    principal: PrincipalAccess = Field(
-        ..., description="The principal requesting access"
-    )
-    resource: ResourceAccess = Field(..., description="The resource being accessed")
-    action: str = Field(
-        default="access", description="Action to be performed on the resource"
-    )
-
-
-class Policy(BaseModel):
-    rules: list[AccessRequest] = Field(..., description="List of access rules")

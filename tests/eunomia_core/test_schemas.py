@@ -144,11 +144,6 @@ class TestResourceAccess:
         )
         assert resource.type.value == "resource"
 
-    def test_type_override_from_any(self):
-        # Type "any" should be overridden to "resource"
-        resource = schemas.ResourceAccess.model_validate({"type": "any", "uri": "123"})
-        assert resource.type.value == "resource"
-
     def test_invalid_type(self):
         # Should raise validation error for invalid type
         with pytest.raises(ValidationError):
@@ -160,13 +155,6 @@ class TestPrincipalAccess:
         # Valid when type is explicitly "principal"
         principal = schemas.PrincipalAccess.model_validate(
             {"type": "principal", "uri": "123"}
-        )
-        assert principal.type.value == "principal"
-
-    def test_type_override_from_any(self):
-        # Type "any" should be overridden to "principal"
-        principal = schemas.PrincipalAccess.model_validate(
-            {"type": "any", "uri": "123"}
         )
         assert principal.type.value == "principal"
 

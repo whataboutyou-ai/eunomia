@@ -1,11 +1,5 @@
-from eunomia_core.schemas import (
-    AccessRequest,
-    EntityType,
-    PrincipalAccess,
-    ResourceAccess,
-)
+from eunomia_core import enums, schemas
 
-from eunomia.engine import schemas
 from eunomia.engine.evaluator import (
     apply_operator,
     evaluate_condition,
@@ -37,29 +31,29 @@ def test_get_attribute_value():
 
 
 def test_apply_operator():
-    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", "test") is True
-    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", "other") is False
-    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, "test", "other") is True
-    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, "test", "test") is False
-    assert apply_operator(schemas.ConditionOperator.CONTAINS, "est", "test") is True
-    assert apply_operator(schemas.ConditionOperator.CONTAINS, "xyz", "test") is False
-    assert apply_operator(schemas.ConditionOperator.STARTS_WITH, "te", "test") is True
-    assert apply_operator(schemas.ConditionOperator.STARTS_WITH, "st", "test") is False
-    assert apply_operator(schemas.ConditionOperator.ENDS_WITH, "st", "test") is True
-    assert apply_operator(schemas.ConditionOperator.ENDS_WITH, "te", "test") is False
+    assert apply_operator(enums.ConditionOperator.EQUALS, "test", "test") is True
+    assert apply_operator(enums.ConditionOperator.EQUALS, "test", "other") is False
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, "test", "other") is True
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, "test", "test") is False
+    assert apply_operator(enums.ConditionOperator.CONTAINS, "est", "test") is True
+    assert apply_operator(enums.ConditionOperator.CONTAINS, "xyz", "test") is False
+    assert apply_operator(enums.ConditionOperator.STARTS_WITH, "te", "test") is True
+    assert apply_operator(enums.ConditionOperator.STARTS_WITH, "st", "test") is False
+    assert apply_operator(enums.ConditionOperator.ENDS_WITH, "st", "test") is True
+    assert apply_operator(enums.ConditionOperator.ENDS_WITH, "te", "test") is False
 
-    assert apply_operator(schemas.ConditionOperator.EQUALS, 1, 1) is True
-    assert apply_operator(schemas.ConditionOperator.EQUALS, 1, 2) is False
-    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, 1, 2) is True
-    assert apply_operator(schemas.ConditionOperator.NOT_EQUALS, 1, 1) is False
+    assert apply_operator(enums.ConditionOperator.EQUALS, 1, 1) is True
+    assert apply_operator(enums.ConditionOperator.EQUALS, 1, 2) is False
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, 1, 2) is True
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, 1, 1) is False
 
-    assert apply_operator(schemas.ConditionOperator.EQUALS, None, "test") is False
-    assert apply_operator(schemas.ConditionOperator.EQUALS, "test", None) is False
+    assert apply_operator(enums.ConditionOperator.EQUALS, None, "test") is False
+    assert apply_operator(enums.ConditionOperator.EQUALS, "test", None) is False
 
 
 def test_evaluate_condition():
     condition = schemas.Condition(
-        path="attributes.role", operator=schemas.ConditionOperator.EQUALS, value="admin"
+        path="attributes.role", operator=enums.ConditionOperator.EQUALS, value="admin"
     )
     obj = DummyObject(attributes={"role": "admin"})
     assert evaluate_condition(condition, obj) is True
@@ -72,12 +66,12 @@ def test_evaluate_conditions():
     conditions = [
         schemas.Condition(
             path="attributes.role",
-            operator=schemas.ConditionOperator.EQUALS,
+            operator=enums.ConditionOperator.EQUALS,
             value="admin",
         ),
         schemas.Condition(
             path="attributes.department",
-            operator=schemas.ConditionOperator.EQUALS,
+            operator=enums.ConditionOperator.EQUALS,
             value="engineering",
         ),
     ]
@@ -92,71 +86,70 @@ def test_evaluate_conditions():
 
 def test_evaluate_rule():
     rule = schemas.Rule(
-        description="Test rule",
-        effect=schemas.PolicyEffect.ALLOW,
+        effect=enums.PolicyEffect.ALLOW,
         principal_conditions=[
             schemas.Condition(
                 path="attributes.role",
-                operator=schemas.ConditionOperator.EQUALS,
+                operator=enums.ConditionOperator.EQUALS,
                 value="admin",
             )
         ],
         resource_conditions=[
             schemas.Condition(
                 path="attributes.type",
-                operator=schemas.ConditionOperator.EQUALS,
+                operator=enums.ConditionOperator.EQUALS,
                 value="document",
             )
         ],
         actions=["access"],
     )
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
         action="access",
     )
     assert evaluate_rule(rule, request) is True
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "user"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
         action="access",
     )
     assert evaluate_rule(rule, request) is False
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"type": "image"},
         ),
         action="access",
     )
     assert evaluate_rule(rule, request) is False
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
         action="delete",
@@ -170,12 +163,11 @@ def test_evaluate_policy():
         description="Test policy",
         rules=[
             schemas.Rule(
-                description="Test rule",
-                effect=schemas.PolicyEffect.ALLOW,
+                effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
                         path="attributes.role",
-                        operator=schemas.ConditionOperator.EQUALS,
+                        operator=enums.ConditionOperator.EQUALS,
                         value="admin",
                     )
                 ],
@@ -183,37 +175,37 @@ def test_evaluate_policy():
                 actions=["access"],
             )
         ],
-        default_effect=schemas.PolicyEffect.DENY,
+        default_effect=enums.PolicyEffect.DENY,
     )
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),
         action="access",
     )
     result = evaluate_policy(policy, request)
-    assert result.effect == schemas.PolicyEffect.ALLOW
+    assert result.effect == enums.PolicyEffect.ALLOW
     assert result.matched_rule is not None
     assert result.policy_name == "test-policy"
 
-    request = AccessRequest(
-        principal=PrincipalAccess(
-            type=EntityType.principal,
+    request = schemas.AccessRequest(
+        principal=schemas.PrincipalAccess(
+            type=enums.EntityType.principal,
             attributes={"role": "user"},
         ),
-        resource=ResourceAccess(
-            type=EntityType.resource,
+        resource=schemas.ResourceAccess(
+            type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),
         action="access",
     )
     result = evaluate_policy(policy, request)
-    assert result.effect == schemas.PolicyEffect.DENY
+    assert result.effect == enums.PolicyEffect.DENY
     assert result.matched_rule is None
     assert result.policy_name == "test-policy"

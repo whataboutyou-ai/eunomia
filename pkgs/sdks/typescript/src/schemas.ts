@@ -1,4 +1,4 @@
-import { EntityType } from "./enums";
+import { ConditionOperator, EntityType, PolicyEffect } from "./enums";
 
 /**
  * Represents an attribute with key-value pair
@@ -61,14 +61,14 @@ export interface EntityAccess {
  * Resource in an access control request
  */
 export interface ResourceAccess extends EntityAccess {
-  type: EntityType.Resource | EntityType.Any;
+  type: EntityType.Resource;
 }
 
 /**
  * Principal in an access control request
  */
 export interface PrincipalAccess extends EntityAccess {
-  type: EntityType.Principal | EntityType.Any;
+  type: EntityType.Principal;
 }
 
 /**
@@ -81,8 +81,39 @@ export interface AccessRequest {
 }
 
 /**
+ * Represents a condition for policy evaluation
+ */
+export interface Condition {
+  path: string;
+  operator: ConditionOperator;
+  value: string;
+}
+
+/**
+ * Represents a rule in a policy
+ */
+export interface Rule {
+  effect: PolicyEffect;
+  principal_conditions: Condition[];
+  resource_conditions: Condition[];
+  actions: string[];
+}
+
+/**
  * Represents a policy with a list of access rules
  */
 export interface Policy {
-  rules: AccessRequest[];
+  name: string;
+  description?: string;
+  rules: Rule[];
+  default_effect: PolicyEffect;
+}
+
+/**
+ * Represents the result of a policy evaluation
+ */
+export interface PolicyEvaluationResult {
+  effect: PolicyEffect;
+  matched_rule?: Rule;
+  policy_name: string;
 }

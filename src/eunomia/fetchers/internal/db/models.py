@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from eunomia_core.enums import EntityType
+from eunomia_core import enums
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -11,7 +11,7 @@ class Entity(db.Base):
     __tablename__ = "entities"
 
     uri: Mapped[str] = mapped_column(primary_key=True)
-    type: Mapped[EntityType]
+    type: Mapped[enums.EntityType]
     registered_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     # relationships
