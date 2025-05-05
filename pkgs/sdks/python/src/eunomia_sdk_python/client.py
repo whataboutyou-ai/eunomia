@@ -107,7 +107,7 @@ class EunomiaClient:
         Parameters
         ----------
         type : enums.EntityType
-            The type of entity to register. Either "resource", "principal" or "any".
+            The type of entity to register. Either "resource" or "principal".
         attributes : dict
             The attributes to associate with the entity.
         uri : str | None, optional
@@ -125,7 +125,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post(
-            "/fetchers/internal/register-entity", json=entity.model_dump()
+            "/fetchers/internal/entities", json=entity.model_dump()
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
@@ -158,15 +158,15 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         entity = schemas.EntityUpdate(uri=uri, attributes=attributes)
-        response = self.client.post(
-            "/fetchers/internal/update-entity",
+        response = self.client.put(
+            f"/fetchers/internal/entities/{uri}",
             json=entity.model_dump(),
             params={"override": override},
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
 
-    def delete_entity(self, uri: str) -> None:
+    def delete_entity(self, uri: str) -> bool:
         """
         Delete an entity from the Eunomia server.
 
@@ -180,33 +180,30 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.post(
-            "/fetchers/internal/delete-entity", params={"uri": uri}
-        )
+        response = self.client.delete(f"/fetchers/internal/entities/{uri}")
         self._handle_response(response)
-        return
+        return response.json()
 
     def create_policy(
-        self, policy: schemas.Policy, filename: str | None = None
-    ) -> None:
+        self, request: schemas.AccessRequest, name: str
+    ) -> schemas.Policy:
         """
-        Create a new policy and save it to the local file system.
+        Create a new policy and store it in the Eunomia server.
 
         Parameters
         ----------
-        policy : schemas.Policy
-            The policy to create.
-        filename : str, optional
-            The filename of the policy to create.
+        request : schemas.AccessRequest
+            The request to create the policy from.
+        name : str
+            The name of the policy.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        params = {} if filename is None else {"filename": filename}
         response = self.client.post(
-            "/create-policy", json=policy.model_dump(), params=params
+            "/policies", json=request.model_dump(), params={"name": name}
         )
         self._handle_response(response)
-        return
+        return schemas.Policy.model_validate(response.json())

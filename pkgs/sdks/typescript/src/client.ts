@@ -128,7 +128,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/fetchers/internal/register-entity",
+        "/fetchers/internal/entities",
         entity,
       );
       return this.handleResponse(response);
@@ -162,8 +162,8 @@ export class EunomiaClient {
     };
 
     try {
-      const response = await this.client.post<EntityInDb>(
-        "/fetchers/internal/update-entity",
+      const response = await this.client.put<EntityInDb>(
+        `/fetchers/internal/entities/${options.uri}`,
         entity,
         {
           params: { override: options.override || false },
@@ -186,11 +186,12 @@ export class EunomiaClient {
    * @param uri - The URI of the entity to delete
    * @returns A promise that resolves when the entity is deleted
    */
-  async deleteEntity(uri: string): Promise<void> {
+  async deleteEntity(uri: string): Promise<boolean> {
     try {
-      await this.client.post("/fetchers/internal/delete-entity", null, {
-        params: { uri },
-      });
+      const response = await this.client.delete(
+        `/fetchers/internal/entities/${uri}`,
+      );
+      return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(
@@ -202,26 +203,22 @@ export class EunomiaClient {
   }
 
   /**
-   * Create a new policy and save it to the local file system.
+   * Create a new policy and store it in the Eunomia server.
    *
-   * @param options - Options for creating the policy
-   * @param options.policy - The policy to create
-   * @param options.filename - The filename of the policy to create (optional)
-   * @returns A promise that resolves when the policy is created
+   * @param request - The access request to create the policy from
+   * @param name - The name of the policy
+   * @returns A promise that resolves to the created policy
    */
-  async createPolicy(options: {
-    policy: Policy;
-    filename?: string;
-  }): Promise<void> {
-    const params: Record<string, string> = {};
-    if (options.filename) {
-      params.filename = options.filename;
-    }
-
+  async createPolicy(request: AccessRequest, name: string): Promise<Policy> {
     try {
-      await this.client.post("/create-policy", options.policy, {
-        params,
-      });
+      const response = await this.client.post<Policy>(
+        "/policies",
+        request,
+        {
+          params: { name },
+        },
+      );
+      return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(

@@ -56,19 +56,17 @@ def run():
 
         # Create policy
         print("Creating policy...")
-        policy = schemas.Policy(
-            rules=[
-                schemas.AccessRequest(
-                    principal=schemas.PrincipalAccess(uri=principal.uri),
-                    resource=schemas.ResourceAccess(uri=resource.uri),
-                ),
-            ],
+        request = schemas.AccessRequest(
+            principal=schemas.PrincipalAccess(
+                attributes={"role": "admin", "department": "engineering"}
+            ),
+            resource=schemas.ResourceAccess(
+                attributes={"type": "document", "classification": "confidential"}
+            ),
+            action="read",
         )
-        client.create_policy(
-            policy=policy,
-            filename="policy-example.rego",
-        )
-        print("Policy created")
+        policy = client.create_policy(request=request, name="policy-example")
+        print(f"Policy created: {policy.name}")
 
     except Exception as error:
         print(f"Error: {error}")
