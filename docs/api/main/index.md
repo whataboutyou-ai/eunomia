@@ -20,12 +20,9 @@ eunomia server
 
 The Eunomia server is composed of the following components:
 
-| Component  | Description                                                                                          | Jump to                                  |
-| ---------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| **APIs**   | Exposes endpoints for applications to interact with the server.                                      | [:material-arrow-right: Page](apis.md)   |
-| **Config** | Offers a customizable settings class to configure the server.                                        | [:material-arrow-right: Page](config.md) |
-| **DB**     | Instantiates a SQL database to store policies and principals/resources metadata. Defaults to SQLite. | [:material-arrow-right: Page](db.md)     |
-| **Engine** | Handles the communication with the OPA policy engine server.                                         | [:material-arrow-right: Page](engine.md) |
-| **Server** | Contains the core logic for the server.                                                              | [:material-arrow-right: Page](server.md) |
-
-[opa-website]: https://www.openpolicyagent.org/
+| Component  | Description                                                                      | Jump to                                  |
+| ---------- | -------------------------------------------------------------------------------- | ---------------------------------------- |
+| **APIs**   | Exposes endpoints for applications to interact with the server.                  | [:material-arrow-right: Page](apis.md)   |
+| **Config** | Offers a customizable settings class to configure the server.                    | [:material-arrow-right: Page](config.md) |
+| **DB**     | Instantiates a SQL database to store policies and principals/resources metadata. | [:material-arrow-right: Page](db.md)     |
+| **Server** | Contains the core logic for the server.                                          | [:material-arrow-right: Page](server.md) |

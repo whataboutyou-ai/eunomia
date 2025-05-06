@@ -8,8 +8,6 @@ This page documents the schema classes used in Eunomia Core for data validation 
 
 ## Entity Schemas
 
-::: eunomia_core.schemas.EntityBase
-
 ::: eunomia_core.schemas.EntityCreate
 
 ::: eunomia_core.schemas.EntityUpdate

@@ -8,9 +8,7 @@ Particulary, let's say that access to the _IT Desk Agent_ is restricted to emplo
 
 ### Server Setup
 
-First, copy the `.env.example` file to `.env` and set the `OPA_POLICY_FOLDER` variable to the path where you want to store the policies.
-
-Then, let's start the Eunomia server with:
+Start the Eunomia server with:
 
 ```bash
 eunomia server
@@ -67,25 +65,6 @@ You can use the `POST /create-policy` endpoint for this.
         "message":"Policy created successfully at path"
     }
     ```
-
-The policy will be saved in your filesystem at the path specified in the response. The file will contain the translated policy in OPA Rego language:
-
-```rego
-package eunomia
-
-default allow := false
-
-allow if {
-	input.principal.attributes.department == "it"
-	input.resource.uri == "it-desk-agent"
-}
-
-allow if {
-	input.principal.attributes.department == "hr"
-	input.principal.attributes.role == "manager"
-	input.resource.uri == "hr-agent"
-}
-```
 
 ### Policy Enforcement
 

@@ -6,7 +6,7 @@ Eunomia is a standalone authorization server that can be integrated into any app
 
 Eunomia uses a decoupled architecture consisting of two main components:
 
-1. **Server**: A standalone service that manages authorization policies, storing metadata for principals and resources, and making access control decisions. The server is built on top of [Open Policy Agent (OPA)][opa-website] and exposes a REST API.
+1. **Server**: A standalone service that manages authorization policies, storing metadata for principals and resources, and making access control decisions. The server exposes a REST API.
 
 2. **Client**: A component integrated into your application that communicates with the Eunomia server. You can interact with the server either directly through HTTP requests or by using one of the provided SDKs for a more streamlined experience.
 
@@ -65,5 +65,3 @@ _Attributes_ can be registered at configuration time or shared at runtime. _Attr
 | Register an Entity          | Learn how to register entities                    | [:material-arrow-right: Page](register_entities.md) |
 | Update and Delete an Entity | Learn how to update or delete entities            | [:material-arrow-right: Page](upd_del_entities.md)  |
 | Check Access at Runtime     | Learn how to check access at runtime              | [:material-arrow-right: Page](check_access.md)      |
-
-[opa-website]: https://www.openpolicyagent.org/

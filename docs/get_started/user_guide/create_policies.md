@@ -1,13 +1,8 @@
 To enforce access control, you need to create policies that specify the rules for granting or denying access. In general, a policy is a collection of rules that define under which conditions a principal is allowed to access a resource based on their attributes. 
  
-There are two ways to define policies:
+## Create a Policy
 
-- **Via the API call:** Use the endpoint to create a policy from a JSON payload
-- **Manually:** Write the policy directly in [Rego][rego-website] and place it in the `OPA_POLICY_FOLDER` directory
-
-## Create a Policy via API call
-
-You can create policies using the **`POST /create-policy`** endpoint. The policy you define will be converted into OPA Rego language and saved to your filesystem in the location specified by the response.
+You can create policies using the **`POST /create-policy`** endpoint. The policy will be stored in the database specified in the **`ENGINE_SQL_DATABASE_URL`** environment variable.
 
 Your policy JSON payload should include a **`rules`** field, which is an array of rule objects. Each rule is defined by the **`AccessRequest`** schema, which includes:
 
@@ -56,30 +51,3 @@ Your policy JSON payload should include a **`rules`** field, which is an array o
         "message": "Policy created successfully at path"
     }
     ```
-
-
-The generated Rego policy file will include rules similar to the following:
-
-```rego
-package eunomia
-
-default allow := false
-
-allow if {
-    input.principal.attributes.department == "it"
-    input.resource.uri == "it-desk-agent"
-}
-
-allow if {
-    input.principal.attributes.department == "hr"
-    input.principal.attributes.role == "manager"
-    input.resource.uri == "hr-agent"
-}
-```
-
-## Create a Policy manually
-
-You can define your policies directly by creating Rego files in the `OPA_POLICY_FOLDER`. 
-In this case, ensure that your Rego files start with `package eunomia` and include your `allow` (and optionally `deny`) rules appropriately.
-
-[rego-website]: https://www.openpolicyagent.org/docs/latest/policy-language/
