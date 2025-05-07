@@ -2,7 +2,7 @@ In the [Quickstart](../index.md) guide, we showed how to use the `POST /check-ac
 
 ## Register a New Entity
 
-You can register a new entity using the `POST /fetchers/internal/register-entity` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
+You can register a new entity using the `POST /fetchers/internal/entities` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
 
 ### Payload Requirements
 
@@ -11,10 +11,10 @@ Your JSON payload must include the following fields:
 - **`attributes`** (required):  
   An array of attribute objects. Each attribute must include:
 
-    - **`key`** (*string*): The attribute's key.
-    - **`value`** (*string*): The attribute's value.  
-    
-  *Note: The attributes array must not be empty, and duplicate keys are not allowed.*
+  - **`key`** (_string_): The attribute's key.
+  - **`value`** (_string_): The attribute's value.
+
+  _Note: The attributes array must not be empty, and duplicate keys are not allowed._
 
 - **`type`** (required):  
   The type of the entity, defined by the **EntityType** enum (i.e., `principal` or `resource`).
@@ -71,7 +71,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
                }
              }'
 
-    curl -X POST 'http://localhost:8000/fetchers/internal/register-entity' \
+    curl -X POST 'http://localhost:8000/fetchers/internal/entities' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "principal",
