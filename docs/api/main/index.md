@@ -18,11 +18,8 @@ eunomia server
 
 ## Components
 
-The Eunomia server is composed of the following components:
+Explore detailed reference of single components of Eunomia:
 
-| Component  | Description                                                                      | Jump to                                  |
-| ---------- | -------------------------------------------------------------------------------- | ---------------------------------------- |
-| **APIs**   | Exposes endpoints for applications to interact with the server.                  | [:material-arrow-right: Page](apis.md)   |
-| **Config** | Offers a customizable settings class to configure the server.                    | [:material-arrow-right: Page](config.md) |
-| **DB**     | Instantiates a SQL database to store policies and principals/resources metadata. | [:material-arrow-right: Page](db.md)     |
-| **Server** | Contains the core logic for the server.                                          | [:material-arrow-right: Page](server.md) |
+| Component | Description                                                     | Jump to                               |
+| --------- | --------------------------------------------------------------- | ------------------------------------- |
+| **API**   | Exposes endpoints for applications to interact with the server. | [:material-arrow-right: Page](api.md) |
