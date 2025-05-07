@@ -59,4 +59,3 @@ We aim to solve this with Eunomia, an open-source, developer-oriented authorizat
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [whataboutyou-website]: https://whataboutyou.ai
-[opa-website]: https://www.openpolicyagent.org/

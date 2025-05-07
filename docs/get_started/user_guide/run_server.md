@@ -6,36 +6,33 @@ In this guide, you'll learn how to **configure** and **run** the Eunomia server.
 
 To run the Eunomia server, you must configure the following parameters:
 
-| **Parameter**       | **Description**                                           | **Default Value**                                                        |
-| ------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `PROJECT_NAME`      | Name of the project                                       | `Eunomia Server`                                                         |
-| `DEBUG`             | Flag to enable debug mode                                 | `False`                                                                  |
-| `FETCHERS`          | Dictionary of fetchers to use                             | `{"internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}}` |
-| `OPA_SERVER_HOST`   | Host address for the Open Policy Agent server             | `127.0.0.1`                                                              |
-| `OPA_SERVER_PORT`   | Port for the Open Policy Agent server                     | `8181`                                                                   |
-| `OPA_POLICY_FOLDER` | Path to the folder where the Rego policy files are stored | _Required (no default)_                                                  |
+| **Parameter**             | **Description**                  | **Default Value**                                                        |
+| ------------------------- | -------------------------------- | ------------------------------------------------------------------------ |
+| `PROJECT_NAME`            | Name of the project              | `Eunomia Server`                                                         |
+| `DEBUG`                   | Flag to enable debug mode        | `False`                                                                  |
+| `ENGINE_SQL_DATABASE_URL` | Path to the policy database file | `sqlite:///.db/engine_db.sqlite`                                         |
+| `FETCHERS`                | Dictionary of fetchers to use    | `{"internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}}` |
 
-All parameters have default values except **`OPA_POLICY_FOLDER`**, which must be provided by the user.
+All parameters have default values, you can override any of them by setting the environment variable in the **`.env`** file.
 
-### Configuring and Overwriting Server Parameters
-
-As noted, **`OPA_POLICY_FOLDER`** is the only parameter that does not have a default and must be defined. You can also override the other parameters if needed.
-
-To do this, create a **`.env`** file in the root directory of your project and set the required variables.
-
-Alternatively, you can copy the **`.env.example`** file included with the library, rename it to **`.env`**, and update the **`OPA_POLICY_FOLDER`** variable with the path to your policy files.
-
-For example, if you want to run the Eunomia server on port **8082** instead of the default **8181**, and your policies are located in the directory **`/Users/demo_user/Desktop/eunomia_policies/`**, your **`.env`** file should contain:
-
-```bash
-OPA_SERVER_PORT=8082
-OPA_POLICY_FOLDER="/Users/demo_user/Desktop/eunomia_policies/"
-```
+The _internal_ fetcher is provided by default to register and fetch metadata from a database.
 
 ### Running the Server
 
-Once your **`.env`** file is configured, start the Eunomia server by executing the following command:
+You can start the Eunomia server by executing the command:
 
 ```bash
 eunomia server
+```
+
+The server will start and listen for requests on address **`127.0.0.1`** and port **`8000`**. You can change the address and port by using the `--host` and `--port` flags:
+
+```bash
+eunomia server --host 0.0.0.0 --port 8080
+```
+
+You can also enable the automatic reload of the server on file changes by using the `--reload` flag:
+
+```bash
+eunomia server --reload
 ```

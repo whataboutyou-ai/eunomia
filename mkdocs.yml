@@ -93,11 +93,7 @@ nav:
       - Documentation: api/index.md
       - Eunomia:
           - Eunomia Docs: api/main/index.md
-          - APIs: api/main/apis.md
-          - Config: api/main/config.md
-          - DB: api/main/db.md
-          - Engine: api/main/engine.md
-          - Server: api/main/server.md
+          - API: api/main/api.md
       - Eunomia Core:
           - Eunomia Core Docs: api/core/index.md
           - Schemas: api/core/schemas.md
