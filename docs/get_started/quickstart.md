@@ -18,34 +18,35 @@ eunomia server
 
 Now, you need to create a policy that will be used to enforce the access control. The policy will contain two rules:
 
-1. Allow access to the resource with identifier `it-desk-agent` to principals with the `department` attribute set to `it`.
-2. Allow access to the resource with identifier `hr-agent` to principals with the `department` attribute set to `hr` _AND_ the `role` attribute set to `manager`.
+1. Allow access to the resource with attributes `agent-id == it-desk-agent` to principals with the `department == it`.
+2. Allow access to the resource with attributes `agent-id == hr-agent` to principals with the `department == hr` _AND_ the `role == manager`.
 
-You can use the `POST /create-policy` endpoint for this.
+You can use the `POST /policies` endpoint for this.
 
 === "Python"
     ```python
-    from eunomia_core.schemas import AccessRequest, Policy, PrincipalAccess, ResourceAccess
+    from eunomia_core.schemas import AccessRequest, PrincipalAccess, ResourceAccess
     from eunomia_sdk_python import EunomiaClient
 
     eunomia = EunomiaClient()
 
-    policy = Policy(
-        rules=[
-            AccessRequest(
-                principal=PrincipalAccess(attributes={"department": "it"}),
-                resource=ResourceAccess(uri="it-desk-agent"),
-            ),
-            AccessRequest(
-                principal=PrincipalAccess(
-                    attributes={"department": "hr", "role": "manager"}
-                ),
-                resource=ResourceAccess(uri="hr-agent"),
-            ),
-        ],
+    eunomia.create_policy(
+        AccessRequest(
+            principal=PrincipalAccess(attributes={"department": "it"}),
+            resource=ResourceAccess(attributes={"agent-id": "it-desk-agent"}),
+            action="access",
+        ),
+        name="it-desk-policy",
     )
 
-    eunomia.create_policy(policy)
+    eunomia.create_policy(
+        AccessRequest(
+            principal=PrincipalAccess(attributes={"department": "hr", "role": "manager"}),
+            resource=ResourceAccess(attributes={"agent-id": "hr-agent"}),
+            action="access",
+        ),
+        name="hr-policy",
+    )
     ```
 
     !!! info
@@ -53,16 +54,41 @@ You can use the `POST /create-policy` endpoint for this.
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/create-policy' \
+    curl -X POST 'http://localhost:8000/policies?name=it-desk-policy' \
     -H "Content-Type: application/json" \
-    -d '{"rules": [{"principal": {"attributes": {"department": "it"}}, "resource": {"uri": "it-desk-agent"}}, {"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"uri": "hr-agent"}}]}'
+    -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
+
+    curl -X POST 'http://localhost:8000/policies?name=hr-policy' \
+    -H "Content-Type: application/json" \
+    -d '{"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"attributes": {"agent-id": "hr-agent"}}, "action": "access"}'
     ```
 
 === "Output"
     ```json
     {
-        "path":"/your-path/policies/policy.rego",
-        "message":"Policy created successfully at path"
+        "name":"it-desk-policy",
+        "rules":[
+            {
+                "effect": "allow",
+                "principal_conditions": [{"path": "attributes.department", "operator": "==", "value": "it"}],
+                "resource_conditions": [{"path": "attributes.agent-id", "operator": "==", "value": "it-desk-agent"}],
+                "actions": ["access"]
+            },
+        ],
+        "default_effect": "deny"
+    }
+
+    {
+        "name":"hr-policy",
+        "rules":[
+            {
+                "effect": "allow",
+                "principal_conditions": [{"path": "attributes.department", "operator": "==", "value": "hr"}, {"path": "attributes.role", "operator": "==", "value": "manager"}],
+                "resource_conditions": [{"path": "attributes.agent-id", "operator": "==", "value": "hr-agent"}],
+                "actions": ["access"]
+            },
+        ],
+        "default_effect": "deny"
     }
     ```
 
@@ -76,10 +102,11 @@ You can use the `POST /check-access` endpoint for this, passing the principal an
     ```python
     # allowed access
     eunomia.check_access(
-        resource_uri="it-desk-agent", principal_attributes={"department": "it"}
+        resource_attributes={"agent-id": "it-desk-agent"},
+        principal_attributes={"department": "it"},
     )
     eunomia.check_access(
-        resource_uri="hr-agent",
+        resource_attributes={"agent-id": "hr-agent"},
         principal_attributes={"department": "hr", "role": "manager"},
     )
 
@@ -95,16 +122,18 @@ You can use the `POST /check-access` endpoint for this, passing the principal an
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "it"}}}'
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "sales"}}}'
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
+
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
+    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
     ```
 
 === "Output"
     ```bash
     true
     true
+
     false
     false
     ```

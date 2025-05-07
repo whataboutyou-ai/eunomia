@@ -18,7 +18,10 @@ The API has the following endpoints:
 - `POST /fetchers/internal/register-entity`: Register a new entity in the system.
 - `POST /fetchers/internal/update-entity`: Update an existing entity.
 - `POST /fetchers/internal/delete-entity`: Delete an entity from the system.
-- `POST /create-policy`: Create a new policy.
+- `GET /policies`: Get all policies.
+- `POST /policies`: Create a new policy.
+- `GET /policies/{name}`: Get a policy by name.
+- `DELETE /policies/{name}`: Delete a policy by name.
 
 For detailed information on the API endpoints, refer to the automatically generated API docs when running the server locally at [http://localhost:8000/docs](http://localhost:8000/docs){:target="\_blank"}.
 
