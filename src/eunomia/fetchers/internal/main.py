@@ -108,7 +108,7 @@ class InternalFetcher(BaseFetcher):
 
         return crud.delete_entity(db_entity, db=db)
 
-    def fetch_attributes(self, uri: str) -> dict:
+    async def fetch_attributes(self, uri: str) -> dict:
         """
         Fetch the attributes of an entity.
 
