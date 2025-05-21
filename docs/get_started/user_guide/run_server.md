@@ -11,7 +11,7 @@ To run the Eunomia server, you must configure the following parameters:
 | `PROJECT_NAME`            | Name of the project              | `Eunomia Server`                                                         |
 | `DEBUG`                   | Flag to enable debug mode        | `False`                                                                  |
 | `ENGINE_SQL_DATABASE_URL` | Path to the policy database file | `sqlite:///.db/engine_db.sqlite`                                         |
-| `FETCHERS`                | Dictionary of fetchers to use    | `{"internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}}` |
+| `FETCHERS`                | Dictionary of fetchers to use    | `{"internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}}` |
 
 All parameters have default values, you can override any of them by setting the environment variable in the **`.env`** file.
 

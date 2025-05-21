@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     # Fetcher config
     FETCHERS: dict[str, dict] = {
-        "internal": {"SQL_DATABASE_URL": "sqlite:///.db/internal_db.sqlite"}
+        "internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}
     }
 
     model_config = SettingsConfigDict(

@@ -11,7 +11,7 @@ def init_db(sql_database_url: str):
     global engine, SessionLocal
 
     if not sql_database_url:
-        raise ValueError("SQL_DATABASE_URL must be provided for 'internal' fetcher")
+        raise ValueError("sql_database_url must be provided for 'internal' fetcher")
 
     engine = create_engine(
         sql_database_url,
