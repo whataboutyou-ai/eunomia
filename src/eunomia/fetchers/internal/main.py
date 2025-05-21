@@ -10,9 +10,11 @@ class InternalFetcherConfig(BaseFetcherConfig):
 
 
 class InternalFetcher(BaseFetcher):
+    config: InternalFetcherConfig
+
     def __init__(self, config: InternalFetcherConfig):
-        self._config = config
-        db.init_db(self._config.sql_database_url)
+        super().__init__(config)
+        db.init_db(self.config.sql_database_url)
 
     def register_entity(
         self, entity: schemas.EntityCreate, db: Session

@@ -29,6 +29,9 @@ class EunomiaServer:
                 *[
                     fetcher.fetch_attributes(entity.uri)
                     for fetcher in self._fetchers.values()
+                    # enforce entity type if configured
+                    if fetcher.config.entity_type is None
+                    or fetcher.config.entity_type == entity.type
                 ]
             )
 
