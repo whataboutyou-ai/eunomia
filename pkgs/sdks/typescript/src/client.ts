@@ -69,6 +69,7 @@ export class EunomiaClient {
    * @param options.resourceUri - The identifier of the resource (optional)
    * @param options.principalAttributes - The attributes of the principal (optional)
    * @param options.resourceAttributes - The attributes of the resource (optional)
+   * @param options.action - The action to check access for (optional, defaults to "access")
    * @returns A promise that resolves to true if the principal has access, false otherwise
    */
   async checkAccess(options: {
@@ -76,6 +77,7 @@ export class EunomiaClient {
     resourceUri?: string;
     principalAttributes?: Record<string, string>;
     resourceAttributes?: Record<string, string>;
+    action?: string;
   }): Promise<boolean> {
     const request: AccessRequest = {
       principal: {
@@ -88,6 +90,7 @@ export class EunomiaClient {
         attributes: options.resourceAttributes || {},
         type: EntityType.Resource,
       },
+      action: options.action || "access",
     };
 
     try {

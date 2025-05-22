@@ -58,6 +58,7 @@ class EunomiaClient:
         resource_uri: str | None = None,
         principal_attributes: dict = {},
         resource_attributes: dict = {},
+        action: str = "access",
     ) -> bool:
         """
         Check whether a principal has access to a specific resource.
@@ -72,6 +73,8 @@ class EunomiaClient:
             The attributes of the principal. Shall be provided if the principal is not registered.
         resource_attributes : dict, optional
             The attributes of the resource. Shall be provided if the resource is not registered.
+        action : str, optional
+            The action to check access for. Defaults to "access".
 
         Returns
         -------
@@ -90,6 +93,7 @@ class EunomiaClient:
             resource=schemas.ResourceAccess(
                 uri=resource_uri, attributes=resource_attributes
             ),
+            action=action,
         )
         response = self.client.post("/check-access", json=request.model_dump())
         self._handle_response(response)

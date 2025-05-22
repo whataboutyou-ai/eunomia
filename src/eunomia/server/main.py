@@ -1,3 +1,5 @@
+import asyncio
+
 from eunomia_core import enums, schemas
 
 from eunomia.config import settings
@@ -17,23 +19,32 @@ class EunomiaServer:
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
-    def _merge_attributes(self, entity: schemas.EntityAccess) -> None:
+    async def _fetch_all_attributes(self, entity: schemas.EntityAccess) -> None:
         if entity.attributes is None:
             entity.attributes = {}
 
         if entity.uri is not None:
-            for fetcher in self._fetchers.values():
-                registered_attributes = fetcher.fetch_attributes(entity.uri)
+            # run all fetchers concurrently
+            fetched_results = await asyncio.gather(
+                *[
+                    fetcher.fetch_attributes(entity.uri)
+                    for fetcher in self._fetchers.values()
+                    # enforce entity type if configured
+                    if fetcher.config.entity_type is None
+                    or fetcher.config.entity_type == entity.type
+                ]
+            )
 
+            for registered_attributes in fetched_results:
                 # if any attribute is colliding with the registered attributes, raise an error
                 for key, value in registered_attributes.items():
                     if key in entity.attributes and entity.attributes[key] != value:
                         raise ValueError(
                             f"For entity '{entity.uri}', attribute '{key}' has more than one value"
                         )
-                entity.attributes.update(registered_attributes)
+            entity.attributes.update(registered_attributes)
 
-    def check_access(self, request: schemas.AccessRequest) -> bool:
+    async def check_access(self, request: schemas.AccessRequest) -> bool:
         """
         Check if a principal has access to a specific resource.
 
@@ -57,6 +68,8 @@ class EunomiaServer:
         ValueError
             If there is a discrepancy between the provided attributes and the registered attributes.
         """
-        self._merge_attributes(request.principal)
-        self._merge_attributes(request.resource)
+        await asyncio.gather(
+            self._fetch_all_attributes(request.principal),
+            self._fetch_all_attributes(request.resource),
+        )
         return self.engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW

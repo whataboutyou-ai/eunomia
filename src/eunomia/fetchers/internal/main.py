@@ -6,13 +6,15 @@ from eunomia.fetchers.internal.db import crud, db
 
 
 class InternalFetcherConfig(BaseFetcherConfig):
-    SQL_DATABASE_URL: str
+    sql_database_url: str
 
 
 class InternalFetcher(BaseFetcher):
+    config: InternalFetcherConfig
+
     def __init__(self, config: InternalFetcherConfig):
-        self._config = config
-        db.init_db(self._config.SQL_DATABASE_URL)
+        super().__init__(config)
+        db.init_db(self.config.sql_database_url)
 
     def register_entity(
         self, entity: schemas.EntityCreate, db: Session
@@ -108,7 +110,7 @@ class InternalFetcher(BaseFetcher):
 
         return crud.delete_entity(db_entity, db=db)
 
-    def fetch_attributes(self, uri: str) -> dict:
+    async def fetch_attributes(self, uri: str) -> dict:
         """
         Fetch the attributes of an entity.
 

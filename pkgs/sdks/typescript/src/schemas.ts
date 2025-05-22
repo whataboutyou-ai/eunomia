@@ -77,7 +77,7 @@ export interface PrincipalAccess extends EntityAccess {
 export interface AccessRequest {
   principal: PrincipalAccess;
   resource: ResourceAccess;
-  action?: "access";
+  action?: string;
 }
 
 /**
