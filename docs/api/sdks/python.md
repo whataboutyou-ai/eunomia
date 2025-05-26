@@ -1,6 +1,6 @@
 Eunomia offers a Python client that enables users to interact with the Eunomia server.
 
-The client allows you to register resources and principals with their metadata to the Eunomia server, as well as verify access control between principals and resources. These features simplify the integration of the Eunomia server into your Python applications.
+The client allows you to register resources and principals with their metadata to the Eunomia server, as well as verify permissions of principals performing actions on resources. These features simplify the integration of the Eunomia server into your Python applications.
 
 ## Installation
 
@@ -41,8 +41,8 @@ principal = client.register_entity(
         "department": "research"}
     )
 
-# Check if a principal has access to a resource
-has_access = client.check_access(
+# Check if a principal has permissions to perform an action on a resource
+is_allowed = client.check(
     principal_uri=principal.uri,
     resource_uri=resource.uri
 )

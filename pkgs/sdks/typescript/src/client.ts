@@ -20,7 +20,7 @@ export interface EunomiaClientOptions {
  * A client for interacting with the Eunomia server.
  *
  * This client provides methods to register resources and principals,
- * check access permissions, and retrieve allowed resources for a principal.
+ * and to check permissions.
  */
 export class EunomiaClient {
   private readonly serverHost: string;
@@ -69,10 +69,10 @@ export class EunomiaClient {
    * @param options.resourceUri - The identifier of the resource (optional)
    * @param options.principalAttributes - The attributes of the principal (optional)
    * @param options.resourceAttributes - The attributes of the resource (optional)
-   * @param options.action - The action to check access for (optional, defaults to "access")
+   * @param options.action - The action to check permissions for (optional, defaults to "access")
    * @returns A promise that resolves to true if the principal has access, false otherwise
    */
-  async checkAccess(options: {
+  async check(options: {
     principalUri?: string;
     resourceUri?: string;
     principalAttributes?: Record<string, string>;
@@ -95,7 +95,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<boolean>(
-        "/check-access",
+        "/check",
         request,
       );
       return this.handleResponse(response);

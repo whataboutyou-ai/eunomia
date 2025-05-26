@@ -31,13 +31,13 @@ async function run(): Promise<void> {
     });
     console.log(`Resource registered: ${resource.uri}`);
 
-    // Check access
-    console.log("Checking access...");
-    const hasAccess = await client.checkAccess({
+    // Check permissions
+    console.log("Checking permissions...");
+    const isAllowed = await client.check({
       principalUri: principal.uri,
       resourceUri: resource.uri,
     });
-    console.log(`Has access: ${hasAccess}`);
+    console.log(`Is allowed: ${isAllowed}`);
 
     // Update entity
     console.log("Updating entity...");

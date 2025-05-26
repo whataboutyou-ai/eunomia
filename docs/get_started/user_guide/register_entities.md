@@ -1,4 +1,4 @@
-In the [Quickstart](../index.md) guide, we showed how to use the `POST /check-access` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
+In the [Quickstart](../index.md) guide, we showed how to use the `POST /check` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
 
 ## Register a New Entity
 
@@ -20,7 +20,7 @@ Your JSON payload must include the following fields:
   The type of the entity, defined by the **EntityType** enum (i.e., `principal` or `resource`).
 
 - **`uri`** (optional):  
-  A unique identifier for the entity. If omitted, the server will generate one automatically. This identifier is used later to check access for the entity.
+  A unique identifier for the entity. If omitted, the server will generate one automatically. This identifier is used later to check permissions for the entity.
 
 ### Response Details
 

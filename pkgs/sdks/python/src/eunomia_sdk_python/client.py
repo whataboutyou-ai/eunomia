@@ -9,7 +9,7 @@ class EunomiaClient:
     A client for interacting with the Eunomia server.
 
     This client provides methods to register resources and principals,
-    check access permissions, and retrieve allowed resources for a principal.
+    and to check permissions.
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ class EunomiaClient:
                 response=e.response,
             ) from None
 
-    def check_access(
+    def check(
         self,
         principal_uri: str | None = None,
         resource_uri: str | None = None,
@@ -74,7 +74,7 @@ class EunomiaClient:
         resource_attributes : dict, optional
             The attributes of the resource. Shall be provided if the resource is not registered.
         action : str, optional
-            The action to check access for. Defaults to "access".
+            The action to check permissions for. Defaults to "access".
 
         Returns
         -------
@@ -95,7 +95,7 @@ class EunomiaClient:
             ),
             action=action,
         )
-        response = self.client.post("/check-access", json=request.model_dump())
+        response = self.client.post("/check", json=request.model_dump())
         self._handle_response(response)
         return bool(response.json())
 

@@ -60,7 +60,7 @@ class EunomiaRetriever(BaseRetriever):
         return [
             doc
             for doc in docs
-            if self._client.check_access(
+            if self._client.check(
                 resource_uri=doc.metadata.pop("eunomia_uri", None),
                 resource_attributes=doc.metadata,
                 principal_uri=self._principal.uri,
@@ -76,7 +76,7 @@ class EunomiaRetriever(BaseRetriever):
         return (
             doc,
             await asyncio.to_thread(
-                self._client.check_access,
+                self._client.check,
                 resource_uri=doc.metadata.pop("eunomia_uri", None),
                 resource_attributes=doc.metadata,
                 principal_uri=self._principal.uri,

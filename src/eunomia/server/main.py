@@ -44,7 +44,7 @@ class EunomiaServer:
                         )
             entity.attributes.update(registered_attributes)
 
-    async def check_access(self, request: schemas.AccessRequest) -> bool:
+    async def check(self, request: schemas.AccessRequest) -> bool:
         """
         Check if a principal has access to a specific resource.
 

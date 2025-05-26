@@ -88,7 +88,7 @@ nav:
           - Create a Policy: get_started/user_guide/create_policies.md
           - Register an Entity: get_started/user_guide/register_entities.md
           - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
-          - Check Access at Runtime: get_started/user_guide/check_access.md
+          - Check Permissions at Runtime: get_started/user_guide/check_permissions.md
   - Docs:
       - Documentation: api/index.md
       - Eunomia:

@@ -30,13 +30,13 @@ def run():
         )
         print(f"Resource registered: {resource.uri}")
 
-        # Check access
-        print("Checking access...")
-        has_access = client.check_access(
+        # Check permissions
+        print("Checking permissions...")
+        is_allowed = client.check(
             principal_uri=principal.uri,
             resource_uri=resource.uri,
         )
-        print(f"Has access: {has_access}")
+        print(f"Is allowed: {is_allowed}")
 
         # Update entity
         print("Updating entity...")
