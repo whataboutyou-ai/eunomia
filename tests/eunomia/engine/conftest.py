@@ -80,12 +80,12 @@ def sample_policy():
 
 @pytest.fixture
 def sample_access_request():
-    return schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    return schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),

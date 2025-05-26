@@ -12,7 +12,7 @@ def engine_router_factory(engine: PolicyEngine) -> APIRouter:
         return engine.get_policies()
 
     @router.post("/policies", response_model=schemas.Policy)
-    async def create_policy(request: schemas.AccessRequest, name: str):
+    async def create_policy(request: schemas.CheckRequest, name: str):
         # we only support simple policy creation via the API
         policy = utils.create_simple_policy(
             name=name,

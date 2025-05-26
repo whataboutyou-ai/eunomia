@@ -70,8 +70,8 @@ def evaluate_conditions(conditions: list[schemas.Condition], obj: Any) -> bool:
     return all(evaluate_condition(condition, obj) for condition in conditions)
 
 
-def evaluate_rule(rule: schemas.Rule, request: schemas.AccessRequest) -> bool:
-    """Evaluate if a rule matches the access request."""
+def evaluate_rule(rule: schemas.Rule, request: schemas.CheckRequest) -> bool:
+    """Evaluate if a rule matches the check request."""
     # Check action match
     if request.action not in rule.actions:
         return False
@@ -90,9 +90,9 @@ def evaluate_rule(rule: schemas.Rule, request: schemas.AccessRequest) -> bool:
 
 
 def evaluate_policy(
-    policy: schemas.Policy, request: schemas.AccessRequest
+    policy: schemas.Policy, request: schemas.CheckRequest
 ) -> schemas.PolicyEvaluationResult:
-    """Evaluate a policy against an access request."""
+    """Evaluate a policy against a check request."""
     for rule in policy.rules:
         if evaluate_rule(rule, request):
             return schemas.PolicyEvaluationResult(

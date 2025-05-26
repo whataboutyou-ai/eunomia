@@ -61,7 +61,7 @@ class EunomiaClient:
         action: str = "access",
     ) -> bool:
         """
-        Check whether a principal has access to a specific resource.
+        Check whether a principal has permissions to perform an action on a specific resource.
 
         Parameters
         ----------
@@ -79,18 +79,18 @@ class EunomiaClient:
         Returns
         -------
         bool
-            True if the principal has access to the resource, False otherwise.
+            True if the principal has permissions to perform the action on the resource, False otherwise.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        request = schemas.AccessRequest(
-            principal=schemas.PrincipalAccess(
+        request = schemas.CheckRequest(
+            principal=schemas.PrincipalCheck(
                 uri=principal_uri, attributes=principal_attributes
             ),
-            resource=schemas.ResourceAccess(
+            resource=schemas.ResourceCheck(
                 uri=resource_uri, attributes=resource_attributes
             ),
             action=action,
@@ -188,15 +188,13 @@ class EunomiaClient:
         self._handle_response(response)
         return response.json()
 
-    def create_policy(
-        self, request: schemas.AccessRequest, name: str
-    ) -> schemas.Policy:
+    def create_policy(self, request: schemas.CheckRequest, name: str) -> schemas.Policy:
         """
         Create a new policy and store it in the Eunomia server.
 
         Parameters
         ----------
-        request : schemas.AccessRequest
+        request : schemas.CheckRequest
             The request to create the policy from.
         name : str
             The name of the policy.

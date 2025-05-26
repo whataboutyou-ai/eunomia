@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { AccessRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
+import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
@@ -57,7 +57,7 @@ async function run(): Promise<void> {
 
     // Create policy
     console.log("Creating policy...");
-    const request: AccessRequest = {
+    const request: CheckRequest = {
       principal: {
         type: EntityType.Principal,
         attributes: {

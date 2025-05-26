@@ -56,11 +56,11 @@ def run():
 
         # Create policy
         print("Creating policy...")
-        request = schemas.AccessRequest(
-            principal=schemas.PrincipalAccess(
+        request = schemas.CheckRequest(
+            principal=schemas.PrincipalCheck(
                 attributes={"role": "admin", "department": "engineering"}
             ),
-            resource=schemas.ResourceAccess(
+            resource=schemas.ResourceCheck(
                 attributes={"type": "document", "classification": "confidential"}
             ),
             action="read",

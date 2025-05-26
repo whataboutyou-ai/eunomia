@@ -55,7 +55,7 @@ retriever = BM25Retriever.from_documents([
 # Wrap the retriever with Eunomia
 wrapped_retriever = EunomiaRetriever(
     retriever=retriever,
-    principal=schemas.PrincipalAccess(uri="test-uri"),
+    principal=schemas.PrincipalCheck(uri="test-uri"),
 )
 
 # Only documents the principal has access to will be returned

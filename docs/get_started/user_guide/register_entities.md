@@ -1,4 +1,4 @@
-In the [Quickstart](../index.md) guide, we showed how to use the `POST /check` endpoint to verify if a given principal has access to a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each access check. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
+In the [Quickstart](../index.md) guide, we showed how to use the `POST /check` endpoint to verify if a given principal can perform an action on a specific resource by passing their identifiers and attributes. While this approach is straightforward, it requires sending all attributes with each check request. For more complex scenarios, it can be more efficient to pre-register the attributes of principals and resources, and then reference them by their identifier at runtime.
 
 ## Register a New Entity
 

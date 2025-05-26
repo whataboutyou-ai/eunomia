@@ -8,7 +8,7 @@ def server_router_factory(server: EunomiaServer) -> APIRouter:
     router = APIRouter()
 
     @router.post("/check", response_model=bool)
-    async def check(request: schemas.AccessRequest):
+    async def check(request: schemas.CheckRequest):
         return await server.check(request)
 
     return router

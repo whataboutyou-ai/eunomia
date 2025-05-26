@@ -17,7 +17,7 @@ class EunomiaRetriever(BaseRetriever):
     ----------
     retriever : BaseRetriever
         The LangChain retriever to wrap.
-    principal : schemas.PrincipalAccess
+    principal : schemas.PrincipalCheck
         The principal to use for the Eunomia server. Defined either with its identifier (uri), attributes or both.
     server_host : str, optional
         The hostname of the Eunomia server.
@@ -39,7 +39,7 @@ class EunomiaRetriever(BaseRetriever):
     ... )
     >>> wrapped_retriever = EunomiaRetriever(
     ...     retriever=retriever,
-    ...     principal=schemas.PrincipalAccess(uri="test-uri"),
+    ...     principal=schemas.PrincipalCheck(uri="test-uri"),
     ... )
     >>> docs = wrapped_retriever.invoke("foo")
     """
@@ -47,7 +47,7 @@ class EunomiaRetriever(BaseRetriever):
     def __init__(
         self,
         retriever: BaseRetriever,
-        principal: schemas.PrincipalAccess,
+        principal: schemas.PrincipalCheck,
         server_host: str | None = None,
         api_key: str | None = None,
     ):
@@ -86,7 +86,7 @@ class EunomiaRetriever(BaseRetriever):
 
     async def _acheck_docs_access(self, docs: list[Document]) -> list[Document]:
         results = await asyncio.gather(*[self._acheck_doc_access(doc) for doc in docs])
-        return [doc for doc, has_access in results if has_access]
+        return [doc for doc, is_allowed in results if is_allowed]
 
     async def _aget_relevant_documents(self, query: str) -> list[Document]:
         docs = await self._retriever.ainvoke(query)

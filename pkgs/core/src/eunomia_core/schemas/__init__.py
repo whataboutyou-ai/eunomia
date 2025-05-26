@@ -1,8 +1,8 @@
-from .access import (
-    AccessRequest,
-    EntityAccess,
-    PrincipalAccess,
-    ResourceAccess,
+from .check import (
+    CheckRequest,
+    EntityCheck,
+    PrincipalCheck,
+    ResourceCheck,
 )
 from .entity import (
     Attribute,
@@ -14,10 +14,10 @@ from .entity import (
 from .policy import Condition, Policy, PolicyEvaluationResult, Rule
 
 __all__ = [
-    "AccessRequest",
-    "EntityAccess",
-    "PrincipalAccess",
-    "ResourceAccess",
+    "CheckRequest",
+    "EntityCheck",
+    "PrincipalCheck",
+    "ResourceCheck",
     "Attribute",
     "AttributeInDb",
     "EntityCreate",

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import {
-  AccessRequest,
+  CheckRequest,
   EntityCreate,
   EntityInDb,
   EntityType,
@@ -62,15 +62,15 @@ export class EunomiaClient {
   }
 
   /**
-   * Check whether a principal has access to a specific resource.
+   * Check whether a principal has permissions to perform an action on a specific resource.
    *
-   * @param options - Options for the access check
+   * @param options - Options for the check request
    * @param options.principalUri - The identifier of the principal (optional)
    * @param options.resourceUri - The identifier of the resource (optional)
    * @param options.principalAttributes - The attributes of the principal (optional)
    * @param options.resourceAttributes - The attributes of the resource (optional)
    * @param options.action - The action to check permissions for (optional, defaults to "access")
-   * @returns A promise that resolves to true if the principal has access, false otherwise
+   * @returns A promise that resolves to true if the request is allowed, false otherwise
    */
   async check(options: {
     principalUri?: string;
@@ -79,7 +79,7 @@ export class EunomiaClient {
     resourceAttributes?: Record<string, string>;
     action?: string;
   }): Promise<boolean> {
-    const request: AccessRequest = {
+    const request: CheckRequest = {
       principal: {
         uri: options.principalUri,
         attributes: options.principalAttributes || {},
@@ -208,11 +208,11 @@ export class EunomiaClient {
   /**
    * Create a new policy and store it in the Eunomia server.
    *
-   * @param request - The access request to create the policy from
+   * @param request - The check request to create the policy from
    * @param name - The name of the policy
    * @returns A promise that resolves to the created policy
    */
-  async createPolicy(request: AccessRequest, name: string): Promise<Policy> {
+  async createPolicy(request: CheckRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
         "/policies",

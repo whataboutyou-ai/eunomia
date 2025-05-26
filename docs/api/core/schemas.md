@@ -12,16 +12,16 @@ This page documents the schema classes used in Eunomia Core for data validation 
 
 ::: eunomia_core.schemas.EntityUpdate
 
-::: eunomia_core.schemas.EntityAccess
+::: eunomia_core.schemas.EntityCheck
 
 ::: eunomia_core.schemas.EntityInDb
 
-## Access Control Schemas
+## Check Schemas
 
-::: eunomia_core.schemas.ResourceAccess
+::: eunomia_core.schemas.ResourceCheck
 
-::: eunomia_core.schemas.PrincipalAccess
+::: eunomia_core.schemas.PrincipalCheck
 
-::: eunomia_core.schemas.AccessRequest
+::: eunomia_core.schemas.CheckRequest
 
 ::: eunomia_core.schemas.Policy

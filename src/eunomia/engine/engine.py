@@ -45,9 +45,9 @@ class PolicyEngine:
         return None
 
     def _evaluate(
-        self, request: schemas.AccessRequest
+        self, request: schemas.CheckRequest
     ) -> list[schemas.PolicyEvaluationResult]:
-        """Evaluate all policies against the access request."""
+        """Evaluate all policies against the check request."""
         results = []
 
         for policy in self.policies:
@@ -57,7 +57,7 @@ class PolicyEngine:
         return results
 
     def evaluate_all(
-        self, request: schemas.AccessRequest
+        self, request: schemas.CheckRequest
     ) -> schemas.PolicyEvaluationResult:
         """
         Evaluate all policies and return a single result.

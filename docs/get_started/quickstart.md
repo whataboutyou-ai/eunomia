@@ -25,24 +25,24 @@ You can use the `POST /policies` endpoint for this.
 
 === "Python"
     ```python
-    from eunomia_core.schemas import AccessRequest, PrincipalAccess, ResourceAccess
+    from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
     from eunomia_sdk_python import EunomiaClient
 
     eunomia = EunomiaClient()
 
     eunomia.create_policy(
-        AccessRequest(
-            principal=PrincipalAccess(attributes={"department": "it"}),
-            resource=ResourceAccess(attributes={"agent-id": "it-desk-agent"}),
+        CheckRequest(
+            principal=PrincipalCheck(attributes={"department": "it"}),
+            resource=ResourceCheck(attributes={"agent-id": "it-desk-agent"}),
             action="access",
         ),
         name="it-desk-policy",
     )
 
     eunomia.create_policy(
-        AccessRequest(
-            principal=PrincipalAccess(attributes={"department": "hr", "role": "manager"}),
-            resource=ResourceAccess(attributes={"agent-id": "hr-agent"}),
+        CheckRequest(
+            principal=PrincipalCheck(attributes={"department": "hr", "role": "manager"}),
+            resource=ResourceCheck(attributes={"agent-id": "hr-agent"}),
             action="access",
         ),
         name="hr-policy",
