@@ -91,6 +91,30 @@ class EunomiaClient:
         self._handle_response(response)
         return bool(response.json())
 
+    def bulk_check(self, check_requests: list[schemas.CheckRequest]) -> list[bool]:
+        """
+        Perform a set of permission checks in a single request.
+
+        Parameters
+        ----------
+        check_requests : list[schemas.CheckRequest]
+            The list of check requests to perform.
+
+        Returns
+        -------
+        list[bool]
+            The list of results of the check requests.
+        """
+        response = self.client.post(
+            "/check/bulk",
+            json=[
+                schemas.CheckRequest.model_validate(request).model_dump()
+                for request in check_requests
+            ],
+        )
+        self._handle_response(response)
+        return [bool(result) for result in response.json()]
+
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None
     ) -> schemas.EntityInDb:
