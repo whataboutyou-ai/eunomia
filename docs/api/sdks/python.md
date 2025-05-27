@@ -17,7 +17,10 @@ Import the `EunomiaClient` class and create an instance of it:
 ```python
 from eunomia_sdk_python import EunomiaClient
 
-client = EunomiaClient()
+client = EunomiaClient(
+    endpoint="http://localhost:8000",
+    api_key="my-api-key",
+)
 ```
 
 You can then use the client to interact with the Eunomia server:

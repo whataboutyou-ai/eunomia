@@ -12,7 +12,7 @@ import {
  * Options for configuring the EunomiaClient
  */
 export interface EunomiaClientOptions {
-  serverHost?: string;
+  endpoint?: string;
   apiKey?: string;
 }
 
@@ -23,7 +23,7 @@ export interface EunomiaClientOptions {
  * and to check permissions.
  */
 export class EunomiaClient {
-  private readonly serverHost: string;
+  private readonly endpoint: string;
   private readonly apiKey: string | undefined;
   private readonly client: AxiosInstance;
 
@@ -31,11 +31,11 @@ export class EunomiaClient {
    * Creates a new EunomiaClient instance.
    *
    * @param options - Configuration options for the client
-   * @param options.serverHost - The base URL of the Eunomia server (defaults to "http://localhost:8000")
+   * @param options.endpoint - The base URL endpoint of the Eunomia server (defaults to "http://localhost:8000")
    * @param options.apiKey - The API key for authenticating with the server (defaults to process.env.WAY_API_KEY)
    */
   constructor(options: EunomiaClientOptions = {}) {
-    this.serverHost = options.serverHost || "http://localhost:8000";
+    this.endpoint = options.endpoint || "http://localhost:8000";
     this.apiKey = options.apiKey || process.env.WAY_API_KEY;
 
     const headers: Record<string, string> = {};
@@ -44,7 +44,7 @@ export class EunomiaClient {
     }
 
     this.client = axios.create({
-      baseURL: this.serverHost,
+      baseURL: this.endpoint,
       headers,
       timeout: 60000,
     });

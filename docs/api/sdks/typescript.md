@@ -18,7 +18,8 @@ Import the EunomiaClient class and create an instance of it:
 import { EunomiaClient, EntityType } from "eunomia-sdk-typescript";
 
 const client = new EunomiaClient({
-  serverHost: "http://localhost:8000",
+  endpoint: "http://localhost:8000",
+  apiKey: "my-api-key",
 });
 ```
 
@@ -60,7 +61,7 @@ A client for interacting with the Eunomia server.
 
 Creates a new `EunomiaClient` instance with the following options:
 
-- `serverHost`: The base URL of the Eunomia server, defaults to "http://localhost:8000"
+- `endpoint`: The base URL endpoint of the Eunomia server, defaults to "http://localhost:8000"
 - `apiKey`: The API key for authentication, defaults to the env variable `WAY_API_KEY`
 
 #### check

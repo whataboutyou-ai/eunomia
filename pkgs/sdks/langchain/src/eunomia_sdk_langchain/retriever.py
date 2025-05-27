@@ -19,8 +19,8 @@ class EunomiaRetriever(BaseRetriever):
         The LangChain retriever to wrap.
     principal : schemas.PrincipalCheck
         The principal to use for the Eunomia server. Defined either with its identifier (uri), attributes or both.
-    server_host : str, optional
-        The hostname of the Eunomia server.
+    endpoint : str, optional
+        The base URL endpoint of the Eunomia server.
     api_key : str, optional
         The API key to use for the Eunomia server, only required when the server is hosted on cloud.
 
@@ -48,13 +48,13 @@ class EunomiaRetriever(BaseRetriever):
         self,
         retriever: BaseRetriever,
         principal: schemas.PrincipalCheck,
-        server_host: str | None = None,
+        endpoint: str | None = None,
         api_key: str | None = None,
     ):
         super().__init__()
         self._retriever = retriever
         self._principal = principal
-        self._client = EunomiaClient(server_host=server_host, api_key=api_key)
+        self._client = EunomiaClient(endpoint=endpoint, api_key=api_key)
 
     def _check_docs_access(self, docs: list[Document]) -> list[Document]:
         return [

@@ -13,20 +13,16 @@ class EunomiaClient:
 
     Parameters
     ----------
-    server_host : str, optional
-        The base URL of the Eunomia server.
+    endpoint : str, optional
+        The base URL endpoint of the Eunomia server.
         Defaults to "http://localhost:8000" if not provided.
     api_key : str, optional
         The API key for authenticating with the server.
         Defaults to the environment variable "WAY_API_KEY" if not provided.
     """
 
-    def __init__(
-        self, server_host: str | None = None, api_key: str | None = None
-    ) -> None:
-        self._server_host = (
-            server_host if server_host is not None else "http://localhost:8000"
-        )
+    def __init__(self, endpoint: str | None = None, api_key: str | None = None) -> None:
+        self._endpoint = endpoint if endpoint is not None else "http://localhost:8000"
         self._api_key = (
             api_key if api_key is not None else os.getenv("WAY_API_KEY", None)
         )
@@ -35,11 +31,7 @@ class EunomiaClient:
         if self._api_key is not None:
             headers["WAY-API-KEY"] = self._api_key
 
-        self.client = httpx.Client(
-            base_url=self._server_host,
-            headers=headers,
-            timeout=60,
-        )
+        self.client = httpx.Client(base_url=self._endpoint, headers=headers, timeout=60)
 
     def _handle_response(self, response: httpx.Response) -> None:
         try:
