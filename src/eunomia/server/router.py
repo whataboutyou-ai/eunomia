@@ -1,14 +1,14 @@
-import asyncio
-
 from eunomia_core import schemas
 from fastapi import APIRouter, HTTPException, status
 
 from eunomia.config import settings
 from eunomia.server import EunomiaServer
+from eunomia.utils.batch_processor import BatchProcessor
 
 
 def server_router_factory(server: EunomiaServer) -> APIRouter:
     router = APIRouter()
+    batch_processor = BatchProcessor(batch_size=settings.BULK_CHECK_BATCH_SIZE)
 
     @router.post("/check", response_model=bool)
     async def check(request: schemas.CheckRequest):
@@ -26,6 +26,6 @@ def server_router_factory(server: EunomiaServer) -> APIRouter:
                 detail=f"Too many requests. Maximum allowed: {settings.BULK_CHECK_MAX_REQUESTS}",
             )
 
-        return await asyncio.gather(*[server.check(request) for request in requests])
+        return await batch_processor.run(requests, server.check)
 
     return router
