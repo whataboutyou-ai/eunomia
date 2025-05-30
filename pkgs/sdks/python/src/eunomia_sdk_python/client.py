@@ -9,24 +9,20 @@ class EunomiaClient:
     A client for interacting with the Eunomia server.
 
     This client provides methods to register resources and principals,
-    check access permissions, and retrieve allowed resources for a principal.
+    and to check permissions.
 
     Parameters
     ----------
-    server_host : str, optional
-        The base URL of the Eunomia server.
+    endpoint : str, optional
+        The base URL endpoint of the Eunomia server.
         Defaults to "http://localhost:8000" if not provided.
     api_key : str, optional
         The API key for authenticating with the server.
         Defaults to the environment variable "WAY_API_KEY" if not provided.
     """
 
-    def __init__(
-        self, server_host: str | None = None, api_key: str | None = None
-    ) -> None:
-        self._server_host = (
-            server_host if server_host is not None else "http://localhost:8000"
-        )
+    def __init__(self, endpoint: str | None = None, api_key: str | None = None) -> None:
+        self._endpoint = endpoint if endpoint is not None else "http://localhost:8000"
         self._api_key = (
             api_key if api_key is not None else os.getenv("WAY_API_KEY", None)
         )
@@ -35,11 +31,7 @@ class EunomiaClient:
         if self._api_key is not None:
             headers["WAY-API-KEY"] = self._api_key
 
-        self.client = httpx.Client(
-            base_url=self._server_host,
-            headers=headers,
-            timeout=60,
-        )
+        self.client = httpx.Client(base_url=self._endpoint, headers=headers, timeout=60)
 
     def _handle_response(self, response: httpx.Response) -> None:
         try:
@@ -52,7 +44,7 @@ class EunomiaClient:
                 response=e.response,
             ) from None
 
-    def check_access(
+    def check(
         self,
         principal_uri: str | None = None,
         resource_uri: str | None = None,
@@ -61,7 +53,7 @@ class EunomiaClient:
         action: str = "access",
     ) -> bool:
         """
-        Check whether a principal has access to a specific resource.
+        Check whether a principal has permissions to perform an action on a specific resource.
 
         Parameters
         ----------
@@ -74,30 +66,54 @@ class EunomiaClient:
         resource_attributes : dict, optional
             The attributes of the resource. Shall be provided if the resource is not registered.
         action : str, optional
-            The action to check access for. Defaults to "access".
+            The action to check permissions for. Defaults to "access".
 
         Returns
         -------
         bool
-            True if the principal has access to the resource, False otherwise.
+            True if the principal has permissions to perform the action on the resource, False otherwise.
 
         Raises
         ------
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        request = schemas.AccessRequest(
-            principal=schemas.PrincipalAccess(
+        request = schemas.CheckRequest(
+            principal=schemas.PrincipalCheck(
                 uri=principal_uri, attributes=principal_attributes
             ),
-            resource=schemas.ResourceAccess(
+            resource=schemas.ResourceCheck(
                 uri=resource_uri, attributes=resource_attributes
             ),
             action=action,
         )
-        response = self.client.post("/check-access", json=request.model_dump())
+        response = self.client.post("/check", json=request.model_dump())
         self._handle_response(response)
         return bool(response.json())
+
+    def bulk_check(self, check_requests: list[schemas.CheckRequest]) -> list[bool]:
+        """
+        Perform a set of permission checks in a single request.
+
+        Parameters
+        ----------
+        check_requests : list[schemas.CheckRequest]
+            The list of check requests to perform.
+
+        Returns
+        -------
+        list[bool]
+            The list of results of the check requests.
+        """
+        response = self.client.post(
+            "/check/bulk",
+            json=[
+                schemas.CheckRequest.model_validate(request).model_dump()
+                for request in check_requests
+            ],
+        )
+        self._handle_response(response)
+        return [bool(result) for result in response.json()]
 
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None
@@ -188,15 +204,13 @@ class EunomiaClient:
         self._handle_response(response)
         return response.json()
 
-    def create_policy(
-        self, request: schemas.AccessRequest, name: str
-    ) -> schemas.Policy:
+    def create_policy(self, request: schemas.CheckRequest, name: str) -> schemas.Policy:
         """
         Create a new policy and store it in the Eunomia server.
 
         Parameters
         ----------
-        request : schemas.AccessRequest
+        request : schemas.CheckRequest
             The request to create the policy from.
         name : str
             The name of the policy.

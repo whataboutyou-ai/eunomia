@@ -19,7 +19,7 @@ class EunomiaServer:
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
 
-    async def _fetch_all_attributes(self, entity: schemas.EntityAccess) -> None:
+    async def _fetch_all_attributes(self, entity: schemas.EntityCheck) -> None:
         if entity.attributes is None:
             entity.attributes = {}
 
@@ -44,29 +44,29 @@ class EunomiaServer:
                         )
             entity.attributes.update(registered_attributes)
 
-    async def check_access(self, request: schemas.AccessRequest) -> bool:
+    async def check(self, request: schemas.CheckRequest) -> bool:
         """
-        Check if a principal has access to a specific resource.
+        Check if a principal has permissions to perform an action on a specific resource.
 
-        This method first fetch resource and principals attributes and then
-        queries the policy engine to determine if the specified principal
-        is allowed to access the specified resource.
+        This method first fetches resource and principals attributes from all configured
+        fetchers and then queries the engine to evaluate policies.
 
         Parameters
         ----------
-        request : schemas.AccessRequest
-            The access request to check, containing the principal requesting access and the resource being accessed.
-            Both entities can be specified either by their registered identifier, by their attributes or by both.
+        request : schemas.CheckRequest
+            The check request containing the principal, the action and the resource.
+            Both principal and resource can be specified either by uri, by their attributes
+            or a combination of both.
 
         Returns
         -------
         bool
-            True if access is granted, False otherwise.
+            True if the principal has permissions to perform the action on the resource, False otherwise.
 
         Raises
         ------
         ValueError
-            If there is a discrepancy between the provided attributes and the registered attributes.
+            If there is a discrepancy between the provided attributes and the fetched attributes.
         """
         await asyncio.gather(
             self._fetch_all_attributes(request.principal),

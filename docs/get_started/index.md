@@ -15,14 +15,14 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     ---
 
-    Principals are actors (human or AI) requesting access to resources.
+    Principals are actors (human or AI) performing actions on resources.
 
 
 -   :material-semantic-web:{ .lg .middle } __Resources__
 
     ---
 
-    Resources are the targets of access, including data, tools, and AI agents.
+    Resources are the targets of actions, including data, tools, and AI agents.
 
     
 
@@ -31,7 +31,7 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     ---
 
-    Metadata of Principals and Resources, used in access policies.
+    Metadata of Principals and Resources, used in authorization policies.
 
 
 
@@ -39,7 +39,7 @@ It is built and maintained by [What About You][whataboutyou-website], while cont
 
     ---
 
-    Policies are rules that explicitly allow or deny Principals access to Resources.
+    Policies are rules that explicitly allow or deny Principals' actions on Resources.
 
 </div>
 

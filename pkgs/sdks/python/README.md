@@ -23,12 +23,12 @@ client = EunomiaClient()
 You can then call any server endpoint through the client. For example, you can check the access of a principal to a resource:
 
 ```python
-has_access = client.check_access(
+is_allowed = client.check(
     principal_attributes={"role": "admin"},
     resource_attributes={"type": "confidential"},
 )
 
-print(f"Has access: {has_access}")
+print(f"Is allowed: {is_allowed}")
 ```
 
 ## Documentation

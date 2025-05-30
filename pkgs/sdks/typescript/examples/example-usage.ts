@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { AccessRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
+import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
@@ -31,13 +31,13 @@ async function run(): Promise<void> {
     });
     console.log(`Resource registered: ${resource.uri}`);
 
-    // Check access
-    console.log("Checking access...");
-    const hasAccess = await client.checkAccess({
+    // Check permissions
+    console.log("Checking permissions...");
+    const isAllowed = await client.check({
       principalUri: principal.uri,
       resourceUri: resource.uri,
     });
-    console.log(`Has access: ${hasAccess}`);
+    console.log(`Is allowed: ${isAllowed}`);
 
     // Update entity
     console.log("Updating entity...");
@@ -57,7 +57,7 @@ async function run(): Promise<void> {
 
     // Create policy
     console.log("Creating policy...");
-    const request: AccessRequest = {
+    const request: CheckRequest = {
       principal: {
         type: EntityType.Principal,
         attributes: {

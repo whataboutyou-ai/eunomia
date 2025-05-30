@@ -18,7 +18,8 @@ Import the EunomiaClient class and create an instance of it:
 import { EunomiaClient, EntityType } from "eunomia-sdk-typescript";
 
 const client = new EunomiaClient({
-  serverHost: "http://localhost:8000",
+  endpoint: "http://localhost:8000",
+  apiKey: "my-api-key",
 });
 ```
 
@@ -45,8 +46,8 @@ const principal = await client.registerEntity({
   uri: "user:john.doe",
 });
 
-// Check if a principal has access to a resource
-const hasAccess = await client.checkAccess({
+// Check if a principal has permissions to perform an action on a resource
+const isAllowed = await client.check({
   principalUri: principal.uri,
   resourceUri: resource.uri,
 });
@@ -60,15 +61,15 @@ A client for interacting with the Eunomia server.
 
 Creates a new `EunomiaClient` instance with the following options:
 
-- `serverHost`: The base URL of the Eunomia server, defaults to "http://localhost:8000"
+- `endpoint`: The base URL endpoint of the Eunomia server, defaults to "http://localhost:8000"
 - `apiKey`: The API key for authentication, defaults to the env variable `WAY_API_KEY`
 
-#### checkAccess
+#### check
 
-Checks whether a principal has access to a specific resource.
+Checks whether a principal has permissions to perform an action on a resource.
 
 ```typescript
-async checkAccess(options: {
+async check(options: {
   principalUri?: string;
   resourceUri?: string;
   principalAttributes?: Record<string, string>;

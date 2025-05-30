@@ -20,16 +20,16 @@ import { EunomiaClient, EntityType } from "eunomia-sdk-typescript";
 const client = new EunomiaClient();
 ```
 
-You can then call any server endpoint through the client. For example, you can check the access of a principal to a resource:
+You can then call any server endpoint through the client. For example, you can check the permissions of a principal to perform an action on a resource:
 
 ```typescript
-async function checkAccess() {
-  const hasAccess = await client.checkAccess({
+async function check() {
+  const isAllowed = await client.check({
     principalAttributes: { role: "admin" },
     resourceAttributes: { type: "confidential" },
   });
 
-  console.log(`Has access: ${hasAccess}`);
+  console.log(`Is allowed: ${isAllowed}`);
 }
 ```
 

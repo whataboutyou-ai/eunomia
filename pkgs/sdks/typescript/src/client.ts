@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import {
-  AccessRequest,
+  CheckRequest,
   EntityCreate,
   EntityInDb,
   EntityType,
@@ -12,7 +12,7 @@ import {
  * Options for configuring the EunomiaClient
  */
 export interface EunomiaClientOptions {
-  serverHost?: string;
+  endpoint?: string;
   apiKey?: string;
 }
 
@@ -20,10 +20,10 @@ export interface EunomiaClientOptions {
  * A client for interacting with the Eunomia server.
  *
  * This client provides methods to register resources and principals,
- * check access permissions, and retrieve allowed resources for a principal.
+ * and to check permissions.
  */
 export class EunomiaClient {
-  private readonly serverHost: string;
+  private readonly endpoint: string;
   private readonly apiKey: string | undefined;
   private readonly client: AxiosInstance;
 
@@ -31,11 +31,11 @@ export class EunomiaClient {
    * Creates a new EunomiaClient instance.
    *
    * @param options - Configuration options for the client
-   * @param options.serverHost - The base URL of the Eunomia server (defaults to "http://localhost:8000")
+   * @param options.endpoint - The base URL endpoint of the Eunomia server (defaults to "http://localhost:8000")
    * @param options.apiKey - The API key for authenticating with the server (defaults to process.env.WAY_API_KEY)
    */
   constructor(options: EunomiaClientOptions = {}) {
-    this.serverHost = options.serverHost || "http://localhost:8000";
+    this.endpoint = options.endpoint || "http://localhost:8000";
     this.apiKey = options.apiKey || process.env.WAY_API_KEY;
 
     const headers: Record<string, string> = {};
@@ -44,7 +44,7 @@ export class EunomiaClient {
     }
 
     this.client = axios.create({
-      baseURL: this.serverHost,
+      baseURL: this.endpoint,
       headers,
       timeout: 60000,
     });
@@ -62,24 +62,24 @@ export class EunomiaClient {
   }
 
   /**
-   * Check whether a principal has access to a specific resource.
+   * Check whether a principal has permissions to perform an action on a specific resource.
    *
-   * @param options - Options for the access check
+   * @param options - Options for the check request
    * @param options.principalUri - The identifier of the principal (optional)
    * @param options.resourceUri - The identifier of the resource (optional)
    * @param options.principalAttributes - The attributes of the principal (optional)
    * @param options.resourceAttributes - The attributes of the resource (optional)
-   * @param options.action - The action to check access for (optional, defaults to "access")
-   * @returns A promise that resolves to true if the principal has access, false otherwise
+   * @param options.action - The action to check permissions for (optional, defaults to "access")
+   * @returns A promise that resolves to true if the request is allowed, false otherwise
    */
-  async checkAccess(options: {
+  async check(options: {
     principalUri?: string;
     resourceUri?: string;
     principalAttributes?: Record<string, string>;
     resourceAttributes?: Record<string, string>;
     action?: string;
   }): Promise<boolean> {
-    const request: AccessRequest = {
+    const request: CheckRequest = {
       principal: {
         uri: options.principalUri,
         attributes: options.principalAttributes || {},
@@ -95,7 +95,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<boolean>(
-        "/check-access",
+        "/check",
         request,
       );
       return this.handleResponse(response);
@@ -208,11 +208,11 @@ export class EunomiaClient {
   /**
    * Create a new policy and store it in the Eunomia server.
    *
-   * @param request - The access request to create the policy from
+   * @param request - The check request to create the policy from
    * @param name - The name of the policy
    * @returns A promise that resolves to the created policy
    */
-  async createPolicy(request: AccessRequest, name: string): Promise<Policy> {
+  async createPolicy(request: CheckRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
         "/policies",

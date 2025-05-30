@@ -14,7 +14,7 @@ eunomia server
 
 The API has the following endpoints:
 
-- `POST /check-access`: Check if a principal has access to perform an action on a resource.
+- `POST /check`: Check if a principal has permissions to perform an action on a resource.
 - `GET /policies`: Get all policies.
 - `POST /policies`: Create a new policy.
 - `GET /policies/{name}`: Get a policy by name.

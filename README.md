@@ -65,13 +65,53 @@ Different packages are available in this repository for an easier interaction wi
 The following integrations are currently available:
 
 - [Python][sdk-python-github]
-- [LangChain][sdk-langchain-github]
 - [Typescript][sdk-typescript-github]
+- [LangChain][sdk-langchain-github]
 - ...and more coming soon!
 
 ## Documentation
 
 For more examples and detailed usage, check out the [documentation][docs].
+
+## Changelog
+
+### Migration to v0.3.2
+
+The following breaking changes were introduced in this version:
+
+#### Endpoint Rename: `/check-access` → `/check`
+
+The authorization endpoint has been renamed for clarity:
+
+- **Old:** `POST /check-access`
+- **New:** `POST /check`
+
+**Update your requests:**
+
+```bash
+# Before (v0.3.1)
+curl -X POST "http://localhost:8000/check-access" \
+  -H "Content-Type: application/json" \
+  -d '{"principal": {...}, "action": "...", "resource": {...}}'
+
+# After (v0.3.2)
+curl -X POST "http://localhost:8000/check" \
+  -H "Content-Type: application/json" \
+  -d '{"principal": {...}, "action": "...", "resource": {...}}'
+```
+
+#### New Bulk Endpoint
+
+A new bulk authorization endpoint has been added for improved performance when checking multiple permissions:
+
+```bash
+curl -X POST "http://localhost:8000/check/bulk" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {"principal": {...}, "action": "...", "resource": {...}},
+    {"principal": {...}, "action": "...", "resource": {...}}
+  ]'
+```
 
 [whataboutyou-website]: https://whataboutyou.ai
 [docs]: https://whataboutyou-ai.github.io/eunomia/

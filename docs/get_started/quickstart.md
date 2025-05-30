@@ -25,24 +25,24 @@ You can use the `POST /policies` endpoint for this.
 
 === "Python"
     ```python
-    from eunomia_core.schemas import AccessRequest, PrincipalAccess, ResourceAccess
+    from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
     from eunomia_sdk_python import EunomiaClient
 
     eunomia = EunomiaClient()
 
     eunomia.create_policy(
-        AccessRequest(
-            principal=PrincipalAccess(attributes={"department": "it"}),
-            resource=ResourceAccess(attributes={"agent-id": "it-desk-agent"}),
+        CheckRequest(
+            principal=PrincipalCheck(attributes={"department": "it"}),
+            resource=ResourceCheck(attributes={"agent-id": "it-desk-agent"}),
             action="access",
         ),
         name="it-desk-policy",
     )
 
     eunomia.create_policy(
-        AccessRequest(
-            principal=PrincipalAccess(attributes={"department": "hr", "role": "manager"}),
-            resource=ResourceAccess(attributes={"agent-id": "hr-agent"}),
+        CheckRequest(
+            principal=PrincipalCheck(attributes={"department": "hr", "role": "manager"}),
+            resource=ResourceCheck(attributes={"agent-id": "hr-agent"}),
             action="access",
         ),
         name="hr-policy",
@@ -96,25 +96,25 @@ You can use the `POST /policies` endpoint for this.
 
 Now, you can enforce the policies in your application at runtime by checking the access of a given principal to a specific resource.
 
-You can use the `POST /check-access` endpoint for this, passing the principal and resource identifiers and their attributes.
+You can use the `POST /check` endpoint for this, passing the principal and resource identifiers and their attributes.
 
 === "Python"
     ```python
     # allowed access
-    eunomia.check_access(
+    eunomia.check(
         resource_attributes={"agent-id": "it-desk-agent"},
         principal_attributes={"department": "it"},
     )
-    eunomia.check_access(
+    eunomia.check(
         resource_attributes={"agent-id": "hr-agent"},
         principal_attributes={"department": "hr", "role": "manager"},
     )
 
     # denied access
-    eunomia.check_access(
+    eunomia.check(
         resource_uri="it-desk-agent", principal_attributes={"department": "sales"}
     )
-    eunomia.check_access(
+    eunomia.check(
         resource_uri="hr-agent",
         principal_attributes={"department": "hr", "role": "analyst"},
     )
@@ -122,11 +122,11 @@ You can use the `POST /check-access` endpoint for this, passing the principal an
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
+    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
+    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
 
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
-    curl -X POST 'http://localhost:8000/check-access' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
+    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
+    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
     ```
 
 === "Output"

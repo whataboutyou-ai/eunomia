@@ -49,34 +49,34 @@ export interface EntityInDb {
 }
 
 /**
- * Base interface for access control entities
+ * Base interface for check request entities
  */
-export interface EntityAccess {
+export interface EntityCheck {
   uri?: string;
   attributes: Record<string, string>;
   type: EntityType;
 }
 
 /**
- * Resource in an access control request
+ * Resource in a check request
  */
-export interface ResourceAccess extends EntityAccess {
+export interface ResourceCheck extends EntityCheck {
   type: EntityType.Resource;
 }
 
 /**
- * Principal in an access control request
+ * Principal in a check request
  */
-export interface PrincipalAccess extends EntityAccess {
+export interface PrincipalCheck extends EntityCheck {
   type: EntityType.Principal;
 }
 
 /**
- * Complete access request to check permissions
+ * Complete request to check permissions
  */
-export interface AccessRequest {
-  principal: PrincipalAccess;
-  resource: ResourceAccess;
+export interface CheckRequest {
+  principal: PrincipalCheck;
+  resource: ResourceCheck;
   action?: string;
 }
 
@@ -100,7 +100,7 @@ export interface Rule {
 }
 
 /**
- * Represents a policy with a list of access rules
+ * Represents a policy with a list of rules
  */
 export interface Policy {
   name: string;

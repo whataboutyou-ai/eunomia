@@ -41,12 +41,12 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     )
     fixture_engine.add_policy(read_only_policy)
 
-    admin_request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    admin_request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin", "department": "engineering"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "secret-project", "visibility": "private"},
         ),
@@ -58,12 +58,12 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     assert admin_result.matched_rule is not None
     assert admin_result.policy_name == "admin-access"
 
-    readonly_public_request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    readonly_public_request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "read-only", "department": "marketing"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "public-dashboard", "visibility": "public"},
         ),
@@ -75,12 +75,12 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     assert readonly_public_result.matched_rule is not None
     assert readonly_public_result.policy_name == "read-only-access"
 
-    readonly_private_request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    readonly_private_request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "read-only", "department": "marketing"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "secret-project", "visibility": "private"},
         ),

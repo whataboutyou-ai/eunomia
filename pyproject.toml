@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-ai"
-version = "0.3.1"
+version = "0.3.2"
 description = "Authorization layer for AI Agents"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -9,7 +9,7 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "eunomia-core>=0.3.1",
+    "eunomia-core>=0.3.2",
     "fastapi[standard]>=0.115.9",
     "httpx>=0.28.1",
     "pydantic-settings>=2.8.1",
@@ -19,6 +19,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.3.4",
+    "pytest-asyncio>=1.0.0",
     "ruff>=0.9.10",
 ]
 docs = [

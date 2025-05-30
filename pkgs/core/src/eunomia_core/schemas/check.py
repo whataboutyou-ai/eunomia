@@ -6,7 +6,7 @@ from eunomia_core.enums.entity import EntityType
 from eunomia_core.schemas.entity import Attribute
 
 
-class EntityAccess(BaseModel):
+class EntityCheck(BaseModel):
     uri: Optional[str] = Field(
         default=None, description="Unique identifier for the entity"
     )
@@ -25,25 +25,25 @@ class EntityAccess(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def either_uri_or_attributes(self) -> "EntityAccess":
+    def either_uri_or_attributes(self) -> "EntityCheck":
         if not self.uri and not self.attributes:
             raise ValueError("Either 'uri' or non-empty 'attributes' must be provided")
         return self
 
 
-class ResourceAccess(EntityAccess):
+class ResourceCheck(EntityCheck):
     type: Literal[EntityType.resource] = EntityType.resource
 
 
-class PrincipalAccess(EntityAccess):
+class PrincipalCheck(EntityCheck):
     type: Literal[EntityType.principal] = EntityType.principal
 
 
-class AccessRequest(BaseModel):
-    principal: PrincipalAccess = Field(
-        ..., description="The principal requesting access"
+class CheckRequest(BaseModel):
+    principal: PrincipalCheck = Field(
+        ..., description="The principal performing the action"
     )
-    resource: ResourceAccess = Field(..., description="The resource being accessed")
+    resource: ResourceCheck = Field(..., description="The resource being acted on")
     action: str = Field(
-        default="access", description="Action to be performed on the resource"
+        default="access", description="The action being performed on the resource"
     )

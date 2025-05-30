@@ -24,7 +24,7 @@ def test_get_policy(fixture_engine: PolicyEngine, sample_policy: schemas.Policy)
 
 
 def test_evaluate_all_with_no_policies(
-    fixture_engine: PolicyEngine, sample_access_request: schemas.AccessRequest
+    fixture_engine: PolicyEngine, sample_access_request: schemas.CheckRequest
 ):
     result = fixture_engine.evaluate_all(sample_access_request)
     assert result.effect == enums.PolicyEffect.DENY
@@ -35,7 +35,7 @@ def test_evaluate_all_with_no_policies(
 def test_evaluate_all_with_matching_policy(
     fixture_engine: PolicyEngine,
     sample_policy: schemas.Policy,
-    sample_access_request: schemas.AccessRequest,
+    sample_access_request: schemas.CheckRequest,
 ):
     fixture_engine.add_policy(sample_policy)
     result = fixture_engine.evaluate_all(sample_access_request)
@@ -47,12 +47,12 @@ def test_evaluate_all_with_matching_policy(
 def test_evaluate_all_with_non_matching_policy(
     fixture_engine: PolicyEngine, sample_policy: schemas.Policy
 ):
-    non_matching_request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    non_matching_request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "user"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),

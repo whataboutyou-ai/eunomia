@@ -25,6 +25,10 @@ class Settings(BaseSettings):
         "internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}
     }
 
+    # Server config
+    BULK_CHECK_MAX_REQUESTS: int = 100
+    BULK_CHECK_BATCH_SIZE: int = 10
+
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=True, extra="ignore"
     )

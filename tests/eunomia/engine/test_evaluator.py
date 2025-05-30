@@ -104,12 +104,12 @@ def test_evaluate_rule():
         actions=["access"],
     )
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
@@ -117,12 +117,12 @@ def test_evaluate_rule():
     )
     assert evaluate_rule(rule, request) is True
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "user"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
@@ -130,12 +130,12 @@ def test_evaluate_rule():
     )
     assert evaluate_rule(rule, request) is False
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"type": "image"},
         ),
@@ -143,12 +143,12 @@ def test_evaluate_rule():
     )
     assert evaluate_rule(rule, request) is False
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"type": "document"},
         ),
@@ -178,12 +178,12 @@ def test_evaluate_policy():
         default_effect=enums.PolicyEffect.DENY,
     )
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "admin"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),
@@ -194,12 +194,12 @@ def test_evaluate_policy():
     assert result.matched_rule is not None
     assert result.policy_name == "test-policy"
 
-    request = schemas.AccessRequest(
-        principal=schemas.PrincipalAccess(
+    request = schemas.CheckRequest(
+        principal=schemas.PrincipalCheck(
             type=enums.EntityType.principal,
             attributes={"role": "user"},
         ),
-        resource=schemas.ResourceAccess(
+        resource=schemas.ResourceCheck(
             type=enums.EntityType.resource,
             attributes={"name": "test-resource"},
         ),

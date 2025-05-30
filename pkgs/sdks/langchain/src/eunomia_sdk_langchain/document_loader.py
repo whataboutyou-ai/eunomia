@@ -20,8 +20,8 @@ class EunomiaLoader:
     ----------
     loader : BaseLoader
         The LangChain loader to wrap.
-    server_host : str, optional
-        The hostname of the Eunomia server.
+    endpoint : str, optional
+        The base URL endpoint of the Eunomia server.
     api_key : str, optional
         The API key to use for the Eunomia server, only required when the server is hosted on cloud.
 
@@ -34,11 +34,11 @@ class EunomiaLoader:
     def __init__(
         self,
         loader: BaseLoader,
-        server_host: str | None = None,
+        endpoint: str | None = None,
         api_key: str | None = None,
     ):
         self._loader = loader
-        self._client = EunomiaClient(server_host=server_host, api_key=api_key)
+        self._client = EunomiaClient(endpoint=endpoint, api_key=api_key)
 
     def _process_document_sync(
         self, doc: Document, additional_metadata: dict = {}
