@@ -103,6 +103,7 @@ nav:
           - TypeScript SDK: api/sdks/typescript.md
       - Extensions:
           - Eunomia Extensions: api/extensions/index.md
+          - MCP Authz Middleware: api/extensions/mcp.md
           - LangChain: api/extensions/langchain.md
   - Community:
       - Join the Community: community/index.md
