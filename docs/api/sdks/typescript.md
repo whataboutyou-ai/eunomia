@@ -53,7 +53,7 @@ const isAllowed = await client.check({
 });
 ```
 
-## SDK Docs
+## Docs
 
 ### EunomiaClient
 

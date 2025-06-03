@@ -51,6 +51,6 @@ is_allowed = client.check(
 )
 ```
 
-## SDK Docs
+## Docs
 
 ::: eunomia_sdk_python.client.EunomiaClient

@@ -27,7 +27,7 @@ class EunomiaRetriever(BaseRetriever):
     Examples
     --------
     >>> from eunomia_core import schemas
-    >>> from eunomia_sdk_langchain.retriever import EunomiaRetriever
+    >>> from eunomia_langchain.retriever import EunomiaRetriever
     >>> from langchain_community.retrievers import BM25Retriever
     >>> from langchain_core.documents import Document
     >>> retriever = BM25Retriever.from_documents(

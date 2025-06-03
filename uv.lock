@@ -10,7 +10,7 @@ resolution-markers = [
 members = [
     "eunomia-ai",
     "eunomia-core",
-    "eunomia-sdk-langchain",
+    "eunomia-langchain",
     "eunomia-sdk-python",
 ]
 
@@ -283,9 +283,9 @@ dependencies = [
 requires-dist = [{ name = "pydantic", specifier = ">=2.10.6" }]
 
 [[package]]
-name = "eunomia-sdk-langchain"
+name = "eunomia-langchain"
 version = "0.3.2"
-source = { editable = "pkgs/sdks/langchain" }
+source = { editable = "pkgs/extensions/langchain" }
 dependencies = [
     { name = "eunomia-sdk-python" },
     { name = "langchain" },
