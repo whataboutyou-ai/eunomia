@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-mcp"
-version = "0.3.2"
+version = "0.3.3"
 description = "Eunomia MCP authorization middleware"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
