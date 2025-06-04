@@ -28,6 +28,7 @@ class Condition(BaseModel):
 
 
 class Rule(BaseModel):
+    name: str = Field(..., description="Name of the rule")
     effect: PolicyEffect = Field(..., description="Effect when the rule matches")
     principal_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to principal"
@@ -48,6 +49,7 @@ class Rule(BaseModel):
 
 
 class Policy(BaseModel):
+    version: str = Field("1.0", description="Version of the policy")
     name: str = Field(..., description="Name of the policy")
     description: Optional[str] = Field(
         None, description="Human-readable description of the policy"

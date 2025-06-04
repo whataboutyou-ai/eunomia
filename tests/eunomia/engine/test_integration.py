@@ -15,10 +15,12 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     fixture_engine.add_policy(admin_policy)
 
     read_only_policy = schemas.Policy(
+        version="1.0",
         name="read-only-access",
         description="Users with read-only role can only access resources with 'public' visibility",
         rules=[
             schemas.Rule(
+                name="read-only-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

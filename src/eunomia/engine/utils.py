@@ -32,6 +32,7 @@ def create_attribute_condition(
 
 def create_simple_policy(
     name: str,
+    version: str = "1.0",
     description: Optional[str] = None,
     principal_attributes: Optional[dict[str, str]] = None,
     resource_attributes: Optional[dict[str, str]] = None,
@@ -46,6 +47,8 @@ def create_simple_policy(
     ----------
     name: str
         Name of the policy
+    version: str, optional
+        Version of the policy
     description: str, optional
         Optional description
     principal_attributes: dict[str, str], optional
@@ -76,6 +79,7 @@ def create_simple_policy(
             resource_conditions.append(create_attribute_condition(key, value))
 
     rule = schemas.Rule(
+        name="created-by-eunomia-engine",
         effect=effect,
         principal_conditions=principal_conditions,
         resource_conditions=resource_conditions,
@@ -83,5 +87,9 @@ def create_simple_policy(
     )
 
     return schemas.Policy(
-        name=name, description=description, rules=[rule], default_effect=default_effect
+        version=version,
+        name=name,
+        description=description,
+        rules=[rule],
+        default_effect=default_effect,
     )

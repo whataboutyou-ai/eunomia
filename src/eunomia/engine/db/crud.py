@@ -14,12 +14,15 @@ def create_policy(policy: schemas.Policy, db: Session) -> models.Policy:
         raise ValueError(f"Policy with name {policy.name} already exists")
 
     db_policy = models.Policy(
+        version=policy.version,
         name=policy.name,
         description=policy.description,
         default_effect=policy.default_effect,
     )
     for rule in policy.rules:
-        db_rule = models.Rule(effect=rule.effect, actions=json.dumps(rule.actions))
+        db_rule = models.Rule(
+            name=rule.name, effect=rule.effect, actions=json.dumps(rule.actions)
+        )
 
         for condition in rule.principal_conditions:
             db_condition = models.Condition(
