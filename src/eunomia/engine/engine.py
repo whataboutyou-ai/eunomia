@@ -56,9 +56,7 @@ class PolicyEngine:
 
         return results
 
-    def evaluate_all(
-        self, request: schemas.CheckRequest
-    ) -> schemas.PolicyEvaluationResult:
+    def evaluate_all(self, request: schemas.CheckRequest) -> schemas.CheckResponse:
         """
         Evaluate all policies and return a single result.
 
@@ -80,13 +78,22 @@ class PolicyEngine:
                 default_deny = result
 
         if explicit_deny:
-            return explicit_deny
+            return schemas.CheckResponse(
+                allowed=False,
+                reason=f"Rule {explicit_deny.matched_rule.name} denied the action in policy {explicit_deny.policy_name}",
+            )
         if explicit_allow:
-            return explicit_allow
+            return schemas.CheckResponse(
+                allowed=True,
+                reason=f"Rule {explicit_allow.matched_rule.name} allowed the action in policy {explicit_allow.policy_name}",
+            )
         if default_deny:
-            return default_deny
+            return schemas.CheckResponse(
+                allowed=False,
+                reason="Action denied by default effect",
+            )
 
-        # If no policies matched or there are no policies, deny by default
-        return schemas.PolicyEvaluationResult(
-            effect=enums.PolicyEffect.DENY, matched_rule=None, policy_name="default"
+        return schemas.CheckResponse(
+            allowed=False,
+            reason="Action denied by default because there are no policies",
         )

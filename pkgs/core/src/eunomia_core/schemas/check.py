@@ -47,3 +47,8 @@ class CheckRequest(BaseModel):
     action: str = Field(
         default="access", description="The action being performed on the resource"
     )
+
+
+class CheckResponse(BaseModel):
+    allowed: bool = Field(..., description="Whether the action is allowed")
+    reason: Optional[str] = Field(None, description="The reason for the decision")

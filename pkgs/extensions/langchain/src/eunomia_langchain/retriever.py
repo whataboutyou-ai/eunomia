@@ -65,14 +65,16 @@ class EunomiaRetriever(BaseRetriever):
                 resource_attributes=doc.metadata,
                 principal_uri=self._principal.uri,
                 principal_attributes=self._principal.attributes,
-            )
+            ).allowed
         ]
 
     def _get_relevant_documents(self, query: str) -> list[Document]:
         docs = self._retriever.invoke(query)
         return self._check_docs_access(docs)
 
-    async def _acheck_doc_access(self, doc: Document) -> tuple[Document, bool]:
+    async def _acheck_doc_access(
+        self, doc: Document
+    ) -> tuple[Document, schemas.CheckResponse]:
         return (
             doc,
             await asyncio.to_thread(
@@ -86,7 +88,7 @@ class EunomiaRetriever(BaseRetriever):
 
     async def _acheck_docs_access(self, docs: list[Document]) -> list[Document]:
         results = await asyncio.gather(*[self._acheck_doc_access(doc) for doc in docs])
-        return [doc for doc, is_allowed in results if is_allowed]
+        return [doc for doc, response in results if response.allowed]
 
     async def _aget_relevant_documents(self, query: str) -> list[Document]:
         docs = await self._retriever.ainvoke(query)

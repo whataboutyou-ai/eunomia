@@ -81,6 +81,14 @@ export interface CheckRequest {
 }
 
 /**
+ * Response from the server when a check request is made
+ */
+export interface CheckResponse {
+  allowed: boolean;
+  reason?: string;
+}
+
+/**
  * Represents a condition for policy evaluation
  */
 export interface Condition {

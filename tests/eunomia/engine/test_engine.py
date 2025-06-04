@@ -27,9 +27,8 @@ def test_evaluate_all_with_no_policies(
     fixture_engine: PolicyEngine, sample_access_request: schemas.CheckRequest
 ):
     result = fixture_engine.evaluate_all(sample_access_request)
-    assert result.effect == enums.PolicyEffect.DENY
-    assert result.matched_rule is None
-    assert result.policy_name == "default"
+    assert result.allowed is False
+    assert "default" in result.reason
 
 
 def test_evaluate_all_with_matching_policy(
@@ -39,9 +38,8 @@ def test_evaluate_all_with_matching_policy(
 ):
     fixture_engine.add_policy(sample_policy)
     result = fixture_engine.evaluate_all(sample_access_request)
-    assert result.effect == enums.PolicyEffect.ALLOW
-    assert result.matched_rule is not None
-    assert result.policy_name == "test-policy"
+    assert result.allowed is True
+    assert "test-policy" in result.reason
 
 
 def test_evaluate_all_with_non_matching_policy(
@@ -60,6 +58,4 @@ def test_evaluate_all_with_non_matching_policy(
     )
     fixture_engine.add_policy(sample_policy)
     result = fixture_engine.evaluate_all(non_matching_request)
-    assert result.effect == enums.PolicyEffect.DENY
-    assert result.matched_rule is None
-    assert result.policy_name == "test-policy"
+    assert result.allowed is False

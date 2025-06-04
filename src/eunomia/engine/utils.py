@@ -79,7 +79,7 @@ def create_simple_policy(
             resource_conditions.append(create_attribute_condition(key, value))
 
     rule = schemas.Rule(
-        name="created-by-eunomia-engine",
+        name=name,
         effect=effect,
         principal_conditions=principal_conditions,
         resource_conditions=resource_conditions,

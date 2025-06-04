@@ -1,5 +1,6 @@
 from .check import (
     CheckRequest,
+    CheckResponse,
     EntityCheck,
     PrincipalCheck,
     ResourceCheck,
@@ -15,6 +16,7 @@ from .policy import Condition, Policy, PolicyEvaluationResult, Rule
 
 __all__ = [
     "CheckRequest",
+    "CheckResponse",
     "EntityCheck",
     "PrincipalCheck",
     "ResourceCheck",
