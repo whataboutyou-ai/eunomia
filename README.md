@@ -58,15 +58,20 @@ eunomia server
 
 Check out the [quickstart example][docs-quickstart] in the documentation for a fully working example.
 
-## Eunomia SDKs
+## Other Eunomia packages
 
-Different packages are available in this repository for an easier interaction with the server. These packages make the integration of Eunomia inside your AI application as seamless as possible within your favorite development framework.
+### Eunomia SDKs
 
-The following integrations are currently available:
+To interact with the server from your code, you can use the following SDKs:
 
 - [Python][sdk-python-github]
 - [Typescript][sdk-typescript-github]
-- [LangChain][sdk-langchain-github]
+
+### Eunomia Extensions
+
+Eunomia provides extensions for the following frameworks:
+
+- [LangChain][extension-langchain-github]
 - ...and more coming soon!
 
 ## Documentation
@@ -117,7 +122,7 @@ curl -X POST "http://localhost:8000/check/bulk" \
 [docs]: https://whataboutyou-ai.github.io/eunomia/
 [docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [sdk-python-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/python
-[sdk-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/langchain
+[extension-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/langchain
 [sdk-typescript-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/typescript
 [pypi]: https://pypi.python.org/pypi/eunomia-ai
 [pypi-badge]: https://img.shields.io/pypi/v/eunomia-ai.svg

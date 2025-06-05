@@ -24,4 +24,6 @@ This page documents the schema classes used in Eunomia Core for data validation 
 
 ::: eunomia_core.schemas.CheckRequest
 
+::: eunomia_core.schemas.CheckResponse
+
 ::: eunomia_core.schemas.Policy

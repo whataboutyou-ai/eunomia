@@ -51,7 +51,7 @@ class EunomiaClient:
         principal_attributes: dict = {},
         resource_attributes: dict = {},
         action: str = "access",
-    ) -> bool:
+    ) -> schemas.CheckResponse:
         """
         Check whether a principal has permissions to perform an action on a specific resource.
 
@@ -70,8 +70,8 @@ class EunomiaClient:
 
         Returns
         -------
-        bool
-            True if the principal has permissions to perform the action on the resource, False otherwise.
+        schemas.CheckResponse
+            The response containing the allowed flag and the reason for the decision.
 
         Raises
         ------
@@ -89,9 +89,11 @@ class EunomiaClient:
         )
         response = self.client.post("/check", json=request.model_dump())
         self._handle_response(response)
-        return bool(response.json())
+        return schemas.CheckResponse.model_validate(response.json())
 
-    def bulk_check(self, check_requests: list[schemas.CheckRequest]) -> list[bool]:
+    def bulk_check(
+        self, check_requests: list[schemas.CheckRequest]
+    ) -> list[schemas.CheckResponse]:
         """
         Perform a set of permission checks in a single request.
 
@@ -102,7 +104,7 @@ class EunomiaClient:
 
         Returns
         -------
-        list[bool]
+        list[schemas.CheckResponse]
             The list of results of the check requests.
         """
         response = self.client.post(
@@ -113,7 +115,9 @@ class EunomiaClient:
             ],
         )
         self._handle_response(response)
-        return [bool(result) for result in response.json()]
+        return [
+            schemas.CheckResponse.model_validate(result) for result in response.json()
+        ]
 
     def register_entity(
         self, type: enums.EntityType, attributes: dict, uri: str | None = None

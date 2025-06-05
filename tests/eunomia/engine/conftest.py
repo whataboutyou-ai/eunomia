@@ -58,10 +58,12 @@ def fixture_engine(monkeypatch):
 def sample_policy():
     """Create a sample policy for testing."""
     return schemas.Policy(
+        version="1.0",
         name="test-policy",
         description="Test policy",
         rules=[
             schemas.Rule(
+                name="test-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

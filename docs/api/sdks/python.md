@@ -45,12 +45,14 @@ principal = client.register_entity(
     )
 
 # Check if a principal has permissions to perform an action on a resource
-is_allowed = client.check(
+response = client.check(
     principal_uri=principal.uri,
     resource_uri=resource.uri
 )
+
+print(f"Is allowed: {response.allowed}")
 ```
 
-## SDK Docs
+## Docs
 
 ::: eunomia_sdk_python.client.EunomiaClient

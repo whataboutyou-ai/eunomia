@@ -24,12 +24,12 @@ You can then call any server endpoint through the client. For example, you can c
 
 ```typescript
 async function check() {
-  const isAllowed = await client.check({
+  const response = await client.check({
     principalAttributes: { role: "admin" },
     resourceAttributes: { type: "confidential" },
   });
 
-  console.log(`Is allowed: ${isAllowed}`);
+  console.log(`Is allowed: ${response.allowed}`);
 }
 ```
 

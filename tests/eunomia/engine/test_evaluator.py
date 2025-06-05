@@ -86,6 +86,7 @@ def test_evaluate_conditions():
 
 def test_evaluate_rule():
     rule = schemas.Rule(
+        name="test-rule",
         effect=enums.PolicyEffect.ALLOW,
         principal_conditions=[
             schemas.Condition(
@@ -159,10 +160,12 @@ def test_evaluate_rule():
 
 def test_evaluate_policy():
     policy = schemas.Policy(
+        version="1.0",
         name="test-policy",
         description="Test policy",
         rules=[
             schemas.Rule(
+                name="test-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

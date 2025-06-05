@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import {
   CheckRequest,
+  CheckResponse,
   EntityCreate,
   EntityInDb,
   EntityType,
@@ -78,7 +79,7 @@ export class EunomiaClient {
     principalAttributes?: Record<string, string>;
     resourceAttributes?: Record<string, string>;
     action?: string;
-  }): Promise<boolean> {
+  }): Promise<CheckResponse> {
     const request: CheckRequest = {
       principal: {
         uri: options.principalUri,
@@ -94,7 +95,7 @@ export class EunomiaClient {
     };
 
     try {
-      const response = await this.client.post<boolean>(
+      const response = await this.client.post<CheckResponse>(
         "/check",
         request,
       );

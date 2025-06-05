@@ -47,13 +47,15 @@ const principal = await client.registerEntity({
 });
 
 // Check if a principal has permissions to perform an action on a resource
-const isAllowed = await client.check({
+const response = await client.check({
   principalUri: principal.uri,
   resourceUri: resource.uri,
 });
+
+console.log(`Is allowed: ${response.allowed}`);
 ```
 
-## SDK Docs
+## Docs
 
 ### EunomiaClient
 

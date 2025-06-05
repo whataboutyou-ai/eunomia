@@ -10,11 +10,11 @@ def server_router_factory(server: EunomiaServer) -> APIRouter:
     router = APIRouter()
     batch_processor = BatchProcessor(batch_size=settings.BULK_CHECK_BATCH_SIZE)
 
-    @router.post("/check", response_model=bool)
+    @router.post("/check", response_model=schemas.CheckResponse)
     async def check(request: schemas.CheckRequest):
         return await server.check(request)
 
-    @router.post("/check/bulk", response_model=list[bool])
+    @router.post("/check/bulk", response_model=list[schemas.CheckResponse])
     async def bulk_check(requests: list[schemas.CheckRequest]):
         if not requests:
             raise HTTPException(

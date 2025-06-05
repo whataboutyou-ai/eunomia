@@ -12,6 +12,7 @@ class Policy(db.Base):
     __tablename__ = "policies"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    version: Mapped[str]
     name: Mapped[str] = mapped_column(unique=True)
     description: Mapped[Optional[str]]
     default_effect: Mapped[enums.PolicyEffect]
@@ -27,6 +28,7 @@ class Rule(db.Base):
     __tablename__ = "rules"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
     policy_id: Mapped[int] = mapped_column(ForeignKey(Policy.id))
     effect: Mapped[enums.PolicyEffect]
     actions: Mapped[list[str]] = mapped_column(JSON)

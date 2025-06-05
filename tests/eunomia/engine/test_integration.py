@@ -15,10 +15,12 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     fixture_engine.add_policy(admin_policy)
 
     read_only_policy = schemas.Policy(
+        version="1.0",
         name="read-only-access",
         description="Users with read-only role can only access resources with 'public' visibility",
         rules=[
             schemas.Rule(
+                name="read-only-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
@@ -54,9 +56,8 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     )
 
     admin_result = fixture_engine.evaluate_all(admin_request)
-    assert admin_result.effect == enums.PolicyEffect.ALLOW
-    assert admin_result.matched_rule is not None
-    assert admin_result.policy_name == "admin-access"
+    assert admin_result.allowed is True
+    assert "admin-access" in admin_result.reason
 
     readonly_public_request = schemas.CheckRequest(
         principal=schemas.PrincipalCheck(
@@ -71,9 +72,8 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     )
 
     readonly_public_result = fixture_engine.evaluate_all(readonly_public_request)
-    assert readonly_public_result.effect == enums.PolicyEffect.ALLOW
-    assert readonly_public_result.matched_rule is not None
-    assert readonly_public_result.policy_name == "read-only-access"
+    assert readonly_public_result.allowed is True
+    assert "read-only-access" in readonly_public_result.reason
 
     readonly_private_request = schemas.CheckRequest(
         principal=schemas.PrincipalCheck(
@@ -88,6 +88,4 @@ def test_role_based_access(fixture_engine: PolicyEngine):
     )
 
     readonly_private_result = fixture_engine.evaluate_all(readonly_private_request)
-    assert readonly_private_result.effect == enums.PolicyEffect.DENY
-    assert readonly_private_result.matched_rule is None
-    assert readonly_private_result.policy_name == "read-only-access"
+    assert readonly_private_result.allowed is False
