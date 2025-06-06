@@ -12,8 +12,12 @@ def engine_router_factory(engine: PolicyEngine) -> APIRouter:
         return engine.get_policies()
 
     @router.post("/policies", response_model=schemas.Policy)
-    async def create_policy(request: schemas.CheckRequest, name: str):
-        # we only support simple policy creation via the API
+    async def create_policy(request: schemas.Policy):
+        engine.add_policy(request)
+        return request
+
+    @router.post("/policies/simple", response_model=schemas.Policy)
+    async def create_simple_policy(request: schemas.CheckRequest, name: str):
         policy = utils.create_simple_policy(
             name=name,
             principal_attributes=request.principal.attributes,
@@ -32,8 +36,6 @@ def engine_router_factory(engine: PolicyEngine) -> APIRouter:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Policy not found"
             )
         return policy
-
-    # @router.put("/policies/{name}", response_model=schemas.Policy)
 
     @router.delete("/policies/{name}", response_model=bool)
     async def delete_policy(name: str):

@@ -111,6 +111,29 @@ export class EunomiaClient {
   }
 
   /**
+   * Perform a set of permission checks in a single request.
+   *
+   * @param checkRequests - The list of check requests to perform
+   * @returns A promise that resolves to the list of results of the check requests
+   */
+  async bulkCheck(checkRequests: CheckRequest[]): Promise<CheckResponse[]> {
+    try {
+      const response = await this.client.post<CheckResponse[]>(
+        "/check/bulk",
+        checkRequests,
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Register a new entity with the Eunomia server.
    *
    * @param options - Options for registering the entity
@@ -209,14 +232,41 @@ export class EunomiaClient {
   /**
    * Create a new policy and store it in the Eunomia server.
    *
+   * @param policy - The policy to create
+   * @param name - The name of the policy
+   * @returns A promise that resolves to the created policy
+   */
+  async createPolicy(policy: Policy, name: string): Promise<Policy> {
+    try {
+      const response = await this.client.post<Policy>(
+        "/policies",
+        policy,
+        {
+          params: { name },
+        },
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new simple policy with a single rule and store it in the Eunomia server.
+   *
    * @param request - The check request to create the policy from
    * @param name - The name of the policy
    * @returns A promise that resolves to the created policy
    */
-  async createPolicy(request: CheckRequest, name: string): Promise<Policy> {
+  async createSimplePolicy(request: CheckRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
-        "/policies",
+        "/policies/simple",
         request,
         {
           params: { name },

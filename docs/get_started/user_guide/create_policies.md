@@ -2,7 +2,7 @@ To enforce access control, you need to create policies that specify the rules fo
 
 ## Create a Policy
 
-You can create policies using the **`POST /policies`** endpoint. The policy will be stored in the database specified in the **`ENGINE_SQL_DATABASE_URL`** environment variable.
+You can create policies using the **`POST /policies/simple`** endpoint. The policy will be stored in the database specified in the **`ENGINE_SQL_DATABASE_URL`** environment variable.
 
 Your request JSON payload should include a rule defined by the **`CheckRequest`** schema, which includes:
 
@@ -17,7 +17,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 
     eunomia = EunomiaClient()
 
-    policy = eunomia.create_policy(
+    policy = eunomia.create_simple_policy(
         CheckRequest(
             principal=PrincipalCheck(attributes={"department": "it"}),
             resource=ResourceCheck(attributes={"agent-id": "it-desk-agent"}),
@@ -32,7 +32,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/policies?name=it-desk-policy' \
+    curl -X POST 'http://localhost:8000/policies/simple?name=it-desk-policy' \
     -H "Content-Type: application/json" \
     -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
     ```

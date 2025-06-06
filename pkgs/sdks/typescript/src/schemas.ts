@@ -101,6 +101,7 @@ export interface Condition {
  * Represents a rule in a policy
  */
 export interface Rule {
+  name: string;
   effect: PolicyEffect;
   principal_conditions: Condition[];
   resource_conditions: Condition[];
@@ -111,6 +112,7 @@ export interface Rule {
  * Represents a policy with a list of rules
  */
 export interface Policy {
+  version: string;
   name: string;
   description?: string;
   rules: Rule[];

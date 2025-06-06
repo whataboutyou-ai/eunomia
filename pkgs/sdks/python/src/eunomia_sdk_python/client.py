@@ -208,9 +208,33 @@ class EunomiaClient:
         self._handle_response(response)
         return response.json()
 
-    def create_policy(self, request: schemas.CheckRequest, name: str) -> schemas.Policy:
+    def create_policy(self, request: schemas.Policy, name: str) -> schemas.Policy:
         """
         Create a new policy and store it in the Eunomia server.
+
+        Parameters
+        ----------
+        request : schemas.Policy
+            The policy to create.
+        name : str
+            The name of the policy.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        response = self.client.post(
+            "/policies", json=request.model_dump(), params={"name": name}
+        )
+        self._handle_response(response)
+        return schemas.Policy.model_validate(response.json())
+
+    def create_simple_policy(
+        self, request: schemas.CheckRequest, name: str
+    ) -> schemas.Policy:
+        """
+        Create a new simple policy with a single rule and store it in the Eunomia server.
 
         Parameters
         ----------
@@ -225,7 +249,7 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         response = self.client.post(
-            "/policies", json=request.model_dump(), params={"name": name}
+            "/policies/simple", json=request.model_dump(), params={"name": name}
         )
         self._handle_response(response)
         return schemas.Policy.model_validate(response.json())
