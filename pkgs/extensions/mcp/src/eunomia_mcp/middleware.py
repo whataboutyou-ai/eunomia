@@ -1,3 +1,4 @@
+import fnmatch
 import json
 import logging
 from typing import Any, Optional
@@ -27,19 +28,19 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         app,
         eunomia_client: Optional[EunomiaClient] = None,
         enable_audit_logging: bool = True,
-        bypass_paths: Optional[list[str]] = None,
+        bypass_methods: Optional[list[str]] = None,
     ):
         super().__init__(app)
         self._eunomia_client = eunomia_client or EunomiaClient()
         self._enable_audit_logging = enable_audit_logging
-        self._bypass_paths = bypass_paths or ["/health", "/status", "/docs"]
+        self._bypass_methods = bypass_methods or [
+            "initialize",
+            "notifications/*",
+            "*/list",
+        ]
 
     async def dispatch(self, request: Request, call_next) -> Response:
         """Main middleware dispatch method."""
-
-        # Skip authorization for bypass paths
-        if any(request.url.path.startswith(path) for path in self._bypass_paths):
-            return await call_next(request)
 
         # Only process JSON-RPC requests
         if not self._is_jsonrpc_request(request):
@@ -62,6 +63,13 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
                     data=f"Invalid JSON-RPC 2.0 format: {str(e)}",
                 )
             ).as_starlette_json_response()
+
+        # Skip authorization for bypass methods
+        if any(
+            fnmatch.fnmatch(jsonrpc_request.method, pattern)
+            for pattern in self._bypass_methods
+        ):
+            return await call_next(request)
 
         # Perform authorization check
         auth_result = await self._authorize_request(jsonrpc_request, request)
