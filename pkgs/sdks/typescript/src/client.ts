@@ -144,7 +144,7 @@ export class EunomiaClient {
    */
   async registerEntity(options: {
     type: EntityType;
-    attributes: Record<string, string>;
+    attributes: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     uri?: string;
   }): Promise<EntityInDb> {
     const entity: EntityCreate = {
@@ -180,7 +180,7 @@ export class EunomiaClient {
    */
   async updateEntity(options: {
     uri: string;
-    attributes: Record<string, string>;
+    attributes: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     override?: boolean;
   }): Promise<EntityInDb> {
     const entity: EntityUpdate = {

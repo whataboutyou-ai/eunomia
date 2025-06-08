@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Optional
 
 from eunomia_core import enums
 from sqlalchemy import JSON, ForeignKey, func
@@ -38,13 +38,13 @@ class Rule(db.Base):
     policy: Mapped["Policy"] = relationship(back_populates="rules")
     principal_conditions: Mapped[list["Condition"]] = relationship(
         foreign_keys="[Condition.rule_id, Condition.entity_type]",
-        primaryjoin="and_(Rule.id==Condition.rule_id, Condition.entity_type=='principal')",
+        primaryjoin=f"and_(Rule.id==Condition.rule_id, Condition.entity_type=='{enums.EntityType.principal.value}')",
         cascade="all, delete-orphan",
         overlaps="resource_conditions",
     )
     resource_conditions: Mapped[list["Condition"]] = relationship(
         foreign_keys="[Condition.rule_id, Condition.entity_type]",
-        primaryjoin="and_(Rule.id==Condition.rule_id, Condition.entity_type=='resource')",
+        primaryjoin=f"and_(Rule.id==Condition.rule_id, Condition.entity_type=='{enums.EntityType.resource.value}')",
         cascade="all, delete-orphan",
         overlaps="principal_conditions",
     )
@@ -55,7 +55,7 @@ class Condition(db.Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     rule_id: Mapped[int] = mapped_column(ForeignKey(Rule.id))
-    entity_type: Mapped[Literal["principal", "resource"]]
+    entity_type: Mapped[enums.EntityType]
     path: Mapped[str]
     operator: Mapped[enums.ConditionOperator]
     value: Mapped[Any] = mapped_column(JSON)

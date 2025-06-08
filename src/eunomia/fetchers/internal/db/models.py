@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import Any
 
 from eunomia_core import enums
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import JSON, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from eunomia.fetchers.internal.db import db
@@ -25,7 +26,7 @@ class Attribute(db.Base):
 
     entity_uri: Mapped[str] = mapped_column(ForeignKey(Entity.uri), primary_key=True)
     key: Mapped[str] = mapped_column(primary_key=True)
-    value: Mapped[str]
+    value: Mapped[Any] = mapped_column(JSON)
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
     )
