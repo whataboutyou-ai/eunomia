@@ -107,18 +107,20 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         """Perform authorization check using Eunomia."""
         try:
             # Extract principal information
-            principal_info = self._extract_principal_info(request)
+            principal_uri, principal_attributes = self._extract_principal_info(request)
 
-            # Map MCP method to resource/action
+            # Map MCP method to action and resource
             params = jsonrpc_request.get_dict_params()
-            resource_info = self._map_method_to_resource(jsonrpc_request.method, params)
+            action, resource_uri, resource_attributes = (
+                self._map_method_to_action_and_resource(jsonrpc_request.method, params)
+            )
 
             return self._eunomia_client.check(
-                principal_uri=principal_info.get("uri"),
-                principal_attributes=principal_info.get("attributes", {}),
-                resource_uri=resource_info.get("uri"),
-                resource_attributes=resource_info.get("attributes", {}),
-                action=resource_info.get("action", "access"),
+                principal_uri=principal_uri,
+                principal_attributes=principal_attributes,
+                resource_uri=resource_uri,
+                resource_attributes=resource_attributes,
+                action=action,
             )
 
         except Exception as e:
@@ -127,9 +129,10 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
                 allowed=False, reason=f"Authorization system error: {str(e)}"
             )
 
-    def _extract_principal_info(self, request: Request) -> dict[str, Any]:
+    def _extract_principal_info(self, request: Request) -> tuple[str, dict[str, Any]]:
         """Extract principal information from request."""
-        principal_info = {"attributes": {}}
+        uri = None
+        attributes = {}
 
         # Extract from custom headers
         agent_id = request.headers.get("X-Agent-ID")
@@ -137,82 +140,64 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         api_key = request.headers.get("Authorization")
 
         if agent_id:
-            principal_info["uri"] = f"agent:{agent_id}"
-            principal_info["attributes"]["agent_id"] = agent_id
+            uri = f"agent:{agent_id}"
+            attributes["agent_id"] = agent_id
 
         if user_id:
-            principal_info["attributes"]["user_id"] = user_id
+            attributes["user_id"] = user_id
 
         if api_key:
-            principal_info["attributes"]["api_key"] = api_key.replace("Bearer ", "")
+            attributes["api_key"] = api_key.replace("Bearer ", "")
 
         # Default fallback
-        if not principal_info.get("uri"):
-            principal_info["uri"] = "agent:unknown"
-            principal_info["attributes"]["type"] = "unknown_agent"
+        if not uri:
+            uri = "agent:unknown"
+            attributes["type"] = "unknown_agent"
 
-        return principal_info
+        return uri, attributes
 
-    def _map_method_to_resource(
+    def _map_method_to_action_and_resource(
         self, method: str, params: dict[str, Any]
-    ) -> dict[str, Any]:
+    ) -> tuple[str, str, dict[str, Any]]:
         """Map MCP JSON-RPC method to Eunomia resource/action."""
-        default_attributes = {"mcp_method": method, "type": "mcp_resource"}
+        known_methods = [
+            "tools/list",
+            "prompts/list",
+            "resources/list",
+            "tools/call",
+            "resources/read",
+            "prompts/get",
+        ]
 
-        tool_name = params.get("name") if method == "tools/call" else ""
-        resource_uri = params.get("uri") if method == "resources/read" else ""
-        prompt_name = params.get("name") if method == "prompts/get" else ""
+        if method in known_methods:
+            resource_type = method.split("/")[0]
+            uri = f"mcp:{resource_type}"
+        else:
+            resource_type = "unknown"
+            uri = f"mcp:method:{method}"
 
-        methods_mapping = {
-            "tools/list": {
-                "action": "access",
-                "uri": "mcp:tools",
-                "attributes": {"resource_type": "tools"},
-            },
-            "tools/call": {
-                "action": "execute",
-                "uri": f"mcp:tools:{tool_name}",
-                "attributes": {
-                    "resource_type": "tools",
-                    "tool_name": tool_name,
-                },
-            },
-            "resources/list": {
-                "action": "access",
-                "uri": "mcp:resources",
-                "attributes": {"resource_type": "resources"},
-            },
-            "resources/read": {
-                "action": "read",
-                "uri": f"mcp:resources:{resource_uri}",
-                "attributes": {
-                    "resource_type": "resources",
-                    "resource_uri": resource_uri,
-                },
-            },
-            "prompts/list": {
-                "action": "access",
-                "uri": "mcp:prompts",
-                "attributes": {"resource_type": "prompts"},
-            },
-            "prompts/get": {
-                "action": "read",
-                "uri": f"mcp:prompts:{prompt_name}",
-                "attributes": {
-                    "resource_type": "prompts",
-                    "prompt_name": prompt_name,
-                },
-            },
-            "other": {
-                "action": "access",
-                "uri": f"mcp:method:{method}",
-                "attributes": {"resource_type": "other"},
-            },
+        action = "access"
+        attributes = {
+            "type": "mcp_resource",
+            "mcp_method": method,
+            "resource_type": resource_type,
+            "arguments": params.get("arguments", {}),
         }
 
-        resource_info = methods_mapping.get(method, methods_mapping["other"])
-        resource_info["attributes"].update(default_attributes)
-        return resource_info
+        if method == "tools/call":
+            action = "execute"
+            uri = uri + f":{params.get('name')}"
+            attributes["tool_name"] = params.get("name")
+        elif method == "resources/read":
+            action = "read"
+            uri = uri + f":{params.get('uri')}"
+            attributes["resource_uri"] = params.get("uri")
+        elif method == "prompts/get":
+            action = "read"
+            uri = uri + f":{params.get('name')}"
+            attributes["prompt_name"] = params.get("name")
+
+        return action, uri, attributes
 
     def _log_violation(
         self, request: Request, jsonrpc_request: JsonRpcRequest, reason: str
