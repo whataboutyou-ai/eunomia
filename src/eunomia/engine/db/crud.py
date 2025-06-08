@@ -1,6 +1,6 @@
 import json
 
-from eunomia_core import schemas
+from eunomia_core import enums, schemas
 from sqlalchemy.orm import Session
 
 from eunomia.engine.db import models
@@ -26,7 +26,7 @@ def create_policy(policy: schemas.Policy, db: Session) -> models.Policy:
 
         for condition in rule.principal_conditions:
             db_condition = models.Condition(
-                entity_type="principal",
+                entity_type=enums.EntityType.principal,
                 path=condition.path,
                 operator=condition.operator,
                 value=json.dumps(condition.value),
@@ -35,7 +35,7 @@ def create_policy(policy: schemas.Policy, db: Session) -> models.Policy:
 
         for condition in rule.resource_conditions:
             db_condition = models.Condition(
-                entity_type="resource",
+                entity_type=enums.EntityType.resource,
                 path=condition.path,
                 operator=condition.operator,
                 value=json.dumps(condition.value),

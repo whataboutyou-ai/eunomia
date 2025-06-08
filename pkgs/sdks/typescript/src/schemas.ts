@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ConditionOperator, EntityType, PolicyEffect } from "./enums";
 
 /**
@@ -5,7 +6,7 @@ import { ConditionOperator, EntityType, PolicyEffect } from "./enums";
  */
 export interface Attribute {
   key: string;
-  value: string;
+  value: any;
 }
 
 /**
@@ -20,22 +21,23 @@ export interface AttributeInDb extends Attribute {
  * Base interface for all entity types
  */
 export interface EntityBase {
-  uri?: string;
+  uri: string;
+  attributes: Record<string, any>;
   type: EntityType;
-  attributes: Record<string, string>;
 }
 
 /**
  * Request body for creating a new entity
  */
-export interface EntityCreate extends EntityBase { }
+export interface EntityCreate extends Omit<EntityBase, "uri"> {
+  uri?: string;
+}
 
 /**
  * Request body for updating an existing entity
  */
-export interface EntityUpdate {
-  uri: string;
-  attributes: Record<string, string>;
+export interface EntityUpdate extends Omit<EntityBase, "type"> {
+  type?: EntityType;
 }
 
 /**
@@ -53,7 +55,7 @@ export interface EntityInDb {
  */
 export interface EntityCheck {
   uri?: string;
-  attributes: Record<string, string>;
+  attributes?: Record<string, any>;
   type: EntityType;
 }
 
@@ -77,7 +79,7 @@ export interface PrincipalCheck extends EntityCheck {
 export interface CheckRequest {
   principal: PrincipalCheck;
   resource: ResourceCheck;
-  action?: string;
+  action: string;
 }
 
 /**
@@ -94,13 +96,14 @@ export interface CheckResponse {
 export interface Condition {
   path: string;
   operator: ConditionOperator;
-  value: string;
+  value: any;
 }
 
 /**
  * Represents a rule in a policy
  */
 export interface Rule {
+  name: string;
   effect: PolicyEffect;
   principal_conditions: Condition[];
   resource_conditions: Condition[];
@@ -111,6 +114,7 @@ export interface Rule {
  * Represents a policy with a list of rules
  */
 export interface Policy {
+  version: string;
   name: string;
   description?: string;
   rules: Rule[];
