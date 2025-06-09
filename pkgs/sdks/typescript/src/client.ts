@@ -278,4 +278,43 @@ export class EunomiaClient {
       throw error;
     }
   }
+
+  /**
+   * Get all policies from the Eunomia server.
+   *
+   * @returns A promise that resolves to the list of all policies
+   */
+  async getPolicies(): Promise<Policy[]> {
+    try {
+      const response = await this.client.get<Policy[]>("/policies");
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a policy from the Eunomia server.
+   *
+   * @param name - The name of the policy to delete
+   * @returns A promise that resolves to true if the policy was successfully deleted
+   */
+  async deletePolicy(name: string): Promise<boolean> {
+    try {
+      const response = await this.client.delete<boolean>(`/policies/${name}`);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
 }
