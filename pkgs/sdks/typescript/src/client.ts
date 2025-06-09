@@ -233,17 +233,13 @@ export class EunomiaClient {
    * Create a new policy and store it in the Eunomia server.
    *
    * @param policy - The policy to create
-   * @param name - The name of the policy
    * @returns A promise that resolves to the created policy
    */
-  async createPolicy(policy: Policy, name: string): Promise<Policy> {
+  async createPolicy(policy: Policy): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
         "/policies",
         policy,
-        {
-          params: { name },
-        },
       );
       return this.handleResponse(response);
     } catch (error) {
