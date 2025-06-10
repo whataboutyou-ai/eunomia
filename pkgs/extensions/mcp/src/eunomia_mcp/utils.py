@@ -15,29 +15,21 @@ def create_eunomia_middleware(
     """
     Create Eunomia authorization middleware for FastMCP servers.
 
-    Args:
-        eunomia_endpoint: Eunomia server endpoint (defaults to localhost:8000)
-        eunomia_api_key: API key for Eunomia server (or set WAY_API_KEY env var)
-        enable_audit_logging: Whether to enable audit logging
-        bypass_methods: List of methods to bypass authorization
+    Parameters
+    ----------
+    eunomia_endpoint : str, optional
+        Eunomia server endpoint (defaults to localhost:8000)
+    eunomia_api_key : str, optional
+        API key for Eunomia server (or set WAY_API_KEY env var)
+    enable_audit_logging : bool, optional
+        Whether to enable audit logging
+    bypass_methods : list[str], optional
+        List of methods to bypass authorization
 
-    Returns:
+    Returns
+    -------
+    Middleware
         Starlette Middleware instance ready for FastMCP
-
-    Example:
-        ```python
-        from fastmcp import FastMCP
-        from eunomia_mcp import create_eunomia_middleware
-
-        # Create FastMCP server
-        mcp = FastMCP("MyServer")
-
-        # Add Eunomia middleware
-        middleware = [create_eunomia_middleware()]
-
-        # Create ASGI app with middleware
-        app = mcp.http_app(middleware=middleware)
-        ```
     """
     client = EunomiaClient(endpoint=eunomia_endpoint, api_key=eunomia_api_key)
 
