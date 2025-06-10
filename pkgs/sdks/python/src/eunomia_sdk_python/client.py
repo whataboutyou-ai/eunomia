@@ -208,9 +208,29 @@ class EunomiaClient:
         self._handle_response(response)
         return response.json()
 
-    def create_policy(self, request: schemas.CheckRequest, name: str) -> schemas.Policy:
+    def create_policy(self, request: schemas.Policy) -> schemas.Policy:
         """
         Create a new policy and store it in the Eunomia server.
+
+        Parameters
+        ----------
+        request : schemas.Policy
+            The policy to create.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        response = self.client.post("/policies", json=request.model_dump())
+        self._handle_response(response)
+        return schemas.Policy.model_validate(response.json())
+
+    def create_simple_policy(
+        self, request: schemas.CheckRequest, name: str
+    ) -> schemas.Policy:
+        """
+        Create a new simple policy with a single rule and store it in the Eunomia server.
 
         Parameters
         ----------
@@ -225,7 +245,48 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         response = self.client.post(
-            "/policies", json=request.model_dump(), params={"name": name}
+            "/policies/simple", json=request.model_dump(), params={"name": name}
         )
         self._handle_response(response)
         return schemas.Policy.model_validate(response.json())
+
+    def get_policies(self) -> list[schemas.Policy]:
+        """
+        Get all policies from the Eunomia server.
+
+        Returns
+        -------
+        list[schemas.Policy]
+            The list of all policies.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        response = self.client.get("/policies")
+        self._handle_response(response)
+        return [schemas.Policy.model_validate(policy) for policy in response.json()]
+
+    def delete_policy(self, name: str) -> bool:
+        """
+        Delete a policy from the Eunomia server.
+
+        Parameters
+        ----------
+        name : str
+            The name of the policy to delete.
+
+        Returns
+        -------
+        bool
+            True if the policy was successfully deleted.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        response = self.client.delete(f"/policies/{name}")
+        self._handle_response(response)
+        return response.json()

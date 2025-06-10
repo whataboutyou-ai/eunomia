@@ -85,7 +85,12 @@ def test_db_policy_to_schema(fixture_db: Session):
                         path="attributes.type",
                         operator=enums.ConditionOperator.EQUALS,
                         value={"foo": {"bar": 123}},
-                    )
+                    ),
+                    schemas.Condition(
+                        path="attributes.list",
+                        operator=enums.ConditionOperator.CONTAINS,
+                        value=[1, 2, "foo", "bar"],
+                    ),
                 ],
                 actions=["read", "write"],
             )

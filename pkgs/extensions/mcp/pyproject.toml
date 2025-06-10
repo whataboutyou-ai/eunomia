@@ -8,7 +8,15 @@ authors = [
 license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "eunomia-sdk-python>=0.3.3",
+    "pydantic>=2.10.6",
+    "starlette>=0.45.3",
+    "typer>=0.15.2",
+]
+
+[project.scripts]
+eunomia-mcp = "eunomia_mcp.cli:app"
 
 [build-system]
 requires = ["hatchling"]

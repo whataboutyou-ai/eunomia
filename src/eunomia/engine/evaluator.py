@@ -35,23 +35,36 @@ def apply_operator(
     if value is None or target is None:
         return False
 
+    if operator_type == enums.ConditionOperator.EQUALS:
+        return value == target
+    elif operator_type == enums.ConditionOperator.NOT_EQUALS:
+        return value != target
+
     if isinstance(value, str) and isinstance(target, str):
-        if operator_type == enums.ConditionOperator.EQUALS:
-            return value == target
-        elif operator_type == enums.ConditionOperator.NOT_EQUALS:
-            return value != target
-        elif operator_type == enums.ConditionOperator.CONTAINS:
+        if operator_type == enums.ConditionOperator.CONTAINS:
             return value in target
+        elif operator_type == enums.ConditionOperator.NOT_CONTAINS:
+            return value not in target
         elif operator_type == enums.ConditionOperator.STARTS_WITH:
             return target.startswith(value)
         elif operator_type == enums.ConditionOperator.ENDS_WITH:
             return target.endswith(value)
 
-    # For non-string types, only equality operators make sense
-    if operator_type == enums.ConditionOperator.EQUALS:
-        return value == target
-    elif operator_type == enums.ConditionOperator.NOT_EQUALS:
-        return value != target
+    elif isinstance(value, (int, float)) and isinstance(target, (int, float)):
+        if operator_type == enums.ConditionOperator.GREATER:
+            return value > target
+        elif operator_type == enums.ConditionOperator.GREATER_OR_EQUAL:
+            return value >= target
+        elif operator_type == enums.ConditionOperator.LESS:
+            return value < target
+        elif operator_type == enums.ConditionOperator.LESS_OR_EQUAL:
+            return value <= target
+
+    elif isinstance(value, list):
+        if operator_type == enums.ConditionOperator.IN:
+            return target in value
+        elif operator_type == enums.ConditionOperator.NOT_IN:
+            return target not in value
 
     return False
 

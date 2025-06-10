@@ -1,5 +1,6 @@
+import json
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -9,7 +10,17 @@ from eunomia_core.utils import generate_uri
 
 class Attribute(BaseModel):
     key: str = Field(..., description="Attribute key")
-    value: str = Field(..., description="Attribute value")
+    value: Any = Field(..., description="Attribute value")
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def parse_json(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return v
+        return v
 
 
 class AttributeInDb(Attribute):
@@ -32,7 +43,7 @@ class EntityBase(BaseModel):
     @classmethod
     def from_dict(cls, v: list[Attribute] | dict) -> list[Attribute]:
         if isinstance(v, dict):
-            return [Attribute(key=k, value=str(val)) for k, val in v.items()]
+            return [Attribute(key=key, value=value) for key, value in v.items()]
         return v
 
     @field_validator("attributes", mode="after")

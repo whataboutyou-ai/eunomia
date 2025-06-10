@@ -1,0 +1,4 @@
+uvicorn>=0.34.0
+eunomia_mcp==0.3.3
+fastmcp>=2.7.0
+pydantic>=2.10.6

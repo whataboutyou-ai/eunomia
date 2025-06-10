@@ -20,16 +20,17 @@ export enum PolicyEffect {
 export enum ConditionOperator {
   Equals = "equals",
   NotEquals = "not_equals",
-  In = "in",
-  NotIn = "not_in",
+  // String operators
   Contains = "contains",
   NotContains = "not_contains",
-  StartsWith = "starts_with",
-  EndsWith = "ends_with",
-  Greater = "greater",
-  GreaterOrEqual = "greater_or_equal",
-  Less = "less",
-  LessOrEqual = "less_or_equal",
-  Exists = "exists",
-  NotExists = "not_exists",
+  StartsWith = "startswith",
+  EndsWith = "endswith",
+  // Number operators
+  Greater = "gt",
+  GreaterOrEqual = "gte",
+  Less = "lt",
+  LessOrEqual = "lte",
+  // List operators
+  In = "in",
+  NotIn = "not_in",
 }

@@ -111,6 +111,29 @@ export class EunomiaClient {
   }
 
   /**
+   * Perform a set of permission checks in a single request.
+   *
+   * @param checkRequests - The list of check requests to perform
+   * @returns A promise that resolves to the list of results of the check requests
+   */
+  async bulkCheck(checkRequests: CheckRequest[]): Promise<CheckResponse[]> {
+    try {
+      const response = await this.client.post<CheckResponse[]>(
+        "/check/bulk",
+        checkRequests,
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Register a new entity with the Eunomia server.
    *
    * @param options - Options for registering the entity
@@ -121,7 +144,7 @@ export class EunomiaClient {
    */
   async registerEntity(options: {
     type: EntityType;
-    attributes: Record<string, string>;
+    attributes: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     uri?: string;
   }): Promise<EntityInDb> {
     const entity: EntityCreate = {
@@ -157,7 +180,7 @@ export class EunomiaClient {
    */
   async updateEntity(options: {
     uri: string;
-    attributes: Record<string, string>;
+    attributes: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     override?: boolean;
   }): Promise<EntityInDb> {
     const entity: EntityUpdate = {
@@ -209,19 +232,81 @@ export class EunomiaClient {
   /**
    * Create a new policy and store it in the Eunomia server.
    *
+   * @param policy - The policy to create
+   * @returns A promise that resolves to the created policy
+   */
+  async createPolicy(policy: Policy): Promise<Policy> {
+    try {
+      const response = await this.client.post<Policy>(
+        "/policies",
+        policy,
+      );
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new simple policy with a single rule and store it in the Eunomia server.
+   *
    * @param request - The check request to create the policy from
    * @param name - The name of the policy
    * @returns A promise that resolves to the created policy
    */
-  async createPolicy(request: CheckRequest, name: string): Promise<Policy> {
+  async createSimplePolicy(request: CheckRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
-        "/policies",
+        "/policies/simple",
         request,
         {
           params: { name },
         },
       );
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get all policies from the Eunomia server.
+   *
+   * @returns A promise that resolves to the list of all policies
+   */
+  async getPolicies(): Promise<Policy[]> {
+    try {
+      const response = await this.client.get<Policy[]>("/policies");
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a policy from the Eunomia server.
+   *
+   * @param name - The name of the policy to delete
+   * @returns A promise that resolves to true if the policy was successfully deleted
+   */
+  async deletePolicy(name: string): Promise<boolean> {
+    try {
+      const response = await this.client.delete<boolean>(`/policies/${name}`);
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

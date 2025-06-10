@@ -15,8 +15,10 @@ eunomia server
 The API has the following endpoints:
 
 - `POST /check`: Check if a principal has permissions to perform an action on a resource.
+- `POST /check/bulk`: Perform a set of permission checks in a single request.
 - `GET /policies`: Get all policies.
 - `POST /policies`: Create a new policy.
+- `POST /policies/simple`: Create a simple policy with a single rule.
 - `GET /policies/{name}`: Get a policy by name.
 - `DELETE /policies/{name}`: Delete a policy by name.
 - `GET /fetchers/internal/entities`: Get entities with pagination.
