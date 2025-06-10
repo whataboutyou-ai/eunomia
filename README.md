@@ -21,18 +21,22 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 </div>
 
+> [!NOTE]
+> Try the new [Eunomia MCP Middleware][extension-mcp-github] for adding policy-based authorization to your MCP servers!
+
 ## Overview
 
-Traditional authorization layers, focused on user-resource separation, become obsolete with AI agents. These agents, both autonomous and controllable, necessitate a new permission paradigm.
+Eunomia is a standalone authorization layer purpose-built for AI agents. As a framework-agnostic solution, it decouples authorization logic from your agent architecture, enabling cleaner and more maintainable systems.
 
-The ability for agents to access tools—executable actions beyond static data—and initiate interactions with other agents introduced policy requirements that legacy systems couldn't meet. This duality demands dynamic yet deterministic boundaries that adapt to context, reflecting their role as both actor and resource.
+Built in the open, Eunomia provides enterprise-grade authorization capabilities that power What About You's AI governance platform. The framework seamlessly integrates with [Model Context Protocol (MCP)][mcp-website] primitives, making it easy to add policy-based authorization to your existing agent workflows.
 
-We aim to solve this with Eunomia, an open-source, developer-oriented authorization framework that:
+Key features:
 
-- Makes it possible to consider agents as both actors and resources
-- Enforces dynamic yet deterministic policies based on static and contextual attributes
-- Enables leaner agent architectures with decoupled authorization logic
-- Preserves agent decision-making while enforcing security
+- **Framework-agnostic**: Works with any AI agent architecture or framework
+- **Decoupled design**: Separates authorization concerns from business logic
+- **MCP integration**: Native support for Model Context Protocol workflows
+- **Enterprise-ready**: Proven in production environments
+- **Developer-focused**: Simple APIs and comprehensive tooling
 
 ## Get Started
 
@@ -58,16 +62,21 @@ eunomia server
 
 Check out the [quickstart example][docs-quickstart] in the documentation for a fully working example.
 
-## Eunomia SDKs
+## Other Eunomia packages
 
-Different packages are available in this repository for an easier interaction with the server. These packages make the integration of Eunomia inside your AI application as seamless as possible within your favorite development framework.
+### Eunomia SDKs
 
-The following integrations are currently available:
+To interact with the server from your code, you can use the following SDKs:
 
 - [Python][sdk-python-github]
 - [Typescript][sdk-typescript-github]
-- [LangChain][sdk-langchain-github]
-- ...and more coming soon!
+
+### Eunomia Extensions
+
+Eunomia provides extensions for the following frameworks:
+
+- [MCP Middleware][extension-mcp-github]
+- [LangChain][extension-langchain-github]
 
 ## Documentation
 
@@ -75,18 +84,29 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 ## Changelog
 
+### Migration to v0.3.3
+
+#### Endpoint Rename: `/policies` → `/policies/simple`
+
+The simple policy creation endpoint has been renamed to `/policies/simple` for consistency.
+
+#### New Endpoint: `/policies`
+
+A new endpoint has been added for creating full policies:
+
+```bash
+curl -X POST "http://localhost:8000/policies" \
+  -H "Content-Type: application/json" \
+  -d '{"version": "1.0", "name": "...", "default_action": "...", "rules": []}'
+```
+
 ### Migration to v0.3.2
 
 The following breaking changes were introduced in this version:
 
 #### Endpoint Rename: `/check-access` → `/check`
 
-The authorization endpoint has been renamed for clarity:
-
-- **Old:** `POST /check-access`
-- **New:** `POST /check`
-
-**Update your requests:**
+The authorization endpoint has been renamed for clarity; update your requests to use the new endpoint:
 
 ```bash
 # Before (v0.3.1)
@@ -100,7 +120,7 @@ curl -X POST "http://localhost:8000/check" \
   -d '{"principal": {...}, "action": "...", "resource": {...}}'
 ```
 
-#### New Bulk Endpoint
+#### New Endpoint: `/check/bulk`
 
 A new bulk authorization endpoint has been added for improved performance when checking multiple permissions:
 
@@ -114,10 +134,12 @@ curl -X POST "http://localhost:8000/check/bulk" \
 ```
 
 [whataboutyou-website]: https://whataboutyou.ai
+[mcp-website]: https://modelcontextprotocol.io/
 [docs]: https://whataboutyou-ai.github.io/eunomia/
 [docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [sdk-python-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/python
-[sdk-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/langchain
+[extension-mcp-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp
+[extension-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/langchain
 [sdk-typescript-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/typescript
 [pypi]: https://pypi.python.org/pypi/eunomia-ai
 [pypi-badge]: https://img.shields.io/pypi/v/eunomia-ai.svg

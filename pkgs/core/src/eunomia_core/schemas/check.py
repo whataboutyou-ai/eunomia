@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -10,14 +10,14 @@ class EntityCheck(BaseModel):
     uri: Optional[str] = Field(
         default=None, description="Unique identifier for the entity"
     )
-    attributes: Optional[dict[str, str]] = Field(
+    attributes: Optional[dict[str, Any]] = Field(
         default_factory=dict, description="Entity attributes"
     )
     type: EntityType = Field(..., description="Type of entity")
 
     @field_validator("attributes", mode="before")
     @classmethod
-    def from_list(cls, v: list[Attribute] | dict) -> dict[str, str]:
+    def from_list(cls, v: list[Attribute] | dict) -> dict[str, Any]:
         if isinstance(v, list) and all(isinstance(attr, Attribute) for attr in v):
             return {attr.key: attr.value for attr in v}
         elif isinstance(v, list):
@@ -47,3 +47,8 @@ class CheckRequest(BaseModel):
     action: str = Field(
         default="access", description="The action being performed on the resource"
     )
+
+
+class CheckResponse(BaseModel):
+    allowed: bool = Field(..., description="Whether the action is allowed")
+    reason: Optional[str] = Field(None, description="The reason for the decision")

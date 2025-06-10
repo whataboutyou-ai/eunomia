@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "name": "mcp-whatsapp-policy",
+  "default_action": "deny",
+  "rules": [
+    {
+      "name": "allow-mcp-discovery",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.mcp_method",
+          "operator": "in",
+          "value": ["tools/list", "resources/list", "prompts/list"]
+        }
+      ],
+      "actions": ["access"]
+    },
+    {
+      "name": "allow-read-operations",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.mcp_method",
+          "operator": "equals",
+          "value": "tools/call"
+        },
+        {
+          "path": "attributes.tool_name",
+          "operator": "not_in",
+          "value": ["send_message", "send_file", "send_audio_message"]
+        }
+      ],
+      "actions": ["execute"]
+    },
+    {
+      "name": "restrict-send-operations",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.mcp_method",
+          "operator": "equals",
+          "value": "tools/call"
+        },
+        {
+          "path": "attributes.tool_name",
+          "operator": "in",
+          "value": ["send_message", "send_file", "send_audio_message"]
+        },
+        {
+          "path": "attributes.arguments.recipient",
+          "operator": "in",
+          "value": ["PHONE_NUMBER_1", "PHONE_NUMBER_2", "PHONE_NUMBER_3"]
+        }
+      ],
+      "actions": ["execute"]
+    }
+  ]
+}

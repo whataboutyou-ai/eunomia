@@ -1,3 +1,5 @@
+import json
+
 from eunomia_core import schemas
 from sqlalchemy.orm import Session, joinedload
 
@@ -28,7 +30,9 @@ def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:
         type=entity.type,
     )
     for attribute in entity.attributes:
-        db_attribute = models.Attribute(key=attribute.key, value=attribute.value)
+        db_attribute = models.Attribute(
+            key=attribute.key, value=json.dumps(attribute.value)
+        )
         db_entity.attributes.append(db_attribute)
 
     db.add(db_entity)
@@ -66,7 +70,9 @@ def update_entity_attributes(
         if db_attribute is not None:
             db_attribute.value = attribute.value
         else:
-            db_attribute = models.Attribute(key=attribute.key, value=attribute.value)
+            db_attribute = models.Attribute(
+                key=attribute.key, value=json.dumps(attribute.value)
+            )
             db_entity.attributes.append(db_attribute)
 
     db.commit()

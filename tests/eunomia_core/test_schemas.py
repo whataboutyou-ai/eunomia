@@ -162,3 +162,138 @@ class TestPrincipalAccess:
         # Should raise validation error for invalid type
         with pytest.raises(ValidationError):
             schemas.PrincipalCheck.model_validate({"type": "resource", "uri": "123"})
+
+
+class TestCheckRequest:
+    def test_valid_cases(self):
+        # Valid request with all required fields
+        request = schemas.CheckRequest.model_validate(
+            {
+                "principal": {"type": "principal", "uri": "user:123"},
+                "resource": {"type": "resource", "uri": "file:456"},
+                "action": "read",
+            }
+        )
+        assert request.principal.type.value == "principal"
+        assert request.resource.type.value == "resource"
+        assert request.action == "read"
+
+        # Valid request with default action
+        request = schemas.CheckRequest.model_validate(
+            {
+                "principal": {"type": "principal", "uri": "user:123"},
+                "resource": {"type": "resource", "uri": "file:456"},
+            }
+        )
+        assert request.action == "access"
+
+        # Valid request with attributes instead of URIs
+        request = schemas.CheckRequest.model_validate(
+            {
+                "principal": {
+                    "type": "principal",
+                    "attributes": {"name": "john", "role": "admin"},
+                },
+                "resource": {
+                    "type": "resource",
+                    "attributes": {"path": "/data", "owner": "system"},
+                },
+                "action": "write",
+            }
+        )
+        assert request.principal.attributes == {"name": "john", "role": "admin"}
+        assert request.resource.attributes == {"path": "/data", "owner": "system"}
+
+    def test_invalid_cases(self):
+        # Missing principal
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {"resource": {"type": "resource", "uri": "file:456"}, "action": "read"}
+            )
+
+        # Missing resource
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {
+                    "principal": {"type": "principal", "uri": "user:123"},
+                    "action": "read",
+                }
+            )
+
+        # Invalid principal type
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {
+                    "principal": {"type": "resource", "uri": "user:123"},
+                    "resource": {"type": "resource", "uri": "file:456"},
+                }
+            )
+
+        # Invalid resource type
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {
+                    "principal": {"type": "principal", "uri": "user:123"},
+                    "resource": {"type": "principal", "uri": "file:456"},
+                }
+            )
+
+        # Principal with neither URI nor attributes
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {
+                    "principal": {"type": "principal"},
+                    "resource": {"type": "resource", "uri": "file:456"},
+                }
+            )
+
+        # Resource with neither URI nor attributes
+        with pytest.raises(ValidationError):
+            schemas.CheckRequest.model_validate(
+                {
+                    "principal": {"type": "principal", "uri": "user:123"},
+                    "resource": {"type": "resource"},
+                }
+            )
+
+
+class TestCheckResponse:
+    def test_valid_cases(self):
+        # Valid response with allowed=True and reason
+        response = schemas.CheckResponse.model_validate(
+            {"allowed": True, "reason": "User has admin privileges"}
+        )
+        assert response.allowed is True
+        assert response.reason == "User has admin privileges"
+
+        # Valid response with allowed=False and reason
+        response = schemas.CheckResponse.model_validate(
+            {"allowed": False, "reason": "Insufficient permissions"}
+        )
+        assert response.allowed is False
+        assert response.reason == "Insufficient permissions"
+
+        # Valid response without reason
+        response = schemas.CheckResponse.model_validate({"allowed": True})
+        assert response.allowed is True
+        assert response.reason is None
+
+        # Valid response with None reason
+        response = schemas.CheckResponse.model_validate(
+            {"allowed": False, "reason": None}
+        )
+        assert response.allowed is False
+        assert response.reason is None
+
+    def test_invalid_cases(self):
+        # Missing allowed field
+        with pytest.raises(ValidationError):
+            schemas.CheckResponse.model_validate({"reason": "Some reason"})
+
+        # Invalid allowed type
+        with pytest.raises(ValidationError):
+            schemas.CheckResponse.model_validate({"allowed": "invalid"})
+
+        # Empty dict
+        with pytest.raises(ValidationError):
+            schemas.CheckResponse.model_validate({})

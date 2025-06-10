@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "name": "mcp-planetary-weather-policy",
+  "default_action": "deny",
+  "rules": [
+    {
+      "name": "allow-mcp-discovery",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.mcp_method",
+          "operator": "in",
+          "value": ["tools/list", "resources/list", "prompts/list"]
+        }
+      ],
+      "actions": ["access"]
+    },
+    {
+      "name": "allow-mcp-operations",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.mcp_method",
+          "operator": "equals",
+          "value": "tools/call"
+        },
+        {
+          "path": "attributes.tool_name",
+          "operator": "in",
+          "value": [
+            "get_mars_weather",
+            "get_jupiter_weather",
+            "get_saturn_weather",
+            "get_venus_weather"
+          ]
+        },
+        {
+          "path": "attributes.arguments.request.date",
+          "operator": "startswith",
+          "value": "2025"
+        }
+      ],
+      "actions": ["execute"]
+    }
+  ]
+}

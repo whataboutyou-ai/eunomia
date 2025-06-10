@@ -31,24 +31,90 @@ def test_get_attribute_value():
 
 
 def test_apply_operator():
+    # String equality operators
     assert apply_operator(enums.ConditionOperator.EQUALS, "test", "test") is True
     assert apply_operator(enums.ConditionOperator.EQUALS, "test", "other") is False
     assert apply_operator(enums.ConditionOperator.NOT_EQUALS, "test", "other") is True
     assert apply_operator(enums.ConditionOperator.NOT_EQUALS, "test", "test") is False
+
+    # String content operators
     assert apply_operator(enums.ConditionOperator.CONTAINS, "est", "test") is True
     assert apply_operator(enums.ConditionOperator.CONTAINS, "xyz", "test") is False
+    assert apply_operator(enums.ConditionOperator.NOT_CONTAINS, "xyz", "test") is True
+    assert apply_operator(enums.ConditionOperator.NOT_CONTAINS, "est", "test") is False
+
+    # String position operators
     assert apply_operator(enums.ConditionOperator.STARTS_WITH, "te", "test") is True
     assert apply_operator(enums.ConditionOperator.STARTS_WITH, "st", "test") is False
     assert apply_operator(enums.ConditionOperator.ENDS_WITH, "st", "test") is True
     assert apply_operator(enums.ConditionOperator.ENDS_WITH, "te", "test") is False
 
+    # Number equality operators
     assert apply_operator(enums.ConditionOperator.EQUALS, 1, 1) is True
     assert apply_operator(enums.ConditionOperator.EQUALS, 1, 2) is False
     assert apply_operator(enums.ConditionOperator.NOT_EQUALS, 1, 2) is True
     assert apply_operator(enums.ConditionOperator.NOT_EQUALS, 1, 1) is False
 
+    # Number comparison operators
+    assert apply_operator(enums.ConditionOperator.GREATER, 5, 3) is True
+    assert apply_operator(enums.ConditionOperator.GREATER, 3, 5) is False
+    assert apply_operator(enums.ConditionOperator.GREATER, 5, 5) is False
+    assert apply_operator(enums.ConditionOperator.GREATER_OR_EQUAL, 5, 3) is True
+    assert apply_operator(enums.ConditionOperator.GREATER_OR_EQUAL, 5, 5) is True
+    assert apply_operator(enums.ConditionOperator.GREATER_OR_EQUAL, 3, 5) is False
+    assert apply_operator(enums.ConditionOperator.LESS, 3, 5) is True
+    assert apply_operator(enums.ConditionOperator.LESS, 5, 3) is False
+    assert apply_operator(enums.ConditionOperator.LESS, 5, 5) is False
+    assert apply_operator(enums.ConditionOperator.LESS_OR_EQUAL, 3, 5) is True
+    assert apply_operator(enums.ConditionOperator.LESS_OR_EQUAL, 5, 5) is True
+    assert apply_operator(enums.ConditionOperator.LESS_OR_EQUAL, 5, 3) is False
+
+    # Float comparison operators
+    assert apply_operator(enums.ConditionOperator.GREATER, 5.5, 3.2) is True
+    assert apply_operator(enums.ConditionOperator.GREATER, 3.2, 5.5) is False
+    assert apply_operator(enums.ConditionOperator.LESS_OR_EQUAL, 3.14, 3.14) is True
+
+    # Mixed int/float comparison
+    assert apply_operator(enums.ConditionOperator.GREATER, 5, 3.5) is True
+    assert apply_operator(enums.ConditionOperator.LESS, 3.5, 5) is True
+
+    # List membership operators
+    assert (
+        apply_operator(enums.ConditionOperator.IN, ["admin", "user"], "admin") is True
+    )
+    assert (
+        apply_operator(enums.ConditionOperator.IN, ["admin", "user"], "guest") is False
+    )
+    assert (
+        apply_operator(enums.ConditionOperator.NOT_IN, ["admin", "user"], "guest")
+        is True
+    )
+    assert (
+        apply_operator(enums.ConditionOperator.NOT_IN, ["admin", "user"], "admin")
+        is False
+    )
+
+    # List with numbers
+    assert apply_operator(enums.ConditionOperator.IN, [1, 2, 3], 2) is True
+    assert apply_operator(enums.ConditionOperator.IN, [1, 2, 3], 4) is False
+    assert apply_operator(enums.ConditionOperator.NOT_IN, [1, 2, 3], 4) is True
+    assert apply_operator(enums.ConditionOperator.NOT_IN, [1, 2, 3], 2) is False
+
+    # Empty list
+    assert apply_operator(enums.ConditionOperator.IN, [], "anything") is False
+    assert apply_operator(enums.ConditionOperator.NOT_IN, [], "anything") is True
+
+    # None value handling
     assert apply_operator(enums.ConditionOperator.EQUALS, None, "test") is False
     assert apply_operator(enums.ConditionOperator.EQUALS, "test", None) is False
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, None, "test") is False
+    assert apply_operator(enums.ConditionOperator.NOT_EQUALS, "test", None) is False
+
+    # Invalid operator combinations should return False
+    assert apply_operator(enums.ConditionOperator.CONTAINS, 123, "test") is False
+    assert apply_operator(enums.ConditionOperator.STARTS_WITH, 123, "test") is False
+    assert apply_operator(enums.ConditionOperator.GREATER, "abc", "def") is False
+    assert apply_operator(enums.ConditionOperator.IN, "not_a_list", "test") is False
 
 
 def test_evaluate_condition():
@@ -86,6 +152,7 @@ def test_evaluate_conditions():
 
 def test_evaluate_rule():
     rule = schemas.Rule(
+        name="test-rule",
         effect=enums.PolicyEffect.ALLOW,
         principal_conditions=[
             schemas.Condition(
@@ -159,10 +226,12 @@ def test_evaluate_rule():
 
 def test_evaluate_policy():
     policy = schemas.Policy(
+        version="1.0",
         name="test-policy",
         description="Test policy",
         rules=[
             schemas.Rule(
+                name="test-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(

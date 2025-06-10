@@ -6,10 +6,12 @@ from eunomia.engine.db import crud
 
 def test_create_and_get_policy(fixture_db: Session):
     policy = schemas.Policy(
+        version="1.0",
         name="test-db-policy",
         description="Test database policy",
         rules=[
             schemas.Rule(
+                name="test-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
@@ -43,6 +45,7 @@ def test_create_and_get_policy(fixture_db: Session):
 
 def test_delete_policy(fixture_db: Session):
     policy = schemas.Policy(
+        version="1.0",
         name="policy-to-delete",
         description="Policy to be deleted",
         rules=[],
@@ -63,10 +66,12 @@ def test_delete_policy(fixture_db: Session):
 
 def test_db_policy_to_schema(fixture_db: Session):
     original_policy = schemas.Policy(
+        version="1.0",
         name="conversion-test",
         description="Test conversion between DB and schema",
         rules=[
             schemas.Rule(
+                name="test-rule",
                 effect=enums.PolicyEffect.ALLOW,
                 principal_conditions=[
                     schemas.Condition(
@@ -80,7 +85,12 @@ def test_db_policy_to_schema(fixture_db: Session):
                         path="attributes.type",
                         operator=enums.ConditionOperator.EQUALS,
                         value={"foo": {"bar": 123}},
-                    )
+                    ),
+                    schemas.Condition(
+                        path="attributes.list",
+                        operator=enums.ConditionOperator.CONTAINS,
+                        value=[1, 2, "foo", "bar"],
+                    ),
                 ],
                 actions=["read", "write"],
             )

@@ -1,6 +1,6 @@
 import asyncio
 
-from eunomia_core import enums, schemas
+from eunomia_core import schemas
 
 from eunomia.config import settings
 from eunomia.engine import PolicyEngine
@@ -44,7 +44,7 @@ class EunomiaServer:
                         )
             entity.attributes.update(registered_attributes)
 
-    async def check(self, request: schemas.CheckRequest) -> bool:
+    async def check(self, request: schemas.CheckRequest) -> schemas.CheckResponse:
         """
         Check if a principal has permissions to perform an action on a specific resource.
 
@@ -60,8 +60,8 @@ class EunomiaServer:
 
         Returns
         -------
-        bool
-            True if the principal has permissions to perform the action on the resource, False otherwise.
+        schemas.CheckResponse
+            The response containing the allowed flag and the reason for the decision.
 
         Raises
         ------
@@ -72,4 +72,4 @@ class EunomiaServer:
             self._fetch_all_attributes(request.principal),
             self._fetch_all_attributes(request.resource),
         )
-        return self.engine.evaluate_all(request).effect == enums.PolicyEffect.ALLOW
+        return self.engine.evaluate_all(request)

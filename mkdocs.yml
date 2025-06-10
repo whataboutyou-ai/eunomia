@@ -100,8 +100,11 @@ nav:
       - SDKs:
           - Eunomia SDKs: api/sdks/index.md
           - Python SDK: api/sdks/python.md
-          - LangChain SDK: api/sdks/langchain.md
           - TypeScript SDK: api/sdks/typescript.md
+      - Extensions:
+          - Eunomia Extensions: api/extensions/index.md
+          - MCP Authz Middleware: api/extensions/mcp.md
+          - LangChain: api/extensions/langchain.md
   - Community:
       - Join the Community: community/index.md
       - How to Contribute: community/contribute.md

@@ -1,16 +1,16 @@
-# Eunomia SDK for LangChain
+# Eunomia extension for LangChain
 
-This package provides integrations between [LangChain][langchain-website] and [Eunomia][eunomia-github], allowing you to:
+This package provides an extension of [Eunomia][eunomia-github] for [LangChain][langchain-website], allowing you to:
 
 - Register documents loaded by any [LangChain's loader][langchain-loaders-docs] to the Eunomia server
 - Enforce authorization policies on documents retrieved by any [LangChain retriever][langchain-retriever-docs]
 
 ## Installation
 
-Install the `eunomia-sdk-langchain` package via pip:
+Install the `eunomia-langchain` package via pip:
 
 ```bash
-pip install eunomia-sdk-langchain
+pip install eunomia-langchain
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ pip install eunomia-sdk-langchain
 The `EunomiaLoader` class is a wrapper around any loader class from LangChain that sends documents to the Eunomia server.
 
 ```python
-from eunomia_sdk_langchain import EunomiaLoader
+from eunomia_langchain import EunomiaLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 
 # Create a document loader
@@ -41,7 +41,7 @@ The `EunomiaRetriever` class wraps any LangChain retriever and filters allowed d
 
 ```python
 from eunomia_core import schemas
-from eunomia_sdk_langchain import EunomiaRetriever
+from eunomia_langchain import EunomiaRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 
@@ -67,7 +67,7 @@ docs = wrapped_retriever.invoke("foo")
 For detailed usage, check out the SDK's [documentation][docs].
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
-[docs]: https://whataboutyou-ai.github.io/eunomia/api/sdks/langchain/
+[docs]: https://whataboutyou-ai.github.io/eunomia/api/extensions/langchain/
 [langchain-website]: https://www.langchain.com/
 [langchain-loaders-docs]: https://python.langchain.com/docs/concepts/document_loaders/
 [langchain-retriever-docs]: https://python.langchain.com/docs/concepts/retrievers/
