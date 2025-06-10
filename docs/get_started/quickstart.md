@@ -21,7 +21,7 @@ Now, you need to create a policy that will be used to enforce the access control
 1. Allow access to the resource with attributes `agent-id == it-desk-agent` to principals with the `department == it`.
 2. Allow access to the resource with attributes `agent-id == hr-agent` to principals with the `department == hr` _AND_ the `role == manager`.
 
-You can use the `POST /policies` endpoint for this.
+You can use the `POST /policies/simple` endpoint for this.
 
 === "Python"
 ```python
@@ -30,7 +30,7 @@ from eunomia_sdk_python import EunomiaClient
 
     eunomia = EunomiaClient()
 
-    eunomia.create_policy(
+    eunomia.create_simple_policy(
         CheckRequest(
             principal=PrincipalCheck(attributes={"department": "it"}),
             resource=ResourceCheck(attributes={"agent-id": "it-desk-agent"}),
@@ -39,7 +39,7 @@ from eunomia_sdk_python import EunomiaClient
         name="it-desk-policy",
     )
 
-    eunomia.create_policy(
+    eunomia.create_simple_policy(
         CheckRequest(
             principal=PrincipalCheck(attributes={"department": "hr", "role": "manager"}),
             resource=ResourceCheck(attributes={"agent-id": "hr-agent"}),
@@ -54,11 +54,11 @@ from eunomia_sdk_python import EunomiaClient
 
 === "Curl"
 ```bash
-curl -X POST 'http://localhost:8000/policies?name=it-desk-policy' \
+curl -X POST 'http://localhost:8000/policies/simple?name=it-desk-policy' \
  -H "Content-Type: application/json" \
  -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
 
-    curl -X POST 'http://localhost:8000/policies?name=hr-policy' \
+    curl -X POST 'http://localhost:8000/policies/simple?name=hr-policy' \
     -H "Content-Type: application/json" \
     -d '{"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"attributes": {"agent-id": "hr-agent"}}, "action": "access"}'
     ```

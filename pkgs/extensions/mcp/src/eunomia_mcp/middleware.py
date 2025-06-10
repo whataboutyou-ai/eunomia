@@ -33,11 +33,7 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._eunomia_client = eunomia_client or EunomiaClient()
         self._enable_audit_logging = enable_audit_logging
-        self._bypass_methods = bypass_methods or [
-            "initialize",
-            "notifications/*",
-            "*/list",
-        ]
+        self._bypass_methods = bypass_methods or ["initialize", "notifications/*"]
 
     async def dispatch(self, request: Request, call_next) -> Response:
         """Main middleware dispatch method."""

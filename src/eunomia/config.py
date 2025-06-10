@@ -18,11 +18,11 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Engine config
-    ENGINE_SQL_DATABASE_URL: str = "sqlite:///.db/engine_db.sqlite"
+    ENGINE_SQL_DATABASE_URL: str = "sqlite:///./.db/engine_db.sqlite"
 
     # Fetcher config
     FETCHERS: dict[str, dict] = {
-        "internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}
+        "internal": {"sql_database_url": "sqlite:///./.db/internal_db.sqlite"}
     }
 
     # Server config

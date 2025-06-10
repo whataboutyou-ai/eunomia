@@ -53,7 +53,71 @@ if __name__ == "__main__":
 > eunomia server
 > ```
 >
-> Or refer to the [Eunomia documentation][eunomia-docs-run-server] for more information.
+> Or refer to the [Eunomia documentation][eunomia-docs-run-server] for more options.
+
+### Advanced Integration
+
+Configure the middleware with custom options for production deployments:
+
+```python
+from fastmcp import FastMCP
+from eunomia_mcp import create_eunomia_middleware
+
+mcp = FastMCP("Secure MCP Server 🔒")
+
+# Configure middleware with custom options
+middleware = [
+    create_eunomia_middleware(
+        eunomia_endpoint="https://your-eunomia-server.com",
+        eunomia_api_key="your-api-key",
+        enable_audit_logging=True,
+        bypass_methods=["initialize", "notifications/*"]
+    )
+]
+
+app = mcp.http_app(middleware=middleware)
+```
+
+## Policy Configuration
+
+Use the `eunomia-mcp` CLI to manage your MCP authorization policies:
+
+### Initialize a New Project
+
+```bash
+# Create a default policy configuration file
+eunomia-mcp init
+
+# Create policy configuration file with custom name
+eunomia-mcp init --policy-file my_policies.json
+
+# Generate both policy configuration file and a sample MCP server
+eunomia-mcp init --sample
+```
+
+You can now edit the policy configuration file to your liking.
+
+### Validate Policy Configuration
+
+```bash
+# Validate your policy file
+eunomia-mcp validate mcp_policies.json
+```
+
+### Push Policies to Eunomia
+
+```bash
+# Push your policy to Eunomia server
+eunomia-mcp push mcp_policies.json
+
+# Push your policy and overwrite existing ones
+eunomia-mcp push mcp_policies.json --overwrite
+```
+
+> [!IMPORTANT]
+> You need the Eunomia server running for the push operation.
+
+**Workflow**: Initialize → Customize policies → Validate → Run Eunomia server → Push to Eunomia → Run MCP server
 
 ## How It Works
 

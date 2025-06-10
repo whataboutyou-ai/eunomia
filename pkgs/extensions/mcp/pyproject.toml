@@ -15,6 +15,9 @@ dependencies = [
     "typer>=0.15.2",
 ]
 
+[project.scripts]
+eunomia-mcp = "eunomia_mcp.cli:app"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
