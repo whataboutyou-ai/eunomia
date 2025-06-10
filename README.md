@@ -26,16 +26,17 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 ## Overview
 
-Traditional authorization layers, focused on user-resource separation, become obsolete with AI agents. These agents, both autonomous and controllable, necessitate a new permission paradigm.
+Eunomia is a standalone authorization layer purpose-built for AI agents. As a framework-agnostic solution, it decouples authorization logic from your agent architecture, enabling cleaner and more maintainable systems.
 
-The ability for agents to access tools—executable actions beyond static data—and initiate interactions with other agents introduced policy requirements that legacy systems couldn't meet. This duality demands dynamic yet deterministic boundaries that adapt to context, reflecting their role as both actor and resource.
+Built in the open, Eunomia provides enterprise-grade authorization capabilities that power What About You's AI governance platform. The framework seamlessly integrates with [Model Context Protocol (MCP)][mcp-website] primitives, making it easy to add policy-based authorization to your existing agent workflows.
 
-We aim to solve this with Eunomia, an open-source, developer-oriented authorization framework that:
+Key features:
 
-- Makes it possible to consider agents as both actors and resources
-- Enforces dynamic yet deterministic policies based on static and contextual attributes
-- Enables leaner agent architectures with decoupled authorization logic
-- Preserves agent decision-making while enforcing security
+- **Framework-agnostic**: Works with any AI agent architecture or framework
+- **Decoupled design**: Separates authorization concerns from business logic
+- **MCP integration**: Native support for Model Context Protocol workflows
+- **Enterprise-ready**: Proven in production environments
+- **Developer-focused**: Simple APIs and comprehensive tooling
 
 ## Get Started
 
@@ -133,6 +134,7 @@ curl -X POST "http://localhost:8000/check/bulk" \
 ```
 
 [whataboutyou-website]: https://whataboutyou.ai
+[mcp-website]: https://modelcontextprotocol.io/
 [docs]: https://whataboutyou-ai.github.io/eunomia/
 [docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [sdk-python-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/python
