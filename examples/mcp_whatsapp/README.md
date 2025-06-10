@@ -55,16 +55,9 @@ uv pip install eunomia-ai eunomia-mcp fastmcp
 
 1. **Update the import in `whatsapp-mcp-server/main.py` to use FastMCP 2.0:**
 
-   Replace this line:
-
-   ```python
-   from mcp.server.fastmcp import FastMCP
-   ```
-
-   With:
-
-   ```python
-   from fastmcp import FastMCP
+   ```diff
+   - from mcp.server.fastmcp import FastMCP
+   + from fastmcp import FastMCP
    ```
 
 2. **Create main_authz.py with the Eunomia middleware:**
