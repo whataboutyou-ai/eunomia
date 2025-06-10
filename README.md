@@ -21,6 +21,9 @@ Made with ❤ by the team at [What About You][whataboutyou-website].
 
 </div>
 
+> [!NOTE]
+> Try the new [Eunomia MCP Middleware][extension-mcp-github] for adding policy-based authorization to your MCP servers!
+
 ## Overview
 
 Traditional authorization layers, focused on user-resource separation, become obsolete with AI agents. These agents, both autonomous and controllable, necessitate a new permission paradigm.
@@ -71,8 +74,8 @@ To interact with the server from your code, you can use the following SDKs:
 
 Eunomia provides extensions for the following frameworks:
 
+- [MCP Middleware][extension-mcp-github]
 - [LangChain][extension-langchain-github]
-- ...and more coming soon!
 
 ## Documentation
 
@@ -80,18 +83,29 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 ## Changelog
 
+### Migration to v0.3.3
+
+#### Endpoint Rename: `/policies` → `/policies/simple`
+
+The simple policy creation endpoint has been renamed to `/policies/simple` for consistency.
+
+#### New Endpoint: `/policies`
+
+A new endpoint has been added for creating full policies:
+
+```bash
+curl -X POST "http://localhost:8000/policies" \
+  -H "Content-Type: application/json" \
+  -d '{"version": "1.0", "name": "...", "default_action": "...", "rules": []}'
+```
+
 ### Migration to v0.3.2
 
 The following breaking changes were introduced in this version:
 
 #### Endpoint Rename: `/check-access` → `/check`
 
-The authorization endpoint has been renamed for clarity:
-
-- **Old:** `POST /check-access`
-- **New:** `POST /check`
-
-**Update your requests:**
+The authorization endpoint has been renamed for clarity; update your requests to use the new endpoint:
 
 ```bash
 # Before (v0.3.1)
@@ -105,7 +119,7 @@ curl -X POST "http://localhost:8000/check" \
   -d '{"principal": {...}, "action": "...", "resource": {...}}'
 ```
 
-#### New Bulk Endpoint
+#### New Endpoint: `/check/bulk`
 
 A new bulk authorization endpoint has been added for improved performance when checking multiple permissions:
 
@@ -122,6 +136,7 @@ curl -X POST "http://localhost:8000/check/bulk" \
 [docs]: https://whataboutyou-ai.github.io/eunomia/
 [docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
 [sdk-python-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/python
+[extension-mcp-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp
 [extension-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/langchain
 [sdk-typescript-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/typescript
 [pypi]: https://pypi.python.org/pypi/eunomia-ai
