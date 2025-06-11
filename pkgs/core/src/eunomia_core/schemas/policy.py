@@ -59,7 +59,7 @@ class Policy(BaseModel):
         PolicyEffect.DENY, description="Default effect if no rules match"
     )
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
 
 
 class PolicyEvaluationResult(BaseModel):

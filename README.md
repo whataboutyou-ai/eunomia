@@ -97,7 +97,7 @@ A new endpoint has been added for creating full policies:
 ```bash
 curl -X POST "http://localhost:8000/policies" \
   -H "Content-Type: application/json" \
-  -d '{"version": "1.0", "name": "...", "default_action": "...", "rules": []}'
+  -d '{"version": "1.0", "name": "...", "default_effect": "...", "rules": []}'
 ```
 
 ### Migration to v0.3.2
