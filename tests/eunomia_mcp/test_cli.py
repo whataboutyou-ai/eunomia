@@ -23,7 +23,7 @@ class TestEunomiaCLI:
     @pytest.fixture
     def runner(self):
         """Create CLI test runner."""
-        return CliRunner()
+        return CliRunner(env={"NO_COLOR": "1"})
 
     @pytest.fixture
     def temp_dir(self):
@@ -408,7 +408,7 @@ class TestCLIIntegration:
     @pytest.fixture
     def runner(self):
         """Create CLI test runner."""
-        return CliRunner()
+        return CliRunner(env={"NO_COLOR": "1"})
 
     def test_cli_help(self, runner):
         """Test CLI help output."""
