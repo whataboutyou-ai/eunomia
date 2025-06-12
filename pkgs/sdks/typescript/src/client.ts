@@ -26,7 +26,7 @@ export interface EunomiaClientOptions {
 export class EunomiaClient {
   private readonly endpoint: string;
   private readonly apiKey: string | undefined;
-  private readonly client: AxiosInstance;
+  public readonly client: AxiosInstance;
 
   /**
    * Creates a new EunomiaClient instance.
