@@ -23,7 +23,7 @@ class TestEunomiaCLI:
     @pytest.fixture
     def runner(self):
         """Create CLI test runner."""
-        return CliRunner(env={"NO_COLOR": "1"})
+        return CliRunner()
 
     @pytest.fixture
     def temp_dir(self):
@@ -408,7 +408,7 @@ class TestCLIIntegration:
     @pytest.fixture
     def runner(self):
         """Create CLI test runner."""
-        return CliRunner(env={"NO_COLOR": "1"})
+        return CliRunner()
 
     def test_cli_help(self, runner):
         """Test CLI help output."""
@@ -423,6 +423,7 @@ class TestCLIIntegration:
     def test_init_command_help(self, runner):
         """Test init command help."""
         result = runner.invoke(app, ["init", "--help"])
+        print(result.stdout)
 
         assert result.exit_code == 0
         assert (
@@ -445,7 +446,7 @@ class TestCLIIntegration:
 
         assert result.exit_code == 0
         assert "Push a policy configuration file to Eunomia" in result.stdout
-        assert "--overwrite" in result.stdout
+        assert "--overwrite" in result.output
         assert "--eunomia-endpoint" in result.stdout
         assert "--eunomia-api-key" in result.stdout
 
