@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-langchain"
-version = "0.3.3"
+version = "0.3.4"
 description = "Eunomia extension for LangChain"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -9,7 +9,7 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "eunomia-sdk-python>=0.3.3",
+    "eunomia-sdk-python>=0.3.4",
     "langchain>=0.3.20",
     "langchain-core>=0.3.41",
 ]
