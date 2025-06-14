@@ -6,7 +6,7 @@ from eunomia_sdk_python import EunomiaClient
 DEFAULT_POLICY = {
     "version": "1.0",
     "name": "mcp-default-policy",
-    "default_action": enums.PolicyEffect.DENY,
+    "default_effect": enums.PolicyEffect.DENY,
     "rules": [
         {
             "name": "allow-mcp-discovery",

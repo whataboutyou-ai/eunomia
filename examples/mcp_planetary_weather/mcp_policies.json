@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "name": "mcp-planetary-weather-policy",
-  "default_action": "deny",
+  "default_effect": "deny",
   "rules": [
     {
       "name": "allow-mcp-discovery",

@@ -86,6 +86,21 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 ### Migration to v0.3.3
 
+#### Modified Response for `/check` and `/check/bulk`
+
+The response of `/check` and `/check/bulk` endpoints has changed from `bool` to `eunomia_core.schemas.CheckResponse`.
+
+Update your Python code to use the new response type:
+
+```python
+# Before (v0.3.2)
+is_allowed = eunomia.check(principal, action, resource)
+
+# After (v0.3.3)
+response = eunomia.check(principal, action, resource)
+is_allowed = response.allowed
+```
+
 #### Endpoint Rename: `/policies` → `/policies/simple`
 
 The simple policy creation endpoint has been renamed to `/policies/simple` for consistency.
@@ -97,7 +112,7 @@ A new endpoint has been added for creating full policies:
 ```bash
 curl -X POST "http://localhost:8000/policies" \
   -H "Content-Type: application/json" \
-  -d '{"version": "1.0", "name": "...", "default_action": "...", "rules": []}'
+  -d '{"version": "1.0", "name": "...", "default_effect": "...", "rules": []}'
 ```
 
 ### Migration to v0.3.2
