@@ -31,7 +31,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 === "Python"
     ```python
     from eunomia_core import enums
-    from eunomia_sdk_python import EunomiaClient
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 

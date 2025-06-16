@@ -19,7 +19,7 @@ The **`DELETE /fetchers/internal/entities/{uri}`** endpoint allows you to delete
 
 === "Python"
     ```python
-    from eunomia_sdk_python import EunomiaClient
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 

@@ -1,7 +1,7 @@
 import os
 
 from eunomia_core import enums, schemas
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 
 DEFAULT_POLICY = {
     "version": "1.0",

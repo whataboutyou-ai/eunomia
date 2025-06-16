@@ -19,7 +19,7 @@ In this option, you provide only the **`uri`** for both the principal and resour
 
 === "Python"
     ```python
-    from eunomia_sdk_python import EunomiaClient
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 

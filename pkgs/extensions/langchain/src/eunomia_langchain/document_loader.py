@@ -2,7 +2,7 @@ import asyncio
 from typing import AsyncIterator, Iterator, List
 
 from eunomia_core import enums
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 from langchain.schema import Document
 from langchain_core.document_loaders.base import BaseLoader
 

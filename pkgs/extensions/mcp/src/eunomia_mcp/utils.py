@@ -1,6 +1,6 @@
 from typing import Optional
 
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 from starlette.middleware import Middleware
 
 from eunomia_mcp.middleware import EunomiaMcpMiddleware

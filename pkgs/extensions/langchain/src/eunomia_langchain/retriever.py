@@ -1,7 +1,7 @@
 import asyncio
 
 from eunomia_core import schemas
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 

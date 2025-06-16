@@ -9,7 +9,7 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "eunomia-sdk-python>=0.3.4",
+    "eunomia-sdk>=0.3.4",
     "pydantic>=2.10.6",
     "starlette>=0.45.3",
     "typer>=0.15.2",
@@ -26,4 +26,4 @@ build-backend = "hatchling.build"
 packages = ["src/eunomia_mcp"]
 
 [tool.uv.sources]
-eunomia-sdk-python = { workspace = true }
+eunomia-sdk = { workspace = true }

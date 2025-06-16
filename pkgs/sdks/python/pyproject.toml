@@ -1,5 +1,5 @@
 [project]
-name = "eunomia-sdk-python"
+name = "eunomia-sdk"
 version = "0.3.4"
 description = "Eunomia SDK for Python"
 authors = [
@@ -18,7 +18,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/eunomia_sdk_python"]
+packages = ["src/eunomia_sdk"]
 
 [tool.uv.sources]
 eunomia-core = { workspace = true }

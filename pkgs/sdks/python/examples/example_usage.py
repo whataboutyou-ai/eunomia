@@ -1,5 +1,5 @@
 from eunomia_core import enums, schemas
-from eunomia_sdk_python.client import EunomiaClient
+from eunomia_sdk.client import EunomiaClient
 
 
 def run():

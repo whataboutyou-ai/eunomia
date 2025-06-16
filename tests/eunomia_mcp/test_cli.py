@@ -13,7 +13,7 @@ from eunomia_mcp.cli.utils import (
     load_policy_config,
     push_policy_config,
 )
-from eunomia_sdk_python.client import EunomiaClient
+from eunomia_sdk.client import EunomiaClient
 from typer.testing import CliRunner
 
 

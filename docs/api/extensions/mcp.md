@@ -340,7 +340,7 @@ Enable detailed logging:
 ```python
 import logging
 logging.getLogger("eunomia_mcp").setLevel(logging.DEBUG)
-logging.getLogger("eunomia_sdk_python").setLevel(logging.DEBUG)
+logging.getLogger("eunomia_sdk").setLevel(logging.DEBUG)
 ```
 
 ## API Reference

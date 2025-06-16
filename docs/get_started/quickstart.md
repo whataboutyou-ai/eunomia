@@ -26,7 +26,7 @@ You can use the `POST /policies/simple` endpoint for this.
 === "Python"
 ```python
 from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 
