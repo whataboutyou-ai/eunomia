@@ -28,10 +28,10 @@ Install the required dependecies with [uv][uv-home]:
 uv sync
 ```
 
-If you are developing one of the SDKs, which are built as separate packages, you can install the dependencies for that specific package:
+If you are developing one of the additional packages (SDKs or extensions), you can install the dependencies for all packages:
 
 ```bash
-uv sync --package eunomia-sdk-<SDK_NAME>
+uv sync --all-packages
 ```
 
 ### Testing and formatting

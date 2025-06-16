@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript";
+import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk";
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
