@@ -3,7 +3,7 @@ import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk-typescript"
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
-    serverHost: "http://localhost:8000",
+    endpoint: "http://localhost:8000",
   });
 
   try {
@@ -74,7 +74,7 @@ async function run(): Promise<void> {
       },
       action: "access",
     };
-    const policy = await client.createPolicy(request, "policy-example");
+    const policy = await client.createSimplePolicy(request, "policy-example");
     console.log(`Policy created: ${policy.name}`);
   } catch (error) {
     console.error("Error:", error);

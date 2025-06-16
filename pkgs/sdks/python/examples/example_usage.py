@@ -3,7 +3,7 @@ from eunomia_sdk_python.client import EunomiaClient
 
 
 def run():
-    client = EunomiaClient(server_host="http://localhost:8000")
+    client = EunomiaClient(endpoint="http://localhost:8000")
 
     try:
         # Register a principal
@@ -65,7 +65,7 @@ def run():
             ),
             action="read",
         )
-        policy = client.create_policy(request=request, name="policy-example")
+        policy = client.create_simple_policy(request=request, name="policy-example")
         print(f"Policy created: {policy.name}")
 
     except Exception as error:
