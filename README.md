@@ -120,10 +120,10 @@ Update your Python code to use the new response type:
 
 ```python
 # Before (v0.3.2)
-is_allowed = eunomia.check(principal, action, resource)
+is_allowed = eunomia.check(principal_uri, resource_uri)
 
 # After (v0.3.3)
-response = eunomia.check(principal, action, resource)
+response = eunomia.check(principal_uri, resource_uri)
 is_allowed = response.allowed
 ```
 
