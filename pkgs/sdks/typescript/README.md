@@ -4,10 +4,10 @@ This package allows you to integrate [Eunomia][eunomia-github] inside your TypeS
 
 ## Installation
 
-Install the `eunomia-sdk-typescript` package via npm:
+Install the `eunomia-sdk` package via npm:
 
 ```bash
-npm install eunomia-sdk-typescript
+npm install eunomia-sdk
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install eunomia-sdk-typescript
 Create an instance of the `EunomiaClient` class to interact with the Eunomia server.
 
 ```typescript
-import { EunomiaClient, EntityType } from "eunomia-sdk-typescript";
+import { EunomiaClient, EntityType } from "eunomia-sdk";
 
 const client = new EunomiaClient();
 ```

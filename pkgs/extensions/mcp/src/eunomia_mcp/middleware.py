@@ -4,7 +4,7 @@ import logging
 from typing import Any, Optional
 
 from eunomia_core import schemas
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 from pydantic import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request

@@ -4,10 +4,10 @@ The client allows you to register resources and principals with their metadata t
 
 ## Installation
 
-Install the `eunomia-sdk-typescript` package via npm:
+Install the `eunomia-sdk` package via npm:
 
 ```bash
-npm install eunomia-sdk-typescript
+npm install eunomia-sdk
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm install eunomia-sdk-typescript
 Import the EunomiaClient class and create an instance of it:
 
 ```typescript
-import { EunomiaClient, EntityType } from "eunomia-sdk-typescript";
+import { EunomiaClient, EntityType } from "eunomia-sdk";
 
 const client = new EunomiaClient({
   endpoint: "http://localhost:8000",

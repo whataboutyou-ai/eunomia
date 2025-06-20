@@ -1,4 +1,4 @@
-The **`POST /check`** endpoint verifies whether a principal is allowed to perform an action on a resource based on their attributes. The API evaluates the authorization policies using a combination of fetched entity attributes and/or attributes provided at runtime. The endpoint returns a boolean value (`true` for allowed action, `false` for denied action).
+The **`POST /check`** endpoint verifies whether a principal is allowed to perform an action on a resource based on their attributes. The API evaluates the authorization policies using a combination of fetched entity attributes and/or attributes provided at runtime. The endpoint returns a response object with a boolean value (`true` for allowed action, `false` for denied action).
 
 You have three options when calling this API:
 
@@ -19,25 +19,25 @@ In this option, you provide only the **`uri`** for both the principal and resour
 
 === "Python"
     ```python
-    from eunomia_sdk_python import EunomiaClient
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 
     # Option 1: Using identifiers only.
     # Assume that the entities are already registered in the system.
     # Allowed action (the registered principal's attributes satisfy the policy)
-    result1 = eunomia.check({
-        "resource": {"uri": "it-desk-agent"},
-        "principal": {"uri": "registered-principal-001"}
-    })
-    print("Allowed:", result1)  # Expected output: True
+    result1 = eunomia.check(
+        principal_uri="registered-principal-001",
+        resource_uri="it-desk-agent"
+    )
+    print("Allowed:", result1.allowed)  # Expected output: True
 
     # Denied action (the registered principal's attributes do not meet the policy)
-    result2 = eunomia.check({
-        "resource": {"uri": "hr-agent"},
-        "principal": {"uri": "registered-principal-003"}
-    })
-    print("Allowed:", result2)  # Expected output: False
+    result2 = eunomia.check(
+        principal_uri="registered-principal-003",
+        resource_uri="hr-agent"
+    )
+    print("Allowed:", result2.allowed)  # Expected output: False
     ```
 
 === "Curl"
@@ -46,18 +46,18 @@ In this option, you provide only the **`uri`** for both the principal and resour
     # Allowed action
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"uri": "registered-principal-001"}}'
+         -d '{"principal_uri": "registered-principal-001", "resource_uri": "it-desk-agent"}'
 
     # Denied action
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "hr-agent"}, "principal": {"uri": "registered-principal-003"}}'
+         -d '{"principal_uri": "registered-principal-003", "resource_uri": "hr-agent"}'
     ```
 
 === "Output"
     ```bash
-    true
-    false
+    {"allowed": true, "reason": "..."}
+    {"allowed": false, "reason": "..."}
     ```
 
 ---
@@ -70,30 +70,30 @@ In this option, you do not provide registered identifiers for the entities. Inst
     ```python
     # Option 2: Using new entities (attributes provided at runtime).
     # Allowed action
-    result1 = eunomia.check({
-        "resource": {"uri": "it-desk-agent"},
-        "principal": {"attributes": {"department": "it"}}
-    })
-    print("Allowed:", result1)  # Expected output: True
+    result1 = eunomia.check(
+        resource_uri="it-desk-agent",
+        principal_attributes={"department": "it"}
+    )
+    print("Allowed:", result1.allowed)  # Expected output: True
 
-    result2 = eunomia.check({
-        "resource": {"uri": "hr-agent"},
-        "principal": {"attributes": {"department": "hr", "role": "manager"}}
-    })
-    print("Allowed:", result2)  # Expected output: True
+    result2 = eunomia.check(
+        resource_uri="hr-agent",
+        principal_attributes={"department": "hr", "role": "manager"}
+    )
+    print("Allowed:", result2.allowed)  # Expected output: True
 
     # Denied action
-    result3 = eunomia.check({
-        "resource": {"uri": "it-desk-agent"},
-        "principal": {"attributes": {"department": "sales"}}
-    })
-    print("Allowed:", result3)  # Expected output: False
+    result3 = eunomia.check(
+        resource_uri="it-desk-agent",
+        principal_attributes={"department": "sales"}
+    )
+    print("Allowed:", result3.allowed)  # Expected output: False
 
-    result4 = eunomia.check({
-        "resource": {"uri": "hr-agent"},
-        "principal": {"attributes": {"department": "hr", "role": "analyst"}}
-    })
-    print("Allowed:", result4)  # Expected output: False
+    result4 = eunomia.check(
+        resource_uri="hr-agent",
+        principal_attributes={"department": "hr", "role": "analyst"}
+    )
+    print("Allowed:", result4.allowed)  # Expected output: False
     ```
 
 === "Curl"
@@ -102,28 +102,28 @@ In this option, you do not provide registered identifiers for the entities. Inst
     # Allowed action
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "it"}}}'
+         -d '{"resource_uri": "it-desk-agent", "principal_attributes": {"department": "it"}}'
 
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
+         -d '{"resource_uri": "hr-agent", "principal_attributes": {"department": "hr", "role": "manager"}}'
 
     # Denied action
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "it-desk-agent"}, "principal": {"attributes": {"department": "sales"}}}'
+         -d '{"resource_uri": "it-desk-agent", "principal_attributes": {"department": "sales"}}'
 
     curl -X POST 'http://localhost:8000/check' \
          -H "Content-Type: application/json" \
-         -d '{"resource": {"uri": "hr-agent"}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
+         -d '{"resource_uri": "hr-agent", "principal_attributes": {"department": "hr", "role": "analyst"}}'
     ```
 
 === "Output"
     ```bash
-    true
-    true
-    false
-    false
+    {"allowed": true, "reason": "..."}
+    {"allowed": true, "reason": "..."}
+    {"allowed": false, "reason": "..."}
+    {"allowed": false, "reason": "..."}
     ```
 
 ---
@@ -136,24 +136,30 @@ In this option, you provide both the registered **`uri`** and additional attribu
     ```python
     # Option 3: Using both identifiers and additional runtime attributes.
     # Allowed action: The registered principal is enriched with runtime attributes.
-    result1 = eunomia.check({
-        "resource": {"uri": "it-desk-agent", "attributes": {"current_location": "HQ"}},
-        "principal": {"uri": "registered-principal-001", "attributes": {"department": "it"}}
-    })
-    print("Allowed:", result1)  # Expected output: True
+    result1 = eunomia.check(
+        principal_uri="registered-principal-001",
+        principal_attributes={"department": "it"}
+        resource_uri="it-desk-agent",
+        resource_attributes={"current_location": "HQ"},
+    )
+    print("Allowed:", result1.allowed)  # Expected output: True
 
-    result2 = eunomia.check({
-        "resource": {"uri": "hr-agent", "attributes": {"during_working_hours": "yes"}},
-        "principal": {"uri": "registered-principal-002", "attributes": {"department": "hr", "role": "manager"}}
-    })
-    print("Allowed:", result2)  # Expected output: True
+    result2 = eunomia.check(
+        principal_uri="registered-principal-002",
+        principal_attributes={"department": "hr", "role": "manager"}
+        resource_uri="hr-agent",
+        resource_attributes={"during_working_hours": "yes"},
+    )
+    print("Allowed:", result2.allowed)  # Expected output: True
 
     # Denied action: Additional runtime attributes do not override the insufficient registered attributes.
-    result3 = eunomia.check({
-        "resource": {"uri": "it-desk-agent", "attributes": {"current_location": "Remote"}},
-        "principal": {"uri": "registered-principal-003", "attributes": {"department": "sales"}}
-    })
-    print("Allowed:", result3)  # Expected output: False
+    result3 = eunomia.check(
+        resource_uri="it-desk-agent",
+        resource_attributes={"current_location": "Remote"},
+        principal_uri="registered-principal-003",
+        principal_attributes={"department": "sales"}
+    )
+    print("Allowed:", result3.allowed)  # Expected output: False
     ```
 
 === "Curl"
@@ -162,21 +168,21 @@ In this option, you provide both the registered **`uri`** and additional attribu
     # Allowed action
     curl -X POST 'http://localhost:8000/check' \
         -H "Content-Type: application/json" \
-        -d '{"resource": {"uri": "it-desk-agent", "attributes": {"current_location": "HQ"}}, "principal": {"uri": "registered-principal-001", "attributes": {"department": "it"}}}'
+        -d '{"principal_uri": "registered-principal-001", "principal_attributes": {"department": "it"}, "resource_uri": "it-desk-agent", "resource_attributes": {"current_location": "HQ"}}'
 
     curl -X POST 'http://localhost:8000/check' \
         -H "Content-Type: application/json" \
-        -d '{"resource": {"uri": "hr-agent", "attributes": {"during_working_hours": "yes"}}, "principal": {"uri": "registered-principal-002", "attributes": {"department": "hr", "role": "manager"}}}'
+        -d '{"principal_uri": "registered-principal-002", "principal_attributes": {"department": "hr", "role": "manager"}, "resource_uri": "hr-agent", "resource_attributes": {"during_working_hours": "yes"}}'
 
     # Denied action
     curl -X POST 'http://localhost:8000/check' \
         -H "Content-Type: application/json" \
-        -d '{"resource": {"uri": "it-desk-agent", "attributes": {"current_location": "Remote"}}, "principal": {"uri": "registered-principal-003", "attributes": {"department": "sales"}}}'
+        -d '{"principal_uri": "registered-principal-003", "principal_attributes": {"department": "sales"}, "resource_uri": "it-desk-agent", "resource_attributes": {"current_location": "Remote"}}'
     ```
 
 === "Output"
     ```bash
-    true
-    true
-    false
+    {"allowed": true, "reason": "..."}
+    {"allowed": true, "reason": "..."}
+    {"allowed": false, "reason": "..."}
     ```

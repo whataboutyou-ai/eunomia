@@ -3,7 +3,7 @@ import os
 from typing import Optional
 
 import typer
-from eunomia_sdk_python.client import EunomiaClient
+from eunomia_sdk.client import EunomiaClient
 
 from eunomia_mcp.cli.utils import (
     DEFAULT_POLICY,

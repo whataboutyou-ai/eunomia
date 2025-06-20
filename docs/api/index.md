@@ -9,9 +9,9 @@ Eunomia is developed and distributed through multiple libraries:
 
 ## Libraries
 
-| Name              | Package name             | Description                                                           | Jump to                                              |
-| ----------------- | ------------------------ | --------------------------------------------------------------------- | ---------------------------------------------------- |
-| Eunomia           | `eunomia-ai`             | Contains all logic for the Eunomia server and its exposed API         | [:material-arrow-right: Page](./main/index.md)       |
-| Eunomia Core      | `eunomia-core`           | Contains the shared functionalities such as data models and utilities | [:material-arrow-right: Page](./core/index.md)       |
-| Eunomia SDKs      | `eunomia-sdk-[SDK_NAME]` | The Eunomia SDKs for different languages                              | [:material-arrow-right: Page](./sdks/index.md)       |
-| Eunomia Extenions | `eunomia-[EXT_NAME]`     | The Eunomia extensions for different frameworks                       | [:material-arrow-right: Page](./extensions/index.md) |
+| Name              | Package name         | Description                                                           | Jump to                                              |
+| ----------------- | -------------------- | --------------------------------------------------------------------- | ---------------------------------------------------- |
+| Eunomia           | `eunomia-ai`         | Contains all logic for the Eunomia server and its exposed API         | [:material-arrow-right: Page](./main/index.md)       |
+| Eunomia Core      | `eunomia-core`       | Contains the shared functionalities such as data models and utilities | [:material-arrow-right: Page](./core/index.md)       |
+| Eunomia SDKs      | `eunomia-sdk`        | The Eunomia SDKs for different languages                              | [:material-arrow-right: Page](./sdks/index.md)       |
+| Eunomia Extenions | `eunomia-[EXT_NAME]` | The Eunomia extensions for different frameworks                       | [:material-arrow-right: Page](./extensions/index.md) |

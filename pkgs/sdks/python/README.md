@@ -4,10 +4,10 @@ This package allows you to integrate [Eunomia][eunomia-github] inside your Pytho
 
 ## Installation
 
-Install the `eunomia-sdk-python` package via pip:
+Install the `eunomia-sdk` package via pip:
 
 ```bash
-pip install eunomia-sdk-python
+pip install eunomia-sdk
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ pip install eunomia-sdk-python
 Create an instance of the `EunomiaClient` class to interact with the Eunomia server.
 
 ```python
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 
 client = EunomiaClient()
 ```

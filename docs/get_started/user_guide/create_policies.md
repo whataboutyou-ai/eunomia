@@ -13,7 +13,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 === "Python"
     ```python
     from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
-    from eunomia_sdk_python import EunomiaClient
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 

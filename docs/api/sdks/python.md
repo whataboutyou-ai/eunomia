@@ -4,10 +4,10 @@ The client allows you to register resources and principals with their metadata t
 
 ## Installation
 
-Install the `eunomia-sdk-python` package via pip:
+Install the `eunomia-sdk` package via pip:
 
 ```bash
-pip install eunomia-sdk-python
+pip install eunomia-sdk
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ pip install eunomia-sdk-python
 Import the `EunomiaClient` class and create an instance of it:
 
 ```python
-from eunomia_sdk_python import EunomiaClient
+from eunomia_sdk import EunomiaClient
 
 client = EunomiaClient(
     endpoint="http://localhost:8000",
@@ -55,4 +55,4 @@ print(f"Is allowed: {response.allowed}")
 
 ## Docs
 
-::: eunomia_sdk_python.client.EunomiaClient
+::: eunomia_sdk.client.EunomiaClient
