@@ -1,5 +1,6 @@
 from .factory import FetcherFactory
 from .internal import InternalFetcher, InternalFetcherConfig, internal_router_factory
+from .passport import PassportFetcher, PassportFetcherConfig
 
 # Register the built-in fetchers
 FetcherFactory.register_fetcher(
@@ -7,6 +8,12 @@ FetcherFactory.register_fetcher(
     InternalFetcher,
     InternalFetcherConfig,
     router_factory=internal_router_factory,
+)
+
+FetcherFactory.register_fetcher(
+    "passport",
+    PassportFetcher,
+    PassportFetcherConfig,
 )
 
 
