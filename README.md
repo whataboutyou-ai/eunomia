@@ -42,20 +42,18 @@ Key features:
 
 Eunomia is a standalone server to decouple the authorization logic from the main architecture of your AI Agent.
 
-### Installation
-
-Install the `eunomia` package via pip:
-
-```bash
-pip install eunomia-ai
-```
-
 ### Running the Server
 
-The server can be served locally with:
+Install the `eunomia-ai` package via `pip` and run the server locally with:
 
 ```bash
 eunomia server
+```
+
+Or use the Docker image instead:
+
+```bash
+docker run -d -p 8000:8000 ttommitt/eunomia-server:latest
 ```
 
 ### Usage
