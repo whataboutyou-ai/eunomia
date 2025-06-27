@@ -17,6 +17,11 @@ for fetcher_id, router in FetcherFactory.get_all_routers().items():
     app.include_router(router, prefix=f"/fetchers/{fetcher_id}", tags=[fetcher_id])
 
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
 @app.exception_handler(ValueError)
 async def value_error_handler(request, exc):
     return JSONResponse(
