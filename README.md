@@ -84,6 +84,32 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 ## Changelog
 
+### Migration to v0.3.5
+
+#### Renamed SDK packages: `eunomia-sdk-python` → `eunomia-sdk` and `eunomia-sdk-typescript` → `eunomia-sdk`
+
+The SDK packages have been renamed to `eunomia-sdk` for consistency. Install the new package and update your imports.
+
+Python:
+
+```python
+# Before (v0.3.4)
+from eunomia_sdk_python import EunomiaClient
+
+# After (v0.3.5)
+from eunomia_sdk import EunomiaClient
+```
+
+Typescript:
+
+```typescript
+// Before (v0.3.4)
+import { EunomiaClient } from "eunomia-sdk-typescript";
+
+// After (v0.3.5)
+import { EunomiaClient } from "eunomia-sdk";
+```
+
 ### Migration to v0.3.3
 
 #### Modified Response for `/check` and `/check/bulk`
@@ -94,10 +120,10 @@ Update your Python code to use the new response type:
 
 ```python
 # Before (v0.3.2)
-is_allowed = eunomia.check(principal, action, resource)
+is_allowed = eunomia.check(principal_uri, resource_uri)
 
 # After (v0.3.3)
-response = eunomia.check(principal, action, resource)
+response = eunomia.check(principal_uri, resource_uri)
 is_allowed = response.allowed
 ```
 

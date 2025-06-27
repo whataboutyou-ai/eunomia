@@ -12,7 +12,7 @@ members = [
     "eunomia-core",
     "eunomia-langchain",
     "eunomia-mcp",
-    "eunomia-sdk-python",
+    "eunomia-sdk",
 ]
 
 [[package]]
@@ -229,7 +229,7 @@ wheels = [
 
 [[package]]
 name = "eunomia-ai"
-version = "0.3.4"
+version = "0.3.5"
 source = { editable = "." }
 dependencies = [
     { name = "eunomia-core" },
@@ -274,7 +274,7 @@ docs = [
 
 [[package]]
 name = "eunomia-core"
-version = "0.3.4"
+version = "0.3.5"
 source = { editable = "pkgs/core" }
 dependencies = [
     { name = "pydantic" },
@@ -285,27 +285,27 @@ requires-dist = [{ name = "pydantic", specifier = ">=2.10.6" }]
 
 [[package]]
 name = "eunomia-langchain"
-version = "0.3.4"
+version = "0.3.5"
 source = { editable = "pkgs/extensions/langchain" }
 dependencies = [
-    { name = "eunomia-sdk-python" },
+    { name = "eunomia-sdk" },
     { name = "langchain" },
     { name = "langchain-core" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "eunomia-sdk-python", editable = "pkgs/sdks/python" },
+    { name = "eunomia-sdk", editable = "pkgs/sdks/python" },
     { name = "langchain", specifier = ">=0.3.20" },
     { name = "langchain-core", specifier = ">=0.3.41" },
 ]
 
 [[package]]
 name = "eunomia-mcp"
-version = "0.3.4"
+version = "0.3.5"
 source = { editable = "pkgs/extensions/mcp" }
 dependencies = [
-    { name = "eunomia-sdk-python" },
+    { name = "eunomia-sdk" },
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typer" },
@@ -313,15 +313,15 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "eunomia-sdk-python", editable = "pkgs/sdks/python" },
+    { name = "eunomia-sdk", editable = "pkgs/sdks/python" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "starlette", specifier = ">=0.45.3" },
     { name = "typer", specifier = ">=0.15.2" },
 ]
 
 [[package]]
-name = "eunomia-sdk-python"
-version = "0.3.4"
+name = "eunomia-sdk"
+version = "0.3.5"
 source = { editable = "pkgs/sdks/python" }
 dependencies = [
     { name = "eunomia-core" },

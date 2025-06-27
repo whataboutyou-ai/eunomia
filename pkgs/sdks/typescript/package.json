@@ -1,6 +1,6 @@
 {
-  "name": "eunomia-sdk-typescript",
-  "version": "0.3.4",
+  "name": "eunomia-sdk",
+  "version": "0.3.5",
   "description": "Eunomia SDK for TypeScript",
   "keywords": [
     "eunomia",
@@ -19,15 +19,17 @@
   "author": "What About You team <info@whataboutyou.ai>",
   "type": "commonjs",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/index.js"
   },
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "./src"
+    "./dist"
   ],
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "axios": "^1.8.0"

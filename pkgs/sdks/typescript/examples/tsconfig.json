@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": "..",
     "paths": {
-      "eunomia-sdk-typescript": ["src"]
+      "eunomia-sdk": ["src"]
     }
   },
   "include": ["./**/*"],
