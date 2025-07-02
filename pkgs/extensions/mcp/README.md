@@ -247,7 +247,12 @@ logger = logging.getLogger("eunomia_mcp")
 # WARNING: Authorization violation: Access denied for tools/call | Method: tools/call | Client: 192.168.1.100
 ```
 
+## Examples
+
+### [WhatsApp MCP to Authorized Contacts][example-whatsapp-mcp]
+
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
+[example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp
