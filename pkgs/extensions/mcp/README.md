@@ -12,6 +12,24 @@ Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [Fas
 - 🔧 **Flexible Configuration**: JSON-based policies with support for complex rules
 - 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
+### Architecture
+
+```mermaid
+sequenceDiagram
+    participant MCPClient as MCP Client
+    participant EunomiaMiddleware as Eunomia Middleware
+    participant MCPServer as MCP Server
+    participant EunomiaServer as Eunomia Server
+
+    MCPClient->>EunomiaMiddleware: MCP Request
+    Note over MCPClient, EunomiaMiddleware: Middleware intercepts request to server
+    EunomiaMiddleware->>EunomiaServer: Authorization Check
+    EunomiaServer->>EunomiaMiddleware: Authorization Decision (allow/deny)
+    EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
+    EunomiaMiddleware->>MCPServer: MCP Request (if allowed)
+    MCPServer-->>MCPClient: MCP Response (if allowed)
+```
+
 ### Installation
 
 ```bash
