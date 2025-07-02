@@ -44,19 +44,19 @@ eunomia server --reload
 You can also run the Eunomia server using the Docker image:
 
 ```bash
-docker run -d -p 8000:8000 ttommitt/eunomia-server:latest
+docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
 ```
 
 Pin to a specific version if needed:
 
 ```bash
-docker run -d -p 8000:8000 ttommitt/eunomia-server:0.3.5
+docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:0.3.5
 ```
 
 Modify the server configuration by providing environment variables:
 
 ```bash
-docker run -d -p 8000:8000 \
+docker run -d -p 8000:8000 --name eunomia \
     -e DEBUG=True \
     -e ENGINE_SQL_DATABASE_URL=postgresql://user:password@host:port/database \
     ttommitt/eunomia-server:latest
