@@ -2,7 +2,9 @@
 
 Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [FastMCP][fastmcp-docs] with minimal code changes.
 
-## Features
+## Overview
+
+### Features
 
 - 🔒 **Policy-Based Authorization**: Control which agents can access which MCP resources and tools
 - 📊 **Audit Logging**: Track all authorization decisions and violations
@@ -10,7 +12,7 @@ Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [Fas
 - 🔧 **Flexible Configuration**: JSON-based policies with support for complex rules
 - 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
-## Installation
+### Installation
 
 ```bash
 pip install eunomia-mcp
@@ -18,7 +20,9 @@ pip install eunomia-mcp
 
 ## Quick Start
 
-### Basic Integration
+### Create a MCP Server with Middleware
+
+#### Basic Integration
 
 ```python
 from fastmcp import FastMCP
@@ -47,15 +51,15 @@ if __name__ == "__main__":
 >
 > [Eunomia][eunomia-github] is a standalone server that handles the policy decisions, you must have it running alongside the MCP server.
 >
-> Install the `eunomia-ai` package and run it in the background with
+> Run it in the background with Docker:
 >
 > ```bash
-> eunomia server
+> docker run -d -p 8000:8000 ttommitt/eunomia-server:latest
 > ```
 >
 > Or refer to the [Eunomia documentation][eunomia-docs-run-server] for more options.
 
-### Advanced Integration
+#### Advanced Integration
 
 Configure the middleware with custom options for production deployments:
 
@@ -78,11 +82,11 @@ middleware = [
 app = mcp.http_app(middleware=middleware)
 ```
 
-## Policy Configuration
+### Policy Configuration
 
 Use the `eunomia-mcp` CLI to manage your MCP authorization policies:
 
-### Initialize a New Project
+#### Initialize a New Project
 
 ```bash
 # Create a default policy configuration file
@@ -97,14 +101,14 @@ eunomia-mcp init --sample
 
 You can now edit the policy configuration file to your liking.
 
-### Validate Policy Configuration
+#### Validate Policy Configuration
 
 ```bash
 # Validate your policy file
 eunomia-mcp validate mcp_policies.json
 ```
 
-### Push Policies to Eunomia
+#### Push Policies to Eunomia
 
 ```bash
 # Push your policy to Eunomia server
@@ -119,9 +123,11 @@ eunomia-mcp push mcp_policies.json --overwrite
 
 **Workflow**: Initialize → Customize policies → Validate → Run Eunomia server → Push to Eunomia → Run MCP server
 
-## How It Works
+## Further Reading
 
-### 1. Request Interception
+### How It Works
+
+#### 1. Request Interception
 
 The middleware intercepts all JSON-RPC 2.0 requests to your MCP server:
 
@@ -137,7 +143,7 @@ The middleware intercepts all JSON-RPC 2.0 requests to your MCP server:
 }
 ```
 
-### 2. Authorization Check
+#### 2. Authorization Check
 
 Requests are mapped to Eunomia resources and checked against policies:
 
@@ -145,12 +151,12 @@ Requests are mapped to Eunomia resources and checked against policies:
 - **Resource**: Mapped from MCP method and parameters (e.g., `mcp:tools:file_read`)
 - **Action**: Derived from MCP method (e.g., `execute` for `tools/call`)
 
-### 3. Response
+#### 3. Response
 
 - ✅ **Authorized**: Request proceeds to MCP server
 - ❌ **Denied**: JSON-RPC error response returned
 
-## MCP Method Mappings
+### MCP Method Mappings
 
 | MCP Method       | Resource URI         | Action    | Notes                    |
 | ---------------- | -------------------- | --------- | ------------------------ |
@@ -161,9 +167,9 @@ Requests are mapped to Eunomia resources and checked against policies:
 | `prompts/list`   | `mcp:prompts`        | `access`  | List available prompts   |
 | `prompts/get`    | `mcp:prompt:{name}`  | `read`    | Get specific prompt      |
 
-## Authentication
+### Authentication
 
-### Agent Identification
+#### Agent Identification
 
 Agents are identified through HTTP headers:
 
@@ -173,7 +179,7 @@ X-User-ID: user123
 Authorization: Bearer api-key-here
 ```
 
-### Custom Principal Extraction
+#### Custom Principal Extraction
 
 You can customize principal extraction by subclassing the middleware:
 
@@ -189,7 +195,7 @@ class CustomAuthMiddleware(EunomiaMcpMiddleware):
         }
 ```
 
-## Error Responses
+### Error Responses
 
 Authorization failures return standard JSON-RPC errors:
 
@@ -205,7 +211,7 @@ Authorization failures return standard JSON-RPC errors:
 }
 ```
 
-## Logging
+### Logging
 
 Enable comprehensive audit logging:
 
