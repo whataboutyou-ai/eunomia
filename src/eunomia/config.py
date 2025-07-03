@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Fetcher config
     FETCHERS: dict[str, dict] = {
-        "internal": {"sql_database_url": "sqlite:///./.db/eunomia_db.sqlite"}
+        "registry": {"sql_database_url": "sqlite:///./.db/eunomia_db.sqlite"}
     }
 
     # Server config

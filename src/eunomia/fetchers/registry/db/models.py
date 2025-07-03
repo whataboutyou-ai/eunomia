@@ -5,7 +5,7 @@ from eunomia_core import enums
 from sqlalchemy import JSON, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from eunomia.fetchers.internal.db import db
+from eunomia.fetchers.registry.db import db
 
 
 class Entity(db.Base):
