@@ -12,45 +12,59 @@ pip install eunomia-sdk
 
 ## Usage
 
-Import the `EunomiaClient` class and create an instance of it:
+### Standard API
+
+Use the standard API for authorization checks in your application:
 
 ```python
 from eunomia_sdk import EunomiaClient
 
-client = EunomiaClient(
-    endpoint="http://localhost:8000",
-    api_key="my-api-key",
+client = EunomiaClient(endpoint="http://localhost:8000")
+
+# Check if a principal has permissions to perform an action on a resource
+response = client.check(
+    principal_uri="user:123",
+    resource_uri="document:456",
+    action="read",
 )
+
+print(f"Is allowed: {response.allowed}")
 ```
 
-You can then use the client to interact with the Eunomia server:
+### Admin API Usage
+
+Use the admin API for server configuration and entity management:
 
 ```python
+from eunomia_sdk import EunomiaClient
+
+# For admin API usage authentication via API key might be required
+client = EunomiaClient(
+    endpoint="http://localhost:8000",
+    api_key="your-admin-api-key"  # or set WAY_API_KEY environment variable
+)
+
 # Register a resource with metadata
 resource = client.register_entity(
     type="resource",
+    uri="document:456",
     attributes={
         "name": "sensitive_document",
         "type": "document",
-        "classification": "confidential"}
-    )
+        "classification": "confidential",
+    },
+)
 
 # Register a principal with metadata
 principal = client.register_entity(
     type="principal",
+    uri="user:123",
     attributes={
         "name": "user_123",
         "role": "analyst",
-        "department": "research"}
-    )
-
-# Check if a principal has permissions to perform an action on a resource
-response = client.check(
-    principal_uri=principal.uri,
-    resource_uri=resource.uri
+        "department": "research",
+    },
 )
-
-print(f"Is allowed: {response.allowed}")
 ```
 
 ## Docs

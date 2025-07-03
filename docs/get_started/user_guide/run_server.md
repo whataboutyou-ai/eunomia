@@ -6,16 +6,19 @@ In this guide, you'll learn how to **configure** and **run** the Eunomia server.
 
 To run the Eunomia server, you must configure the following parameters:
 
-| **Parameter**             | **Description**                  | **Default Value**                                                        |
-| ------------------------- | -------------------------------- | ------------------------------------------------------------------------ |
-| `PROJECT_NAME`            | Name of the project              | `Eunomia Server`                                                         |
-| `DEBUG`                   | Flag to enable debug mode        | `False`                                                                  |
-| `ENGINE_SQL_DATABASE_URL` | Path to the policy database file | `sqlite:///.db/engine_db.sqlite`                                         |
-| `FETCHERS`                | Dictionary of fetchers to use    | `{"internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}}` |
+| **Parameter**             | **Description**                                             | **Default Value**                                                        |
+| ------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `PROJECT_NAME`            | Name of the project                                         | `Eunomia Server`                                                         |
+| `DEBUG`                   | Flag to enable debug mode                                   | `False`                                                                  |
+| `ENGINE_SQL_DATABASE_URL` | Path to the policy database file                            | `sqlite:///.db/engine_db.sqlite`                                         |
+| `FETCHERS`                | Dictionary of fetchers to use                               | `{"internal": {"sql_database_url": "sqlite:///.db/internal_db.sqlite"}}` |
+| `ADMIN_API_KEY`           | Optional pre-shared key for Admin API authentication        | `None`                                                                   |
+| `BULK_CHECK_MAX_REQUESTS` | Maximum number of requests allowed in bulk check operations | `100`                                                                    |
+| `BULK_CHECK_BATCH_SIZE`   | Batch size for processing bulk check requests               | `10`                                                                     |
 
 All parameters have default values, you can override any of them by setting environment variables, e.g., using a **`.env`** file.
 
-The _internal_ fetcher is provided by default to register and fetch metadata from a database.
+The `internal` fetcher is provided by default to register and fetch metadata from a database.
 
 ## Running the Server
 
