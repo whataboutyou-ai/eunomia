@@ -21,12 +21,12 @@ Now, you need to create a policy that will be used to enforce the access control
 1. Allow access to the resource with attributes `agent-id == it-desk-agent` to principals with the `department == it`.
 2. Allow access to the resource with attributes `agent-id == hr-agent` to principals with the `department == hr` _AND_ the `role == manager`.
 
-You can use the `POST /policies/simple` endpoint for this.
+You can use the `POST /admin/policies/simple` endpoint for this.
 
 === "Python"
-```python
-from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
-from eunomia_sdk import EunomiaClient
+    ```python
+    from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
+    from eunomia_sdk import EunomiaClient
 
     eunomia = EunomiaClient()
 
@@ -53,33 +53,33 @@ from eunomia_sdk import EunomiaClient
         To use the Python SDK, check out its [documentation](../api/sdks/python.md) for installation instructions.
 
 === "Curl"
-```bash
-curl -X POST 'http://localhost:8000/policies/simple?name=it-desk-policy' \
- -H "Content-Type: application/json" \
- -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
+    ```bash
+    curl -X POST 'http://localhost:8000/admin/policies/simple?name=it-desk-policy' \
+      -H "Content-Type: application/json" \
+      -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
 
-    curl -X POST 'http://localhost:8000/policies/simple?name=hr-policy' \
-    -H "Content-Type: application/json" \
-    -d '{"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"attributes": {"agent-id": "hr-agent"}}, "action": "access"}'
+    curl -X POST 'http://localhost:8000/admin/policies/simple?name=hr-policy' \
+      -H "Content-Type: application/json" \
+      -d '{"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"attributes": {"agent-id": "hr-agent"}}, "action": "access"}'
     ```
 
 === "Output"
-```json
-{
-"version": "1.0",
-"name":"it-desk-policy",
-"description": null,
-"rules":[
-{
-"name": "it-desk-policy",
-"effect": "allow",
-"principal_conditions": [{"path": "attributes.department", "operator": "==", "value": "it"}],
-"resource_conditions": [{"path": "attributes.agent-id", "operator": "==", "value": "it-desk-agent"}],
-"actions": ["access"]
-},
-],
-"default_effect": "deny"
-}
+    ```json
+    {
+        "version": "1.0",
+        "name":"it-desk-policy",
+        "description": null,
+        "rules":[
+            {
+                "name": "it-desk-policy",
+                "effect": "allow",
+                "principal_conditions": [{"path": "attributes.department", "operator": "==", "value": "it"}],
+                "resource_conditions": [{"path": "attributes.agent-id", "operator": "==", "value": "it-desk-agent"}],
+                "actions": ["access"]
+            }
+        ],
+        "default_effect": "deny"
+    }
 
     {
         "version": "1.0",
@@ -105,7 +105,7 @@ Now, you can enforce the policies in your application at runtime by checking the
 You can use the `POST /check` endpoint for this, passing the principal and resource identifiers and their attributes.
 
 === "Python"
-`python
+    ```python
     # allowed access
     eunomia.check(
         resource_attributes={"agent-id": "it-desk-agent"},
@@ -117,33 +117,34 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
     )
     # denied access
     eunomia.check(
-        resource_uri="it-desk-agent", principal_attributes={"department": "sales"}
+        resource_attributes="it-desk-agent",
+        principal_attributes={"department": "sales"},
     )
     eunomia.check(
-        resource_uri="hr-agent",
+        resource_attributes="hr-agent",
         principal_attributes={"department": "hr", "role": "analyst"},
     )
-    `
+    ```
 
 === "Curl"
-`bash
+    ```bash
     # allowed access
     curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
     curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
     # denied access
     curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
     curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
-    `
+    ```
 
 === "Output"
-`bash
+    ```bash
     # allowed access
     {"allowed":true, "reason":"Rule it-desk-policy allowed the action in policy it-desk-policy"}
     {"allowed":true, "reason":"Rule hr-policy allowed the action in policy hr-policy"}
     # denied access
     {"allowed":false, "reason":"Action denied by default effect"}
     {"allowed":false, "reason":"Action denied by default effect"}
-    `
+    ```
 
 Congratulations! You've just made your first steps with Eunomia.
 

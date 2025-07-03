@@ -149,7 +149,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post(
-            "/fetchers/internal/entities", json=entity.model_dump()
+            "/admin/fetchers/internal/entities", json=entity.model_dump()
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
@@ -183,7 +183,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityUpdate(uri=uri, attributes=attributes)
         response = self.client.put(
-            f"/fetchers/internal/entities/{uri}",
+            f"/admin/fetchers/internal/entities/{uri}",
             json=entity.model_dump(),
             params={"override": override},
         )
@@ -204,7 +204,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.delete(f"/fetchers/internal/entities/{uri}")
+        response = self.client.delete(f"/admin/fetchers/internal/entities/{uri}")
         self._handle_response(response)
         return response.json()
 
@@ -222,7 +222,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.post("/policies", json=request.model_dump())
+        response = self.client.post("/admin/policies", json=request.model_dump())
         self._handle_response(response)
         return schemas.Policy.model_validate(response.json())
 
@@ -245,7 +245,7 @@ class EunomiaClient:
             If the HTTP request returns an unsuccessful status code.
         """
         response = self.client.post(
-            "/policies/simple", json=request.model_dump(), params={"name": name}
+            "/admin/policies/simple", json=request.model_dump(), params={"name": name}
         )
         self._handle_response(response)
         return schemas.Policy.model_validate(response.json())
@@ -264,7 +264,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.get("/policies")
+        response = self.client.get("/admin/policies")
         self._handle_response(response)
         return [schemas.Policy.model_validate(policy) for policy in response.json()]
 
@@ -287,6 +287,6 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.delete(f"/policies/{name}")
+        response = self.client.delete(f"/admin/policies/{name}")
         self._handle_response(response)
         return response.json()

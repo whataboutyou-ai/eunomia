@@ -155,7 +155,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/fetchers/internal/entities",
+        "/admin/fetchers/internal/entities",
         entity,
       );
       return this.handleResponse(response);
@@ -190,7 +190,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.put<EntityInDb>(
-        `/fetchers/internal/entities/${options.uri}`,
+        `/admin/fetchers/internal/entities/${options.uri}`,
         entity,
         {
           params: { override: options.override || false },
@@ -216,7 +216,7 @@ export class EunomiaClient {
   async deleteEntity(uri: string): Promise<boolean> {
     try {
       const response = await this.client.delete(
-        `/fetchers/internal/entities/${uri}`,
+        `/admin/fetchers/internal/entities/${uri}`,
       );
       return this.handleResponse(response);
     } catch (error) {
@@ -238,7 +238,7 @@ export class EunomiaClient {
   async createPolicy(policy: Policy): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
-        "/policies",
+        "/admin/policies",
         policy,
       );
       return this.handleResponse(response);
@@ -262,7 +262,7 @@ export class EunomiaClient {
   async createSimplePolicy(request: CheckRequest, name: string): Promise<Policy> {
     try {
       const response = await this.client.post<Policy>(
-        "/policies/simple",
+        "/admin/policies/simple",
         request,
         {
           params: { name },
@@ -286,7 +286,7 @@ export class EunomiaClient {
    */
   async getPolicies(): Promise<Policy[]> {
     try {
-      const response = await this.client.get<Policy[]>("/policies");
+      const response = await this.client.get<Policy[]>("/admin/policies");
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -306,7 +306,7 @@ export class EunomiaClient {
    */
   async deletePolicy(name: string): Promise<boolean> {
     try {
-      const response = await this.client.delete<boolean>(`/policies/${name}`);
+      const response = await this.client.delete<boolean>(`/admin/policies/${name}`);
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

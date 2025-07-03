@@ -16,7 +16,7 @@ def public_router_factory(server: EunomiaServer) -> APIRouter:
 
 
 def admin_router_factory(server: EunomiaServer) -> APIRouter:
-    router = APIRouter(dependencies=[Depends(validate_api_key)])
+    router = APIRouter(dependencies=[Depends(validate_api_key)], prefix="/admin")
 
     router.include_router(engine_router_factory(server.engine), tags=["engine"])
 
