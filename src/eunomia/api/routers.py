@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from eunomia.api.dependencies import validate_api_key
 from eunomia.engine.router import engine_router_factory
 from eunomia.fetchers.factory import FetcherFactory
 from eunomia.server import EunomiaServer
@@ -15,7 +16,7 @@ def public_router_factory(server: EunomiaServer) -> APIRouter:
 
 
 def admin_router_factory(server: EunomiaServer) -> APIRouter:
-    router = APIRouter()
+    router = APIRouter(dependencies=[Depends(validate_api_key)])
 
     router.include_router(engine_router_factory(server.engine), tags=["engine"])
 
