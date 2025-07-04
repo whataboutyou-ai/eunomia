@@ -82,6 +82,23 @@ For more examples and detailed usage, check out the [documentation][docs].
 
 ## Changelog
 
+### Migration to v0.3.6
+
+#### Admin API endpoints now require `/admin` prefix
+
+Admin endpoints for policy and entity management have been moved under the `/admin` prefix for better organization and security. Update your requests to use the new endpoints:
+
+**Affected endpoints:**
+
+- All `/policies[...]` endpoints → `/admin/policies[...]`
+- All `/fetchers[...]` endpoints → `/admin/fetchers[...]`
+
+**Public endpoints unchanged:**
+
+- All `/check[...]` endpoints remain public
+
+The SDKs have been automatically updated to use the new endpoints.
+
 ### Migration to v0.3.5
 
 #### Renamed SDK packages: `eunomia-sdk-python` → `eunomia-sdk` and `eunomia-sdk-typescript` → `eunomia-sdk`

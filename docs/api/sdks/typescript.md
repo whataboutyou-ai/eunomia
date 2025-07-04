@@ -12,47 +12,58 @@ npm install eunomia-sdk
 
 ## Usage
 
-Import the EunomiaClient class and create an instance of it:
+### Standard API
+
+Use the standard API for authorization checks in your application:
+
+```typescript
+import { EunomiaClient } from "eunomia-sdk";
+
+const client = new EunomiaClient({
+  endpoint: "http://localhost:8000"
+});
+
+// Check if a principal has permissions to perform an action on a resource
+const response = await client.check({
+  principalUri: "user:123",
+  resourceUri: "document:456",
+  action: "read",
+});
+
+console.log(`Is allowed: ${response.allowed}`);
+```
 
 ```typescript
 import { EunomiaClient, EntityType } from "eunomia-sdk";
 
+// For admin API usage authentication via API key might be required
 const client = new EunomiaClient({
   endpoint: "http://localhost:8000",
   apiKey: "my-api-key",
 });
-```
 
-You can then use the client to interact with the Eunomia server:
-
-```typescript
 // Register a resource with metadata
 const resource = await client.registerEntity({
   type: EntityType.Resource,
+  uri: "document:456",
   attributes: {
+    name: "sensitive_document",
     type: "document",
     classification: "confidential",
   },
-  uri: "document:project-plan",
+  
 });
 
 // Register a principal with metadata
 const principal = await client.registerEntity({
   type: EntityType.Principal,
+  uri: "user:123",
   attributes: {
-    role: "admin",
-    department: "engineering",
+    name: "user_123",
+    role: "analyst",
+    department: "research",
   },
-  uri: "user:john.doe",
 });
-
-// Check if a principal has permissions to perform an action on a resource
-const response = await client.check({
-  principalUri: principal.uri,
-  resourceUri: resource.uri,
-});
-
-console.log(`Is allowed: ${response.allowed}`);
 ```
 
 ## Docs
