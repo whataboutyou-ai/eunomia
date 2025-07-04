@@ -53,7 +53,7 @@ eunomia server
 Or use the Docker image instead:
 
 ```bash
-docker run -d -p 8000:8000 ttommitt/eunomia-server:latest
+docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
 ```
 
 ### Usage
