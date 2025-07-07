@@ -149,7 +149,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityCreate(type=type, attributes=attributes, uri=uri)
         response = self.client.post(
-            "/admin/fetchers/internal/entities", json=entity.model_dump()
+            "/admin/fetchers/registry/entities", json=entity.model_dump()
         )
         self._handle_response(response)
         return schemas.EntityInDb.model_validate(response.json())
@@ -183,7 +183,7 @@ class EunomiaClient:
         """
         entity = schemas.EntityUpdate(uri=uri, attributes=attributes)
         response = self.client.put(
-            f"/admin/fetchers/internal/entities/{uri}",
+            f"/admin/fetchers/registry/entities/{uri}",
             json=entity.model_dump(),
             params={"override": override},
         )
@@ -204,7 +204,7 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
-        response = self.client.delete(f"/admin/fetchers/internal/entities/{uri}")
+        response = self.client.delete(f"/admin/fetchers/registry/entities/{uri}")
         self._handle_response(response)
         return response.json()
 

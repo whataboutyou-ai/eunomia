@@ -99,6 +99,10 @@ Admin endpoints for policy and entity management have been moved under the `/adm
 
 The SDKs have been automatically updated to use the new endpoints.
 
+#### Renamed fetcher: `internal` → `registry`
+
+The `internal` fetcher has been renamed to `registry` for consistency. Update your configuration and endpoints to use the new name.
+
 ### Migration to v0.3.5
 
 #### Renamed SDK packages: `eunomia-sdk-python` → `eunomia-sdk` and `eunomia-sdk-typescript` → `eunomia-sdk`

@@ -3,7 +3,7 @@ import json
 from eunomia_core import schemas
 from sqlalchemy.orm import Session, joinedload
 
-from eunomia.fetchers.internal.db import models
+from eunomia.fetchers.registry.db import models
 
 
 def create_entity(entity: schemas.EntityCreate, db: Session) -> models.Entity:

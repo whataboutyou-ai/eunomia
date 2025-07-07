@@ -2,17 +2,17 @@ from eunomia_core import schemas
 from sqlalchemy.orm import Session
 
 from eunomia.fetchers.base import BaseFetcher, BaseFetcherConfig
-from eunomia.fetchers.internal.db import crud, db
+from eunomia.fetchers.registry.db import crud, db
 
 
-class InternalFetcherConfig(BaseFetcherConfig):
+class RegistryFetcherConfig(BaseFetcherConfig):
     sql_database_url: str
 
 
-class InternalFetcher(BaseFetcher):
-    config: InternalFetcherConfig
+class RegistryFetcher(BaseFetcher):
+    config: RegistryFetcherConfig
 
-    def __init__(self, config: InternalFetcherConfig):
+    def __init__(self, config: RegistryFetcherConfig):
         super().__init__(config)
         db.init_db(self.config.sql_database_url)
 

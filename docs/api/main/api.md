@@ -23,14 +23,14 @@ The admin API is designed for server configuration and management tasks. These e
 - `GET /admin/policies/{name}`: Get a policy by name
 - `DELETE /admin/policies/{name}`: Delete a policy by name
 
-If the `internal` fetcher is enabled (which is by default), the following endpoints are also available:
+If the `registry` fetcher is enabled (which is by default), the following endpoints are also available:
 
-- `GET /admin/fetchers/internal/entities`: Get entities with pagination
-- `GET /admin/fetchers/internal/entities/$count`: Get the total number of entities
-- `POST /admin/fetchers/internal/entities`: Register a new entity in the system
-- `GET /admin/fetchers/internal/entities/{uri}`: Get an entity by URI
-- `PUT /admin/fetchers/internal/entities/{uri}`: Update an existing entity
-- `DELETE /admin/fetchers/internal/entities/{uri}`: Delete an entity from the system
+- `GET /admin/fetchers/registry/entities`: Get entities with pagination
+- `GET /admin/fetchers/registry/entities/$count`: Get the total number of entities
+- `POST /admin/fetchers/registry/entities`: Register a new entity in the system
+- `GET /admin/fetchers/registry/entities/{uri}`: Get an entity by URI
+- `PUT /admin/fetchers/registry/entities/{uri}`: Update an existing entity
+- `DELETE /admin/fetchers/registry/entities/{uri}`: Delete an entity from the system
 
 #### Admin API Authentication
 

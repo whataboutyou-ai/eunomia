@@ -2,7 +2,7 @@ In addition to registering entities, you can update or delete them using dedicat
 
 ## Update an Entity
 
-The **`PUT /admin/fetchers/internal/entities/{uri}`** endpoint allows you to update an already registered entity. The JSON payload must conform to the **EntityUpdate** schema. In this schema:
+The **`PUT /admin/fetchers/registry/entities/{uri}`** endpoint allows you to update an already registered entity. The JSON payload must conform to the **EntityUpdate** schema. In this schema:
 
 - **`uri`** (required):  
   The unique identifier for the entity that you want to update.
@@ -13,7 +13,7 @@ The **`PUT /admin/fetchers/internal/entities/{uri}`** endpoint allows you to upd
 
 ## Delete an Entity
 
-The **`DELETE /admin/fetchers/internal/entities/{uri}`** endpoint allows you to delete an entity by providing its unique **`uri`**.
+The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to delete an entity by providing its unique **`uri`**.
 
 ## Example Usage
 
@@ -43,7 +43,7 @@ The **`DELETE /admin/fetchers/internal/entities/{uri}`** endpoint allows you to 
 === "Curl"
     ```bash
     # Update an entity
-    curl -X PUT 'http://localhost:8000/admin/fetchers/internal/entities/generated-uri-123' \
+    curl -X PUT 'http://localhost:8000/admin/fetchers/registry/entities/generated-uri-123' \
          -H "Content-Type: application/json" \
          -d '{
                "uri": "generated-uri-123",
@@ -56,7 +56,7 @@ The **`DELETE /admin/fetchers/internal/entities/{uri}`** endpoint allows you to 
              }'
 
     # Delete an entity
-    curl -X DELETE 'http://localhost:8000/admin/fetchers/internal/entities/generated-uri-123' \
+    curl -X DELETE 'http://localhost:8000/admin/fetchers/registry/entities/generated-uri-123' \
          -H "Content-Type: application/json" \
          -d '{"uri": "generated-uri-123"}'
     ```

@@ -14,7 +14,7 @@ def init_db(sql_database_url: str):
     global engine, SessionLocal
 
     if not sql_database_url:
-        raise ValueError("sql_database_url must be provided for 'internal' fetcher")
+        raise ValueError("sql_database_url must be provided for 'registry' fetcher")
 
     connect_args = {}
     if sql_database_url.startswith("sqlite"):

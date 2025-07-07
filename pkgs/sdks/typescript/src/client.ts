@@ -155,7 +155,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.post<EntityInDb>(
-        "/admin/fetchers/internal/entities",
+        "/admin/fetchers/registry/entities",
         entity,
       );
       return this.handleResponse(response);
@@ -190,7 +190,7 @@ export class EunomiaClient {
 
     try {
       const response = await this.client.put<EntityInDb>(
-        `/admin/fetchers/internal/entities/${options.uri}`,
+        `/admin/fetchers/registry/entities/${options.uri}`,
         entity,
         {
           params: { override: options.override || false },
@@ -216,7 +216,7 @@ export class EunomiaClient {
   async deleteEntity(uri: string): Promise<boolean> {
     try {
       const response = await this.client.delete(
-        `/admin/fetchers/internal/entities/${uri}`,
+        `/admin/fetchers/registry/entities/${uri}`,
       );
       return this.handleResponse(response);
     } catch (error) {
