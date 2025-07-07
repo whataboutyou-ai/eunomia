@@ -2,7 +2,7 @@ In the [Quickstart](../index.md) guide, we showed how to use the `POST /check` e
 
 ## Register a New Entity
 
-You can register a new entity using the `POST /fetchers/internal/entities` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
+You can register a new entity using the `POST /admin/fetchers/registry/entities` endpoint. This endpoint accepts a **POST** request with a JSON payload that follows the **EntityCreate** schema. Upon successful registration, the server returns the entity's information as defined by the **EntityInDb** model.
 
 ### Payload Requirements
 
@@ -60,7 +60,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/fetchers/internal/register-entity' \
+    curl -X POST 'http://localhost:8000/admin/fetchers/registry/entities' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "resource",
@@ -71,7 +71,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
                }
              }'
 
-    curl -X POST 'http://localhost:8000/fetchers/internal/entities' \
+    curl -X POST 'http://localhost:8000/admin/fetchers/registry/entities' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "principal",

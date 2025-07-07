@@ -13,6 +13,22 @@ The Eunomia MCP Authorization Middleware provides **policy-based authorization**
 
 ### Architecture
 
+```mermaid
+sequenceDiagram
+    participant MCPClient as MCP Client
+    participant EunomiaMiddleware as Eunomia Middleware
+    participant MCPServer as MCP Server
+    participant EunomiaServer as Eunomia Server
+
+    MCPClient->>EunomiaMiddleware: MCP Request
+    Note over MCPClient, EunomiaMiddleware: Middleware intercepts request to server
+    EunomiaMiddleware->>EunomiaServer: Authorization Check
+    EunomiaServer->>EunomiaMiddleware: Authorization Decision (allow/deny)
+    EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
+    EunomiaMiddleware->>MCPServer: MCP Request (if allowed)
+    MCPServer-->>MCPClient: MCP Response (if allowed)
+```
+
 The middleware operates as a transparent authorization layer that:
 
 1. **Intercepts** JSON-RPC 2.0 requests to your MCP server

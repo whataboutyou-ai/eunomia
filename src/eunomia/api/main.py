@@ -1,20 +1,21 @@
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 
+from eunomia.api.routers import admin_router_factory, public_router_factory
 from eunomia.config import settings
-from eunomia.engine.router import engine_router_factory
-from eunomia.fetchers.factory import FetcherFactory
 from eunomia.server import EunomiaServer
-from eunomia.server.router import server_router_factory
 
 app = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG)
 server = EunomiaServer()
 
-app.include_router(server_router_factory(server), tags=["server"])
-app.include_router(engine_router_factory(server.engine), tags=["engine"])
 
-for fetcher_id, router in FetcherFactory.get_all_routers().items():
-    app.include_router(router, prefix=f"/fetchers/{fetcher_id}", tags=[fetcher_id])
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+
+app.include_router(public_router_factory(server))
+app.include_router(admin_router_factory(server))
 
 
 @app.exception_handler(ValueError)

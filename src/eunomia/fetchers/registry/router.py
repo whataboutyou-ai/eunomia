@@ -2,11 +2,11 @@ from eunomia_core import schemas
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from eunomia.fetchers.internal import InternalFetcher
-from eunomia.fetchers.internal.db import crud, db
+from eunomia.fetchers.registry import RegistryFetcher
+from eunomia.fetchers.registry.db import crud, db
 
 
-def internal_router_factory(fetcher: InternalFetcher) -> APIRouter:
+def registry_router_factory(fetcher: RegistryFetcher) -> APIRouter:
     router = APIRouter()
 
     @router.get("/entities", response_model=list[schemas.EntityInDb])

@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,14 +19,15 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Engine config
-    ENGINE_SQL_DATABASE_URL: str = "sqlite:///./.db/engine_db.sqlite"
+    ENGINE_SQL_DATABASE_URL: str = "sqlite:///./.db/eunomia_db.sqlite"
 
     # Fetcher config
     FETCHERS: dict[str, dict] = {
-        "internal": {"sql_database_url": "sqlite:///./.db/internal_db.sqlite"}
+        "registry": {"sql_database_url": "sqlite:///./.db/eunomia_db.sqlite"}
     }
 
     # Server config
+    ADMIN_API_KEY: Optional[str] = None
     BULK_CHECK_MAX_REQUESTS: int = 100
     BULK_CHECK_BATCH_SIZE: int = 10
 

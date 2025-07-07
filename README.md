@@ -42,20 +42,18 @@ Key features:
 
 Eunomia is a standalone server to decouple the authorization logic from the main architecture of your AI Agent.
 
-### Installation
-
-Install the `eunomia` package via pip:
-
-```bash
-pip install eunomia-ai
-```
-
 ### Running the Server
 
-The server can be served locally with:
+Install the `eunomia-ai` package via `pip` and run the server locally with:
 
 ```bash
 eunomia server
+```
+
+Or use the Docker image instead:
+
+```bash
+docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
 ```
 
 ### Usage
@@ -83,6 +81,27 @@ Eunomia provides extensions for the following frameworks:
 For more examples and detailed usage, check out the [documentation][docs].
 
 ## Changelog
+
+### Migration to v0.3.6
+
+#### Admin API endpoints now require `/admin` prefix
+
+Admin endpoints for policy and entity management have been moved under the `/admin` prefix for better organization and security. Update your requests to use the new endpoints:
+
+**Affected endpoints:**
+
+- All `/policies[...]` endpoints → `/admin/policies[...]`
+- All `/fetchers[...]` endpoints → `/admin/fetchers[...]`
+
+**Public endpoints unchanged:**
+
+- All `/check[...]` endpoints remain public
+
+The SDKs have been automatically updated to use the new endpoints.
+
+#### Renamed fetcher: `internal` → `registry`
+
+The `internal` fetcher has been renamed to `registry` for consistency. Update your configuration and endpoints to use the new name.
 
 ### Migration to v0.3.5
 
