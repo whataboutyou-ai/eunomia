@@ -1,14 +1,14 @@
 import pytest
 from eunomia_core import enums, schemas
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from eunomia.fetchers.registry import RegistryFetcher, RegistryFetcherConfig
 from eunomia.fetchers.registry.db import db
 
 
 @pytest.fixture(scope="function")
-def fixture_registry_db():
+def fixture_db():
     """Create an in-memory SQLite database for registry testing."""
     test_engine = create_engine("sqlite:///:memory:")
     db.Base.metadata.create_all(test_engine)
@@ -35,15 +35,15 @@ def fixture_registry_db():
 
 
 @pytest.fixture
-def registry_fetcher_config():
+def fixture_registry_config():
     """Create a registry fetcher configuration for testing."""
     return RegistryFetcherConfig(sql_database_url="sqlite:///:memory:")
 
 
 @pytest.fixture
-def registry_fetcher(registry_fetcher_config):
+def fixture_registry(fixture_registry_config):
     """Create a registry fetcher instance for testing."""
-    return RegistryFetcher(registry_fetcher_config)
+    return RegistryFetcher(fixture_registry_config)
 
 
 @pytest.fixture
@@ -59,3 +59,15 @@ def sample_entity_create_resource():
             schemas.Attribute(key="tags", value=["public", "documentation"]),
         ],
     )
+
+
+@pytest.fixture
+def fixture_registry_with_entity(
+    fixture_registry: RegistryFetcher,
+    sample_entity_create_resource: schemas.EntityCreate,
+    fixture_db: Session,
+):
+    """Create a registry fetcher instance with an entity for testing."""
+    fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
+    fixture_db.commit()
+    yield fixture_registry

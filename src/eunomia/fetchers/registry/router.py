@@ -23,7 +23,7 @@ def registry_router_factory(fetcher: RegistryFetcher) -> APIRouter:
     async def create_entity(
         entity: schemas.EntityCreate, db_session: Session = Depends(db.get_db)
     ):
-        return fetcher.register_entity(entity, db=db_session)
+        return fetcher.register_entity(entity, db_session=db_session)
 
     @router.get("/entities/{uri}", response_model=schemas.EntityInDb)
     async def get_entity(uri: str, db_session: Session = Depends(db.get_db)):
@@ -46,10 +46,10 @@ def registry_router_factory(fetcher: RegistryFetcher) -> APIRouter:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="URI mismatch",
             )
-        return fetcher.update_entity(entity, override=override, db=db_session)
+        return fetcher.update_entity(entity, override=override, db_session=db_session)
 
     @router.delete("/entities/{uri}", response_model=bool)
     async def delete_entity(uri: str, db_session: Session = Depends(db.get_db)):
-        return fetcher.delete_entity(uri, db=db_session)
+        return fetcher.delete_entity(uri, db_session=db_session)
 
     return router

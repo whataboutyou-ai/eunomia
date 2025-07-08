@@ -11,24 +11,24 @@ class TestRegistryFetcher:
 
     def test_init_with_config(
         self,
-        registry_fetcher: RegistryFetcher,
-        registry_fetcher_config: RegistryFetcherConfig,
+        fixture_registry: RegistryFetcher,
+        fixture_registry_config: RegistryFetcherConfig,
     ):
         """Test fetcher initialization with config"""
 
-        assert registry_fetcher.config == registry_fetcher_config
-        assert registry_fetcher.config.sql_database_url == "sqlite:///:memory:"
+        assert fixture_registry.config == fixture_registry_config
+        assert fixture_registry.config.sql_database_url == "sqlite:///:memory:"
 
     def test_register_entity_success(
         self,
-        fixture_registry_db: Session,
+        fixture_db: Session,
         sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        fixture_registry: RegistryFetcher,
     ):
         """Test successful entity registration"""
 
-        result = registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
+        result = fixture_registry.register_entity(
+            sample_entity_create_resource, fixture_db
         )
         attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
@@ -40,28 +40,24 @@ class TestRegistryFetcher:
 
     def test_register_entity_duplicate_uri(
         self,
-        fixture_registry_db: Session,
+        fixture_db: Session,
         sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        fixture_registry: RegistryFetcher,
     ):
         """Test registering entity with duplicate URI raises error"""
 
         # Register first entity
-        registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
-        )
+        fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
 
         # Try to register same entity again
         with pytest.raises(
             ValueError,
             match="Entity with uri 'test://resource/1' is already registered",
         ):
-            registry_fetcher.register_entity(
-                sample_entity_create_resource, fixture_registry_db
-            )
+            fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
 
     def test_register_entity_different_types(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_db: Session, fixture_registry: RegistryFetcher
     ):
         """Test registering entities of different types"""
 
@@ -77,11 +73,9 @@ class TestRegistryFetcher:
             attributes=[schemas.Attribute(key="name", value="Principal")],
         )
 
-        resource_result = registry_fetcher.register_entity(
-            resource_entity, fixture_registry_db
-        )
-        principal_result = registry_fetcher.register_entity(
-            principal_entity, fixture_registry_db
+        resource_result = fixture_registry.register_entity(resource_entity, fixture_db)
+        principal_result = fixture_registry.register_entity(
+            principal_entity, fixture_db
         )
 
         assert resource_result.type == enums.EntityType.resource
@@ -89,15 +83,13 @@ class TestRegistryFetcher:
 
     def test_update_entity_success(
         self,
-        fixture_registry_db: Session,
+        fixture_db: Session,
         sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        fixture_registry: RegistryFetcher,
     ):
         """Test successful entity update"""
         # Register initial entity
-        registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
-        )
+        fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
 
         # Update entity
         update_data = schemas.EntityUpdate(
@@ -108,8 +100,8 @@ class TestRegistryFetcher:
             ],
         )
 
-        result = registry_fetcher.update_entity(
-            update_data, override=False, db=fixture_registry_db
+        result = fixture_registry.update_entity(
+            update_data, override=False, db_session=fixture_db
         )
         attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
@@ -120,16 +112,14 @@ class TestRegistryFetcher:
 
     def test_update_entity_with_override(
         self,
-        fixture_registry_db: Session,
+        fixture_db: Session,
         sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        fixture_registry: RegistryFetcher,
     ):
         """Test entity update with override=True"""
 
         # Register initial entity
-        registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
-        )
+        fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
 
         # Update with override
         update_data = schemas.EntityUpdate(
@@ -140,8 +130,8 @@ class TestRegistryFetcher:
             ],
         )
 
-        result = registry_fetcher.update_entity(
-            update_data, override=True, db=fixture_registry_db
+        result = fixture_registry.update_entity(
+            update_data, override=True, db_session=fixture_db
         )
         attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
@@ -152,7 +142,7 @@ class TestRegistryFetcher:
         assert "owner" not in attributes_dict
 
     def test_update_entity_not_found(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_db: Session, fixture_registry: RegistryFetcher
     ):
         """Test updating non-existent entity raises error"""
 
@@ -165,34 +155,32 @@ class TestRegistryFetcher:
             ValueError,
             match="Entity with uri 'test://resource/nonexistent' is not registered",
         ):
-            registry_fetcher.update_entity(
-                update_data, override=False, db=fixture_registry_db
+            fixture_registry.update_entity(
+                update_data, override=False, db_session=fixture_db
             )
 
     def test_delete_entity_success(
         self,
-        fixture_registry_db: Session,
+        fixture_db: Session,
         sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        fixture_registry: RegistryFetcher,
     ):
         """Test successful entity deletion"""
 
         # Register entity
-        registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
-        )
+        fixture_registry.register_entity(sample_entity_create_resource, fixture_db)
 
         # Verify entity exists
-        assert crud.get_entity("test://resource/1", fixture_registry_db) is not None
+        assert crud.get_entity("test://resource/1", fixture_db) is not None
 
         # Delete entity
-        registry_fetcher.delete_entity("test://resource/1", fixture_registry_db)
+        fixture_registry.delete_entity("test://resource/1", fixture_db)
 
         # Verify entity is deleted
-        assert crud.get_entity("test://resource/1", fixture_registry_db) is None
+        assert crud.get_entity("test://resource/1", fixture_db) is None
 
     def test_delete_entity_not_found(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_db: Session, fixture_registry: RegistryFetcher
     ):
         """Test deleting non-existent entity raises error"""
 
@@ -200,26 +188,18 @@ class TestRegistryFetcher:
             ValueError,
             match="Entity with uri 'test://resource/nonexistent' is not registered",
         ):
-            registry_fetcher.delete_entity(
-                "test://resource/nonexistent", fixture_registry_db
-            )
+            fixture_registry.delete_entity("test://resource/nonexistent", fixture_db)
 
     @pytest.mark.asyncio
     async def test_fetch_attributes_success(
-        self,
-        fixture_registry_db: Session,
-        sample_entity_create_resource: schemas.EntityCreate,
-        registry_fetcher: RegistryFetcher,
+        self, fixture_registry_with_entity: RegistryFetcher
     ):
         """Test successful attribute fetching"""
 
-        # Register entity
-        registry_fetcher.register_entity(
-            sample_entity_create_resource, fixture_registry_db
-        )
-
         # Fetch attributes
-        attributes = await registry_fetcher.fetch_attributes("test://resource/1")
+        attributes = await fixture_registry_with_entity.fetch_attributes(
+            "test://resource/1"
+        )
 
         assert isinstance(attributes, dict)
         assert "name" in attributes
@@ -231,19 +211,19 @@ class TestRegistryFetcher:
 
     @pytest.mark.asyncio
     async def test_fetch_attributes_not_found(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_registry_with_entity: RegistryFetcher
     ):
         """Test fetching attributes for non-existent entity"""
 
         # Fetch attributes for non-existent entity
-        attributes = await registry_fetcher.fetch_attributes(
+        attributes = await fixture_registry_with_entity.fetch_attributes(
             "test://resource/nonexistent"
         )
 
         assert attributes == {}
 
     def test_entity_lifecycle(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_db: Session, fixture_registry: RegistryFetcher
     ):
         """Test complete entity lifecycle: create, update, delete"""
 
@@ -257,7 +237,7 @@ class TestRegistryFetcher:
             ],
         )
 
-        created = registry_fetcher.register_entity(entity, fixture_registry_db)
+        created = fixture_registry.register_entity(entity, fixture_db)
         attributes_dict = {attr.key: attr.value for attr in created.attributes}
         assert created.uri == "test://resource/lifecycle"
         assert attributes_dict["name"] == "Lifecycle Test"
@@ -271,8 +251,8 @@ class TestRegistryFetcher:
             ],
         )
 
-        updated = registry_fetcher.update_entity(
-            update, override=False, db=fixture_registry_db
+        updated = fixture_registry.update_entity(
+            update, override=False, db_session=fixture_db
         )
         attributes_dict = {attr.key: attr.value for attr in updated.attributes}
         assert attributes_dict["version"] == "v2.0"
@@ -280,19 +260,17 @@ class TestRegistryFetcher:
         assert attributes_dict["name"] == "Lifecycle Test"  # Should retain
 
         # Delete entity
-        registry_fetcher.delete_entity("test://resource/lifecycle", fixture_registry_db)
+        fixture_registry.delete_entity("test://resource/lifecycle", fixture_db)
 
         # Verify deletion
         with pytest.raises(
             ValueError,
             match="Entity with uri 'test://resource/lifecycle' is not registered",
         ):
-            registry_fetcher.delete_entity(
-                "test://resource/lifecycle", fixture_registry_db
-            )
+            fixture_registry.delete_entity("test://resource/lifecycle", fixture_db)
 
     def test_complex_attribute_types(
-        self, fixture_registry_db: Session, registry_fetcher: RegistryFetcher
+        self, fixture_db: Session, fixture_registry: RegistryFetcher
     ):
         """Test entities with complex attribute types"""
 
@@ -311,7 +289,7 @@ class TestRegistryFetcher:
             ],
         )
 
-        created = registry_fetcher.register_entity(entity, fixture_registry_db)
+        created = fixture_registry.register_entity(entity, fixture_db)
         attributes_dict = {attr.key: attr.value for attr in created.attributes}
 
         assert attributes_dict["name"] == "Complex Entity"
