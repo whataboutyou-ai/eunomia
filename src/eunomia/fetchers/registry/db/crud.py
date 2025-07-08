@@ -233,4 +233,6 @@ def get_entity_attributes(uri: str, db: Session) -> dict:
     db_entity = get_entity(uri, db)
     if db_entity is None:
         return {}
-    return {attribute.key: attribute.value for attribute in db_entity.attributes}
+
+    entity = schemas.EntityInDb.model_validate(db_entity)
+    return {attribute.key: attribute.value for attribute in entity.attributes}
