@@ -127,4 +127,9 @@ class RegistryFetcher(BaseFetcher):
             The attributes of the entity.
         """
         with db.SessionLocal() as db_session:
-            return crud.get_entity_attributes(uri, db=db_session)
+            db_entity = crud.get_entity(uri, db=db_session)
+            if db_entity is None:
+                return {}
+
+            entity = schemas.EntityInDb.model_validate(db_entity)
+            return entity.attributes_dict

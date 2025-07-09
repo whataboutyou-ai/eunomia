@@ -208,31 +208,3 @@ def get_attribute(uri: str, key: str, db: Session) -> models.Attribute | None:
         .filter(models.Attribute.entity_uri == uri, models.Attribute.key == key)
         .first()
     )
-
-
-def get_entity_attributes(uri: str, db: Session) -> dict:
-    """
-    Retrieve attributes for a resource by its unique identifier.
-
-    This function retrieves all attributes associated with a specific resource
-    and returns it as a dictionary. If no entity with the specified uri is found,
-    an empty dictionary is returned.
-
-    Parameters
-    ----------
-    uri : str
-        Unique identifier of the entity.
-    db : Session
-        SQLAlchemy database session.
-
-    Returns
-    -------
-    dict
-        Dictionary containing all attributes key-value pairs for the entity.
-    """
-    db_entity = get_entity(uri, db)
-    if db_entity is None:
-        return {}
-
-    entity = schemas.EntityInDb.model_validate(db_entity)
-    return {attribute.key: attribute.value for attribute in entity.attributes}
