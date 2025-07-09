@@ -1,12 +1,13 @@
+from datetime import datetime, timedelta, timezone
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
-from datetime import datetime, timezone, timedelta
+from eunomia_core import enums
 from jose import jwt
 
 from eunomia.fetchers.passport import PassportFetcher, PassportFetcherConfig
-from eunomia.fetchers.passport.schemas import PassportJWT, PassportIssueRequest, PassportIssueResponse
+from eunomia.fetchers.passport.schemas import PassportIssueRequest, PassportJWT
 from eunomia.fetchers.registry import RegistryFetcher
-from eunomia_core import schemas, enums
 
 
 @pytest.fixture
@@ -17,7 +18,7 @@ def passport_config():
         jwt_algorithm="HS256",
         jwt_issuer="eunomia-test",
         jwt_default_ttl=7200,  # 2 hours
-        requires_registry=False
+        requires_registry=False,
     )
 
 
@@ -29,7 +30,7 @@ def passport_config_with_registry():
         jwt_algorithm="HS256",
         jwt_issuer="eunomia-test",
         jwt_default_ttl=7200,
-        requires_registry=True
+        requires_registry=True,
     )
 
 
@@ -43,7 +44,7 @@ def passport_fetcher(passport_config):
 def mock_registry_fetcher():
     """Create a mock registry fetcher for testing."""
     mock_registry = Mock(spec=RegistryFetcher)
-    
+
     # Mock entity for testing
     mock_entity = Mock()
     mock_entity.uri = "test://resource/1"
@@ -51,15 +52,17 @@ def mock_registry_fetcher():
     mock_entity.attributes_dict = {
         "name": "Test Resource",
         "type": "document",
-        "owner": "user123"
+        "owner": "user123",
     }
-    
+
     mock_registry.get_entity.return_value = mock_entity
     return mock_registry
 
 
 @pytest.fixture
-def passport_fetcher_with_registry(passport_config_with_registry, mock_registry_fetcher):
+def passport_fetcher_with_registry(
+    passport_config_with_registry, mock_registry_fetcher
+):
     """Create a passport fetcher instance with mocked registry."""
     fetcher = PassportFetcher(passport_config_with_registry)
     fetcher._registry = mock_registry_fetcher
@@ -79,7 +82,7 @@ def sample_attributes():
         "name": "Test Resource",
         "type": "document",
         "owner": "user123",
-        "tags": ["public", "test"]
+        "tags": ["public", "test"],
     }
 
 
@@ -93,11 +96,7 @@ def valid_passport_jwt():
         exp=int((now + timedelta(seconds=7200)).timestamp()),
         iss="eunomia-test",
         sub="test://resource/1",
-        attr={
-            "name": "Test Resource",
-            "type": "document",
-            "owner": "user123"
-        }
+        attr={"name": "Test Resource", "type": "document", "owner": "user123"},
     )
 
 
@@ -111,7 +110,7 @@ def expired_passport_jwt():
         exp=int(past_time.timestamp()),
         iss="eunomia-test",
         sub="test://resource/1",
-        attr={"name": "Test Resource"}
+        attr={"name": "Test Resource"},
     )
 
 
@@ -121,7 +120,7 @@ def valid_jwt_token(passport_config, valid_passport_jwt):
     return jwt.encode(
         valid_passport_jwt.model_dump(),
         passport_config.jwt_secret,
-        algorithm=passport_config.jwt_algorithm
+        algorithm=passport_config.jwt_algorithm,
     )
 
 
@@ -131,7 +130,7 @@ def expired_jwt_token(passport_config, expired_passport_jwt):
     return jwt.encode(
         expired_passport_jwt.model_dump(),
         passport_config.jwt_secret,
-        algorithm=passport_config.jwt_algorithm
+        algorithm=passport_config.jwt_algorithm,
     )
 
 
@@ -147,5 +146,5 @@ def passport_issue_request():
     return PassportIssueRequest(
         uri="test://resource/1",
         attributes={"name": "Test Resource", "type": "document"},
-        ttl=3600
+        ttl=3600,
     )
