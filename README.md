@@ -210,4 +210,4 @@ curl -X POST "http://localhost:8000/check/bulk" \
 [license]: https://github.com/whataboutyou-ai/eunomia/blob/main/LICENSE
 [license-badge]: https://img.shields.io/github/license/whataboutyou-ai/eunomia.svg?v
 [discord]: https://discord.gg/TyhGZtzg3G
-[discord-badge]: https://dcbadge.vercel.app/api/server/TyhGZtzg3G?style=flat&theme=default-inverted
+[discord-badge]: https://dcbadge.limes.pink/api/server/TyhGZtzg3G?style=flat&theme=default-inverted
