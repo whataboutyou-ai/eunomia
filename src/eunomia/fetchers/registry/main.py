@@ -17,7 +17,7 @@ class RegistryFetcher(BaseFetcher):
         db.init_db(self.config.sql_database_url)
 
     def register_entity(
-        self, entity: schemas.EntityCreate, db: Session
+        self, entity: schemas.EntityCreate, db_session: Session
     ) -> schemas.EntityInDb:
         """
         Register a new entity in the system.
@@ -30,7 +30,7 @@ class RegistryFetcher(BaseFetcher):
         ----------
         entity : schemas.EntityCreate
             Pydantic model containing attributes about the entity.
-        db : Session
+        db_session : Session
             The SQLAlchemy database session.
 
         Returns
@@ -43,15 +43,15 @@ class RegistryFetcher(BaseFetcher):
         ValueError
             If the entity is already registered.
         """
-        db_entity = crud.get_entity(entity.uri, db=db)
+        db_entity = crud.get_entity(entity.uri, db=db_session)
         if db_entity is not None:
             raise ValueError(f"Entity with uri '{entity.uri}' is already registered")
 
-        db_entity = crud.create_entity(entity, db=db)
+        db_entity = crud.create_entity(entity, db=db_session)
         return schemas.EntityInDb.model_validate(db_entity)
 
     def update_entity(
-        self, entity: schemas.EntityUpdate, override: bool, db: Session
+        self, entity: schemas.EntityUpdate, override: bool, db_session: Session
     ) -> schemas.EntityInDb:
         """
         Update the attributes of an existing entity.
@@ -64,7 +64,7 @@ class RegistryFetcher(BaseFetcher):
             If True, the existing attributes are deleted and the new attributes are added.
             If False, the existing attributes are maintaned or updated in case of overlap,
             and the additional new attributes are added.
-        db : Session
+        db_session : Session
             The SQLAlchemy database session.
 
         Returns
@@ -77,17 +77,19 @@ class RegistryFetcher(BaseFetcher):
         ValueError
             If the entity is not registered.
         """
-        db_entity = crud.get_entity(entity.uri, db=db)
+        db_entity = crud.get_entity(entity.uri, db=db_session)
         if db_entity is None:
             raise ValueError(f"Entity with uri '{entity.uri}' is not registered")
 
         if override:
-            crud.delete_entity_attributes(db_entity, db=db)
+            crud.delete_entity_attributes(db_entity, db=db_session)
 
-        db_entity = crud.update_entity_attributes(db_entity, entity.attributes, db=db)
+        db_entity = crud.update_entity_attributes(
+            db_entity, entity.attributes, db=db_session
+        )
         return schemas.EntityInDb.model_validate(db_entity)
 
-    def delete_entity(self, uri: str, db: Session) -> None:
+    def delete_entity(self, uri: str, db_session: Session) -> None:
         """
         Delete an entity from the system.
 
@@ -95,7 +97,7 @@ class RegistryFetcher(BaseFetcher):
         ----------
         uri : str
             The uri of the entity to delete.
-        db : Session
+        db_session : Session
             The SQLAlchemy database session.
 
 
@@ -104,11 +106,11 @@ class RegistryFetcher(BaseFetcher):
         ValueError
             If the entity is not registered.
         """
-        db_entity = crud.get_entity(uri, db=db)
+        db_entity = crud.get_entity(uri, db=db_session)
         if db_entity is None:
             raise ValueError(f"Entity with uri '{uri}' is not registered")
 
-        return crud.delete_entity(db_entity, db=db)
+        return crud.delete_entity(db_entity, db=db_session)
 
     async def fetch_attributes(self, uri: str) -> dict:
         """
