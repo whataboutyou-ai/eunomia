@@ -10,7 +10,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from eunomia_mcp.schemas import JsonRpcError, JsonRpcErrorResponse, JsonRpcRequest
+from eunomia_mcp.schemas import JsonRpcError, JsonRpcRequest, JsonRpcResponse
 
 logger = logging.getLogger(__name__)
 
@@ -52,17 +52,17 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
             raw_data = json.loads(body.decode())
             jsonrpc_request = JsonRpcRequest(**raw_data)
         except (json.JSONDecodeError, UnicodeDecodeError) as e:
-            return JsonRpcErrorResponse(
+            return JsonRpcResponse(
                 error=JsonRpcError(code=-32700, message="Parse error", data=str(e))
-            ).as_starlette_json_response()
+            ).as_starlette()
         except ValidationError as e:
-            return JsonRpcErrorResponse(
+            return JsonRpcResponse(
                 error=JsonRpcError(
                     code=-32600,
                     message="Invalid Request",
                     data=f"Invalid JSON-RPC 2.0 format: {str(e)}",
                 )
-            ).as_starlette_json_response()
+            ).as_starlette()
 
         # Skip authorization for bypass methods
         if any(
@@ -77,12 +77,12 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         if not auth_result.allowed:
             if self._enable_audit_logging:
                 self._log_violation(request, jsonrpc_request, auth_result.reason)
-            return JsonRpcErrorResponse(
+            return JsonRpcResponse(
                 error=JsonRpcError(
                     code=-32603, message="Unauthorized", data=auth_result.reason
                 ),
                 id=jsonrpc_request.id,
-            ).as_starlette_json_response()
+            ).as_starlette()
 
         # Log successful authorization
         if self._enable_audit_logging:

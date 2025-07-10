@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from eunomia_core.schemas import CheckResponse
 from eunomia_mcp.middleware import EunomiaMcpMiddleware
-from eunomia_mcp.schemas import JsonRpcError, JsonRpcErrorResponse, JsonRpcRequest
+from eunomia_mcp.schemas import JsonRpcError, JsonRpcRequest, JsonRpcResponse
 from pydantic import ValidationError
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
@@ -298,12 +298,12 @@ class TestEunomiaAuthMiddleware:
 
     def test_create_jsonrpc_error(self, middleware):
         """Test JSON-RPC error response creation."""
-        response = JsonRpcErrorResponse(
+        response = JsonRpcResponse(
             error=JsonRpcError(
                 code=-32603, message="Test error", data="Additional data"
             ),
             id=123,
-        ).as_starlette_json_response()
+        ).as_starlette()
 
         assert isinstance(response, JSONResponse)
         content = json.loads(response.body.decode())

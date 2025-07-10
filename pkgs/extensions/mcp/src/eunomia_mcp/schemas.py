@@ -28,12 +28,13 @@ class JsonRpcError(BaseModel):
     data: Union[str, None] = None
 
 
-class JsonRpcErrorResponse(BaseModel):
+class JsonRpcResponse(BaseModel):
     jsonrpc: str = "2.0"
-    error: JsonRpcError
     id: Union[int, str, None] = None
+    result: Union[dict, None] = None
+    error: Union[JsonRpcError, None] = None
 
-    def as_starlette_json_response(self):
+    def as_starlette(self):
         return JSONResponse(
             content=self.model_dump(exclude_none=True),
             status_code=200,
