@@ -166,89 +166,85 @@ class TestEunomiaAuthMiddleware:
             "Authorization": "Bearer api-key-123",
         }
 
-        principal_uri, principal_attributes = middleware._extract_principal_info(
-            request
-        )
+        principal = middleware._extract_principal_info(request)
 
-        assert principal_uri == "agent:claude"
-        assert principal_attributes["agent_id"] == "claude"
-        assert principal_attributes["user_id"] == "user123"
-        assert principal_attributes["api_key"] == "api-key-123"
+        assert principal.uri == "agent:claude"
+        assert principal.attributes["agent_id"] == "claude"
+        assert principal.attributes["user_id"] == "user123"
+        assert principal.attributes["api_key"] == "api-key-123"
 
     def test_extract_principal_info_fallback(self, middleware):
         """Test principal extraction fallback."""
         request = Mock()
         request.headers = {}
 
-        principal_uri, principal_attributes = middleware._extract_principal_info(
-            request
-        )
+        principal = middleware._extract_principal_info(request)
 
-        assert principal_uri == "agent:unknown"
-        assert principal_attributes["type"] == "unknown_agent"
+        assert principal.uri == "agent:unknown"
+        assert principal.attributes["type"] == "unknown_agent"
 
     def test_map_tools_method(self, middleware):
         """Test mapping of tools methods."""
         # Test tools/list
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "tools/list", {}
         )
-        assert uri == "mcp:tools"
+        assert resource.uri == "mcp:tools"
         assert action == "access"
-        assert attributes["resource_type"] == "tools"
+        assert resource.attributes["resource_type"] == "tools"
 
         # Test tools/call
         params = {"name": "read_file", "arguments": {"path": "test.txt"}}
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "tools/call", params
         )
-        assert uri == "mcp:tools:read_file"
+        assert resource.uri == "mcp:tools:read_file"
         assert action == "execute"
-        assert attributes["tool_name"] == "read_file"
-        assert attributes["arguments"] == {"path": "test.txt"}
+        assert resource.attributes["tool_name"] == "read_file"
+        assert resource.attributes["arguments"] == {"path": "test.txt"}
 
     def test_map_resources_method(self, middleware):
         """Test mapping of resources methods."""
         # Test resources/list
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "resources/list", {}
         )
-        assert uri == "mcp:resources"
+        assert resource.uri == "mcp:resources"
         assert action == "access"
 
         # Test resources/read
         params = {"uri": "file://test.txt"}
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "resources/read", params
         )
-        assert uri == "mcp:resources:file://test.txt"
+        assert resource.uri == "mcp:resources:file://test.txt"
         assert action == "read"
-        assert attributes["resource_uri"] == "file://test.txt"
+        assert resource.attributes["resource_uri"] == "file://test.txt"
 
     def test_map_prompts_method(self, middleware):
         """Test mapping of prompts methods."""
         # Test prompts/list
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "prompts/list", {}
         )
-        assert uri == "mcp:prompts"
+        assert resource.uri == "mcp:prompts"
         assert action == "access"
 
         # Test prompts/get
         params = {"name": "test_prompt"}
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "prompts/get", params
         )
-        assert uri == "mcp:prompts:test_prompt"
+        assert resource.uri == "mcp:prompts:test_prompt"
         assert action == "read"
-        assert attributes["prompt_name"] == "test_prompt"
+        assert resource.attributes["prompt_name"] == "test_prompt"
 
     def test_map_generic_method(self, middleware):
         """Test mapping of generic methods."""
-        action, uri, attributes = middleware._map_method_to_action_and_resource(
+        action, resource = middleware._map_method_to_action_and_resource(
             "custom/method", {}
         )
-        assert uri == "mcp:method:custom/method"
+        assert resource.uri == "mcp:method:custom/method"
         assert action == "access"
 
     def test_is_jsonrpc_request(self, middleware):

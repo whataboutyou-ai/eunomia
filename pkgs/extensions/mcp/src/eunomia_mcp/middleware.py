@@ -107,19 +107,18 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
         """Perform authorization check using Eunomia."""
         try:
             # Extract principal information
-            principal_uri, principal_attributes = self._extract_principal_info(request)
+            principal = self._extract_principal_info(request)
 
             # Map MCP method to action and resource
-            params = jsonrpc_request.get_dict_params()
-            action, resource_uri, resource_attributes = (
-                self._map_method_to_action_and_resource(jsonrpc_request.method, params)
+            action, resource = self._map_method_to_action_and_resource(
+                jsonrpc_request.method, jsonrpc_request.params_dict
             )
 
             return self._eunomia_client.check(
-                principal_uri=principal_uri,
-                principal_attributes=principal_attributes,
-                resource_uri=resource_uri,
-                resource_attributes=resource_attributes,
+                principal_uri=principal.uri,
+                principal_attributes=principal.attributes,
+                resource_uri=resource.uri,
+                resource_attributes=resource.attributes,
                 action=action,
             )
 
@@ -129,7 +128,7 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
                 allowed=False, reason=f"Authorization system error: {str(e)}"
             )
 
-    def _extract_principal_info(self, request: Request) -> tuple[str, dict[str, Any]]:
+    def _extract_principal_info(self, request: Request) -> schemas.PrincipalCheck:
         """Extract principal information from request."""
         uri = None
         attributes = {}
@@ -154,11 +153,11 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
             uri = "agent:unknown"
             attributes["type"] = "unknown_agent"
 
-        return uri, attributes
+        return schemas.PrincipalCheck(uri=uri, attributes=attributes)
 
     def _map_method_to_action_and_resource(
         self, method: str, params: dict[str, Any]
-    ) -> tuple[str, str, dict[str, Any]]:
+    ) -> tuple[str, schemas.ResourceCheck]:
         """Map MCP JSON-RPC method to Eunomia resource/action."""
         known_methods = [
             "tools/list",
@@ -178,6 +177,7 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
 
         action = "access"
         attributes = {
+            "exchange": "request",
             "type": "mcp_resource",
             "mcp_method": method,
             "resource_type": resource_type,
@@ -197,7 +197,7 @@ class EunomiaMcpMiddleware(BaseHTTPMiddleware):
             uri = uri + f":{params.get('name')}"
             attributes["prompt_name"] = params.get("name")
 
-        return action, uri, attributes
+        return action, schemas.ResourceCheck(uri=uri, attributes=attributes)
 
     def _log_violation(
         self, request: Request, jsonrpc_request: JsonRpcRequest, reason: str

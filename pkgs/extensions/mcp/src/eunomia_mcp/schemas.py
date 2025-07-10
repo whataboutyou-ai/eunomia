@@ -16,7 +16,8 @@ class JsonRpcRequest(BaseModel):
             raise ValueError("expected version 2.0")
         return v
 
-    def get_dict_params(self) -> dict:
+    @property
+    def params_dict(self) -> dict:
         if isinstance(self.params, list):
             return {}
         return self.params or {}
