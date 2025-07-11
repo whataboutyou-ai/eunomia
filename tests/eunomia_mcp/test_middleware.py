@@ -1,18 +1,17 @@
-import json
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from eunomia_core.schemas import CheckResponse
 from eunomia_mcp.middleware import EunomiaMcpMiddleware
-from eunomia_mcp.schemas import JsonRpcError, JsonRpcRequest, JsonRpcResponse
-from pydantic import ValidationError
-from starlette.applications import Starlette
-from starlette.responses import JSONResponse
-from starlette.routing import Route
-from starlette.testclient import TestClient
+from fastmcp.exceptions import ToolError
+from fastmcp.prompts.prompt import Prompt
+from fastmcp.resources.resource import Resource
+from fastmcp.server.middleware import MiddlewareContext
+from fastmcp.tools.tool import Tool
+from mcp import types
 
 
-class TestEunomiaAuthMiddleware:
+class TestEunomiaMcpMiddleware:
     """Test suite for EunomiaMcpMiddleware."""
 
     @pytest.fixture
@@ -22,306 +21,433 @@ class TestEunomiaAuthMiddleware:
         client.check = Mock(
             return_value=CheckResponse(allowed=True, reason="Authorized")
         )
+        client.bulk_check = Mock(
+            return_value=[CheckResponse(allowed=True, reason="Authorized")]
+        )
         return client
 
     @pytest.fixture
     def middleware(self, mock_eunomia_client):
         """Create middleware instance."""
-        app = Starlette()
         return EunomiaMcpMiddleware(
-            app=app,
             eunomia_client=mock_eunomia_client,
             enable_audit_logging=True,
         )
 
     @pytest.fixture
-    def test_app(self, middleware):
-        """Create test application with middleware."""
+    def mock_tool(self):
+        """Mock FastMCP tool."""
+        tool = Mock(spec=Tool)
+        tool.name = "test_tool"
+        tool.enabled = True
+        return tool
 
-        async def mcp_endpoint(request):
-            return JSONResponse({"result": "success"})
+    @pytest.fixture
+    def mock_resource(self):
+        """Mock FastMCP resource."""
+        resource = Mock(spec=Resource)
+        resource.name = "test_resource"
+        resource.enabled = True
+        return resource
 
-        async def health_endpoint(request):
-            return JSONResponse({"status": "ok"})
+    @pytest.fixture
+    def mock_prompt(self):
+        """Mock FastMCP prompt."""
+        prompt = Mock(spec=Prompt)
+        prompt.name = "test_prompt"
+        prompt.enabled = True
+        return prompt
 
-        routes = [
-            Route("/mcp", endpoint=mcp_endpoint, methods=["POST"]),
-            Route("/health", endpoint=health_endpoint, methods=["GET"]),
-        ]
-        app = Starlette(routes=routes)
+    @pytest.fixture
+    def mock_context(self):
+        """Mock MiddlewareContext."""
+        context = Mock(spec=MiddlewareContext)
+        context.method = "tools/call"
+        context.message = Mock()
+        context.message.name = "test_tool"
+        # Configure mock to return specific values for getattr calls
+        context.message.configure_mock(arguments={"arg1": "value1"}, uri=None)
+        context.fastmcp_context = Mock()
+        context.fastmcp_context.fastmcp = Mock()
+        return context
 
-        app.add_middleware(
-            EunomiaMcpMiddleware, eunomia_client=middleware._eunomia_client
-        )
-        return app
-
-    def test_bypass_paths(self, test_app):
-        """Test that bypass paths skip authorization."""
-        client = TestClient(test_app)
-        response = client.get("/health")
-        assert response.status_code == 200
-        assert response.json() == {"status": "ok"}
-
-    def test_non_jsonrpc_requests_pass_through(self, test_app):
-        """Test that non-JSON-RPC requests pass through."""
-        client = TestClient(test_app)
-        response = client.get("/mcp")
-        # Should get method not allowed, not authorization error
-        assert response.status_code == 405
-
-    def test_invalid_json_returns_parse_error(self, test_app):
-        """Test that invalid JSON returns parse error."""
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp", content="invalid json", headers={"Content-Type": "application/json"}
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["error"]["code"] == -32700
-        assert "Parse error" in data["error"]["message"]
-
-    def test_invalid_jsonrpc_format(self, test_app):
-        """Test that invalid JSON-RPC format is rejected."""
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp",
-            json={"invalid": "format"},
-            headers={"Content-Type": "application/json"},
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["error"]["code"] == -32600
-        assert "Invalid Request" in data["error"]["message"]
-
-    def test_missing_jsonrpc_version(self, test_app):
-        """Test that missing jsonrpc version is rejected."""
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp",
-            json={"method": "test_method", "id": 1},
-            headers={"Content-Type": "application/json"},
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["error"]["code"] == -32600
-        assert "Invalid Request" in data["error"]["message"]
-
-    def test_wrong_jsonrpc_version(self, test_app):
-        """Test that wrong JSON-RPC version is rejected."""
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp",
-            json={"jsonrpc": "1.0", "method": "test_method", "id": 1},
-            headers={"Content-Type": "application/json"},
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["error"]["code"] == -32600
-        assert "Invalid Request" in data["error"]["message"]
-
-    @patch("eunomia_mcp.middleware.EunomiaMcpMiddleware._authorize_request")
-    def test_authorization_success(self, mock_authorize, test_app):
-        """Test successful authorization."""
-        mock_authorize.return_value = CheckResponse(allowed=True, reason="Authorized")
-
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp",
-            json={"jsonrpc": "2.0", "method": "tools/list", "id": 1},
-            headers={"Content-Type": "application/json", "X-Agent-ID": "test-agent"},
-        )
-        assert response.status_code == 200
-        assert response.json() == {"result": "success"}
-
-    @patch("eunomia_mcp.middleware.EunomiaMcpMiddleware._authorize_request")
-    def test_authorization_failure(self, mock_authorize, test_app):
-        """Test authorization failure."""
-        mock_authorize.return_value = CheckResponse(
-            allowed=False, reason="Access denied"
-        )
-
-        client = TestClient(test_app)
-        response = client.post(
-            "/mcp",
-            json={
-                "jsonrpc": "2.0",
-                "method": "tools/call",
-                "params": {"name": "restricted_tool"},
-                "id": 1,
-            },
-            headers={"Content-Type": "application/json", "X-Agent-ID": "test-agent"},
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["error"]["code"] == -32603
-        assert "Unauthorized" in data["error"]["message"]
-        assert data["id"] == 1
-
-    def test_extract_principal_info_with_headers(self, middleware):
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_extract_principal_with_headers(self, mock_get_headers, middleware):
         """Test principal extraction from headers."""
-        request = Mock()
-        request.headers = {
-            "X-Agent-ID": "claude",
-            "X-User-ID": "user123",
-            "Authorization": "Bearer api-key-123",
+        mock_get_headers.return_value = {
+            "x-agent-id": "claude",
+            "x-user-id": "user123",
+            "user-agent": "test-agent",
+            "authorization": "Bearer api-key-123",
         }
 
-        principal = middleware._extract_principal_info(request)
+        principal = middleware._extract_principal()
 
         assert principal.uri == "agent:claude"
         assert principal.attributes["agent_id"] == "claude"
         assert principal.attributes["user_id"] == "user123"
+        assert principal.attributes["user_agent"] == "test-agent"
         assert principal.attributes["api_key"] == "api-key-123"
 
-    def test_extract_principal_info_fallback(self, middleware):
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_extract_principal_fallback(self, mock_get_headers, middleware):
         """Test principal extraction fallback."""
-        request = Mock()
-        request.headers = {}
+        mock_get_headers.return_value = {}
 
-        principal = middleware._extract_principal_info(request)
+        principal = middleware._extract_principal()
 
         assert principal.uri == "agent:unknown"
-        assert principal.attributes["type"] == "unknown_agent"
+        assert principal.attributes["agent_id"] == "unknown"
+        assert principal.attributes["user_id"] == "unknown"
+        assert principal.attributes["user_agent"] == "undefined"
 
-    def test_map_tools_method(self, middleware):
-        """Test mapping of tools methods."""
-        # Test tools/list
-        action, resource = middleware._map_method_to_action_and_resource(
-            "tools/list", {}
-        )
-        assert resource.uri == "mcp:tools"
-        assert action == "access"
-        assert resource.attributes["resource_type"] == "tools"
+    def test_extract_resource_for_tool(self, middleware, mock_context, mock_tool):
+        """Test resource extraction for tool component."""
+        mock_context.method = "tools/call"
+        # Configure mock to return specific values for getattr calls
+        mock_context.message.configure_mock(uri=None, arguments={"arg1": "value1"})
 
-        # Test tools/call
-        params = {"name": "read_file", "arguments": {"path": "test.txt"}}
-        action, resource = middleware._map_method_to_action_and_resource(
-            "tools/call", params
-        )
-        assert resource.uri == "mcp:tools:read_file"
-        assert action == "execute"
-        assert resource.attributes["tool_name"] == "read_file"
-        assert resource.attributes["arguments"] == {"path": "test.txt"}
+        resource = middleware._extract_resource(mock_context, mock_tool)
 
-    def test_map_resources_method(self, middleware):
-        """Test mapping of resources methods."""
-        # Test resources/list
-        action, resource = middleware._map_method_to_action_and_resource(
-            "resources/list", {}
-        )
-        assert resource.uri == "mcp:resources"
-        assert action == "access"
+        assert resource.uri == "mcp:tools:test_tool"
+        assert resource.attributes["method"] == "tools/call"
+        assert resource.attributes["component_type"] == "tools"
+        assert resource.attributes["name"] == "test_tool"
+        assert resource.attributes["arguments"] == {"arg1": "value1"}
 
-        # Test resources/read
-        params = {"uri": "file://test.txt"}
-        action, resource = middleware._map_method_to_action_and_resource(
-            "resources/read", params
-        )
-        assert resource.uri == "mcp:resources:file://test.txt"
-        assert action == "read"
-        assert resource.attributes["resource_uri"] == "file://test.txt"
+    def test_extract_resource_for_resource(
+        self, middleware, mock_context, mock_resource
+    ):
+        """Test resource extraction for resource component."""
+        mock_context.method = "resources/read"
+        # Configure mock to return specific values for getattr calls
+        mock_context.message.configure_mock(uri="file://test.txt", arguments=None)
 
-    def test_map_prompts_method(self, middleware):
-        """Test mapping of prompts methods."""
-        # Test prompts/list
-        action, resource = middleware._map_method_to_action_and_resource(
-            "prompts/list", {}
-        )
-        assert resource.uri == "mcp:prompts"
-        assert action == "access"
+        resource = middleware._extract_resource(mock_context, mock_resource)
 
-        # Test prompts/get
-        params = {"name": "test_prompt"}
-        action, resource = middleware._map_method_to_action_and_resource(
-            "prompts/get", params
-        )
+        assert resource.uri == "mcp:resources:test_resource"
+        assert resource.attributes["method"] == "resources/read"
+        assert resource.attributes["component_type"] == "resources"
+        assert resource.attributes["name"] == "test_resource"
+        assert resource.attributes["uri"] == "file://test.txt"
+
+    def test_extract_resource_for_prompt(self, middleware, mock_context, mock_prompt):
+        """Test resource extraction for prompt component."""
+        mock_context.method = "prompts/get"
+        # Configure mock to return specific values for getattr calls
+        mock_context.message.configure_mock(uri=None, arguments=None)
+
+        resource = middleware._extract_resource(mock_context, mock_prompt)
+
         assert resource.uri == "mcp:prompts:test_prompt"
-        assert action == "read"
-        assert resource.attributes["prompt_name"] == "test_prompt"
+        assert resource.attributes["method"] == "prompts/get"
+        assert resource.attributes["component_type"] == "prompts"
+        assert resource.attributes["name"] == "test_prompt"
 
-    def test_map_generic_method(self, middleware):
-        """Test mapping of generic methods."""
-        action, resource = middleware._map_method_to_action_and_resource(
-            "custom/method", {}
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_authorize_call_success(
+        self, mock_get_headers, middleware, mock_context, mock_tool
+    ):
+        """Test successful authorization for component call."""
+        mock_get_headers.return_value = {"x-agent-id": "test-agent"}
+        middleware._eunomia_client.check.return_value = CheckResponse(
+            allowed=True, reason="Authorized"
         )
-        assert resource.uri == "mcp:method:custom/method"
-        assert action == "access"
 
-    def test_is_jsonrpc_request(self, middleware):
-        """Test JSON-RPC request detection."""
-        # Valid JSON-RPC request
-        request = Mock()
-        request.method = "POST"
-        request.headers = {"content-type": "application/json"}
-        assert middleware._is_jsonrpc_request(request) is True
+        # Should not raise any exception
+        middleware._authorize_call(mock_context, mock_tool)
 
-        # Invalid method
-        request.method = "GET"
-        assert middleware._is_jsonrpc_request(request) is False
+        middleware._eunomia_client.check.assert_called_once()
 
-        # Invalid content type
-        request.method = "POST"
-        request.headers = {"content-type": "text/plain"}
-        assert middleware._is_jsonrpc_request(request) is False
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_authorize_call_failure(
+        self, mock_get_headers, middleware, mock_context, mock_tool
+    ):
+        """Test authorization failure for component call."""
+        mock_get_headers.return_value = {"x-agent-id": "test-agent"}
+        middleware._eunomia_client.check.return_value = CheckResponse(
+            allowed=False, reason="Access denied"
+        )
 
-    def test_jsonrpc_schema_validation(self):
-        """Test JSON-RPC schema validation."""
-        # Valid JSON-RPC
-        valid_data = {"jsonrpc": "2.0", "method": "test_method", "id": 1}
-        request = JsonRpcRequest(**valid_data)
-        assert request.method == "test_method"
-        assert request.id == 1
+        with pytest.raises(ToolError, match="Access denied"):
+            middleware._authorize_call(mock_context, mock_tool)
 
-        # Valid JSON-RPC with params
-        valid_data_with_params = {
-            "jsonrpc": "2.0",
-            "method": "test_method",
-            "params": {"arg1": "value1"},
-            "id": 1,
-        }
-        request = JsonRpcRequest(**valid_data_with_params)
-        assert request.params == {"arg1": "value1"}
+    def test_authorize_call_disabled_component(
+        self, middleware, mock_context, mock_tool
+    ):
+        """Test authorization failure for disabled component."""
+        mock_tool.enabled = False
 
-        # Valid JSON-RPC notification (no id)
-        notification_data = {"jsonrpc": "2.0", "method": "test_method"}
-        request = JsonRpcRequest(**notification_data)
-        assert request.id is None
+        with pytest.raises(ToolError, match="Access denied: test_tool is disabled"):
+            middleware._authorize_call(mock_context, mock_tool)
 
-        # Wrong jsonrpc version
-        invalid_version = {"jsonrpc": "1.0", "method": "test_method", "id": 1}
-        with pytest.raises(ValidationError):
-            request = JsonRpcRequest(**invalid_version)
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_authorize_list_success(self, mock_get_headers, middleware, mock_context):
+        """Test successful authorization for list operation."""
+        mock_get_headers.return_value = {"x-agent-id": "test-agent"}
+        mock_context.method = "tools/list"
+        # Configure mock message for list operations
+        mock_context.message.configure_mock(uri=None, arguments=None)
 
-    def test_create_jsonrpc_error(self, middleware):
-        """Test JSON-RPC error response creation."""
-        response = JsonRpcResponse(
-            error=JsonRpcError(
-                code=-32603, message="Test error", data="Additional data"
-            ),
-            id=123,
-        ).as_starlette()
+        tool1 = Mock(spec=Tool)
+        tool1.name = "tool1"
+        tool1.enabled = True
+        tool2 = Mock(spec=Tool)
+        tool2.name = "tool2"
+        tool2.enabled = True
 
-        assert isinstance(response, JSONResponse)
-        content = json.loads(response.body.decode())
+        components = [tool1, tool2]
 
-        assert content["jsonrpc"] == "2.0"
-        assert content["error"]["code"] == -32603
-        assert content["error"]["message"] == "Test error"
-        assert content["error"]["data"] == "Additional data"
-        assert content["id"] == 123
+        middleware._eunomia_client.bulk_check.return_value = [
+            CheckResponse(allowed=True, reason="Authorized"),
+            CheckResponse(allowed=True, reason="Authorized"),
+        ]
+
+        result = middleware._authorize_list(mock_context, components)
+
+        assert len(result) == 2
+        assert result == components
+        middleware._eunomia_client.bulk_check.assert_called_once()
+
+    @patch("eunomia_mcp.middleware.get_http_headers")
+    def test_authorize_list_partial_filtering(
+        self, mock_get_headers, middleware, mock_context
+    ):
+        """Test partial filtering in list operation."""
+        mock_get_headers.return_value = {"x-agent-id": "test-agent"}
+        mock_context.method = "tools/list"
+        # Configure mock message for list operations
+        mock_context.message.configure_mock(uri=None, arguments=None)
+
+        tool1 = Mock(spec=Tool)
+        tool1.name = "tool1"
+        tool1.enabled = True
+        tool2 = Mock(spec=Tool)
+        tool2.name = "tool2"
+        tool2.enabled = True
+
+        components = [tool1, tool2]
+
+        middleware._eunomia_client.bulk_check.return_value = [
+            CheckResponse(allowed=True, reason="Authorized"),
+            CheckResponse(allowed=False, reason="Access denied"),
+        ]
+
+        result = middleware._authorize_list(mock_context, components)
+
+        assert len(result) == 1
+        assert result[0] == tool1
+
+    def test_authorize_list_empty_components(self, middleware, mock_context):
+        """Test authorization with empty components list."""
+        result = middleware._authorize_list(mock_context, [])
+        assert result == []
+
+    @patch("eunomia_mcp.middleware.logger")
+    def test_log_authorization_success(self, mock_logger, middleware):
+        """Test audit logging for successful authorization."""
+        from eunomia_core.schemas import PrincipalCheck, ResourceCheck
+
+        principal = PrincipalCheck(
+            uri="agent:claude",
+            attributes={"agent_id": "claude", "user_agent": "test-agent"},
+        )
+        resource = ResourceCheck(
+            uri="mcp:tools:test_tool", attributes={"method": "tools/call"}
+        )
+
+        middleware._log_authorization(
+            principal, resource, "tools/call", "Authorized", is_violation=False
+        )
+
+        mock_logger.info.assert_called_once()
+        log_message = mock_logger.info.call_args[0][0]
+        assert "Authorized request" in log_message
+        assert "tools/call" in log_message
+
+    @patch("eunomia_mcp.middleware.logger")
+    def test_log_authorization_violation(self, mock_logger, middleware):
+        """Test audit logging for authorization violation."""
+        from eunomia_core.schemas import PrincipalCheck, ResourceCheck
+
+        principal = PrincipalCheck(
+            uri="agent:claude",
+            attributes={"agent_id": "claude", "user_agent": "test-agent"},
+        )
+        resource = ResourceCheck(
+            uri="mcp:tools:test_tool", attributes={"method": "tools/call"}
+        )
+
+        middleware._log_authorization(
+            principal, resource, "tools/call", "Access denied", is_violation=True
+        )
+
+        mock_logger.warning.assert_called_once()
+        log_message = mock_logger.warning.call_args[0][0]
+        assert "Authorization violation" in log_message
+        assert "tools/call" in log_message
 
     @pytest.mark.asyncio
-    async def test_params_handling_with_list(self, middleware):
-        """Test that list params are converted to empty dict for mapping."""
-        # Create a mock JsonRpcRequest with list params
-        jsonrpc_request = JsonRpcRequest(
-            jsonrpc="2.0", method="test_method", params=["param1", "param2"], id=1
+    async def test_on_call_tool_success(self, middleware, mock_context, mock_tool):
+        """Test on_call_tool method with successful authorization."""
+        mock_context.fastmcp_context.fastmcp.get_tool = AsyncMock(
+            return_value=mock_tool
         )
 
-        request = Mock()
-        request.headers = {"X-Agent-ID": "test-agent"}
+        call_next = AsyncMock(
+            return_value=types.CallToolResult(
+                content=[types.TextContent(type="text", text="success")]
+            )
+        )
 
-        # This should not raise an error and should handle list params gracefully
-        result = await middleware._authorize_request(jsonrpc_request, request)
-        # The actual result depends on the mocked client, but we're testing that no exception is raised
-        assert result is not None
+        with patch.object(middleware, "_authorize_call") as mock_authorize:
+            result = await middleware.on_call_tool(mock_context, call_next)
+
+            mock_authorize.assert_called_once_with(mock_context, mock_tool)
+            call_next.assert_called_once_with(mock_context)
+            assert result.content[0].text == "success"
+
+    @pytest.mark.asyncio
+    async def test_on_call_tool_authorization_failure(
+        self, middleware, mock_context, mock_tool
+    ):
+        """Test on_call_tool method with authorization failure."""
+        mock_context.fastmcp_context.fastmcp.get_tool = AsyncMock(
+            return_value=mock_tool
+        )
+
+        call_next = AsyncMock()
+
+        with patch.object(
+            middleware, "_authorize_call", side_effect=ToolError("Access denied")
+        ):
+            with pytest.raises(ToolError, match="Access denied"):
+                await middleware.on_call_tool(mock_context, call_next)
+
+            call_next.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_on_read_resource_success(
+        self, middleware, mock_context, mock_resource
+    ):
+        """Test on_read_resource method with successful authorization."""
+        mock_context.fastmcp_context.fastmcp.get_resource = AsyncMock(
+            return_value=mock_resource
+        )
+
+        call_next = AsyncMock(
+            return_value=types.ReadResourceResult(
+                contents=[
+                    types.TextResourceContents(
+                        uri="file://test.txt", mimeType="text/plain", text="content"
+                    )
+                ]
+            )
+        )
+
+        with patch.object(middleware, "_authorize_call") as mock_authorize:
+            result = await middleware.on_read_resource(mock_context, call_next)
+
+            mock_authorize.assert_called_once_with(mock_context, mock_resource)
+            call_next.assert_called_once_with(mock_context)
+            assert result.contents[0].text == "content"
+
+    @pytest.mark.asyncio
+    async def test_on_get_prompt_success(self, middleware, mock_context, mock_prompt):
+        """Test on_get_prompt method with successful authorization."""
+        mock_context.fastmcp_context.fastmcp.get_prompt = AsyncMock(
+            return_value=mock_prompt
+        )
+
+        call_next = AsyncMock(
+            return_value=types.GetPromptResult(
+                description="test prompt",
+                messages=[
+                    types.PromptMessage(
+                        role="user", content=types.TextContent(type="text", text="test")
+                    )
+                ],
+            )
+        )
+
+        with patch.object(middleware, "_authorize_call") as mock_authorize:
+            result = await middleware.on_get_prompt(mock_context, call_next)
+
+            mock_authorize.assert_called_once_with(mock_context, mock_prompt)
+            call_next.assert_called_once_with(mock_context)
+            assert result.description == "test prompt"
+
+    @pytest.mark.asyncio
+    async def test_on_list_tools_success(self, middleware, mock_context):
+        """Test on_list_tools method with successful authorization."""
+        tool1 = Mock(spec=Tool)
+        tool1.name = "tool1"
+        tool2 = Mock(spec=Tool)
+        tool2.name = "tool2"
+
+        tools = [tool1, tool2]
+        call_next = AsyncMock(return_value=tools)
+
+        with patch.object(
+            middleware, "_authorize_list", return_value=tools
+        ) as mock_authorize:
+            result = await middleware.on_list_tools(mock_context, call_next)
+
+            call_next.assert_called_once_with(mock_context)
+            mock_authorize.assert_called_once_with(mock_context, tools)
+            assert result == tools
+
+    @pytest.mark.asyncio
+    async def test_on_list_resources_success(self, middleware, mock_context):
+        """Test on_list_resources method with successful authorization."""
+        resource1 = Mock(spec=Resource)
+        resource1.name = "resource1"
+        resource2 = Mock(spec=Resource)
+        resource2.name = "resource2"
+
+        resources = [resource1, resource2]
+        call_next = AsyncMock(return_value=resources)
+
+        with patch.object(
+            middleware, "_authorize_list", return_value=resources
+        ) as mock_authorize:
+            result = await middleware.on_list_resources(mock_context, call_next)
+
+            call_next.assert_called_once_with(mock_context)
+            mock_authorize.assert_called_once_with(mock_context, resources)
+            assert result == resources
+
+    @pytest.mark.asyncio
+    async def test_on_list_prompts_success(self, middleware, mock_context):
+        """Test on_list_prompts method with successful authorization."""
+        prompt1 = Mock(spec=Prompt)
+        prompt1.name = "prompt1"
+        prompt2 = Mock(spec=Prompt)
+        prompt2.name = "prompt2"
+
+        prompts = [prompt1, prompt2]
+        call_next = AsyncMock(return_value=prompts)
+
+        with patch.object(
+            middleware, "_authorize_list", return_value=prompts
+        ) as mock_authorize:
+            result = await middleware.on_list_prompts(mock_context, call_next)
+
+            call_next.assert_called_once_with(mock_context)
+            mock_authorize.assert_called_once_with(mock_context, prompts)
+            assert result == prompts
+
+    def test_middleware_initialization(self):
+        """Test middleware initialization with different parameters."""
+        # Test with default client
+        middleware = EunomiaMcpMiddleware()
+        assert middleware._eunomia_client is not None
+        assert middleware._enable_audit_logging is True
+
+        # Test with custom client
+        custom_client = Mock()
+        middleware = EunomiaMcpMiddleware(
+            eunomia_client=custom_client, enable_audit_logging=False
+        )
+        assert middleware._eunomia_client is custom_client
+        assert middleware._enable_audit_logging is False

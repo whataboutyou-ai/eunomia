@@ -14,4 +14,5 @@ class McpAttributes(BaseModel):
     ]
     component_type: Literal["tools", "prompts", "resources"]
     name: str
+    uri: Optional[str] = None
     arguments: Optional[dict[str, Any]] = None

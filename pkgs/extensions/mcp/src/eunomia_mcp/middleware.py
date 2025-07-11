@@ -144,7 +144,7 @@ class EunomiaMcpMiddleware(Middleware):
         info = (
             f"MCP method: {method} | "
             f"MCP uri: {resource.uri} | "
-            f"User-Agent: {principal.attributes['user_agent']}"
+            f"User-Agent: {principal.attributes.get('user_agent')}"
         )
 
         if is_violation:
