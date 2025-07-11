@@ -130,6 +130,7 @@ class PassportFetcher(BaseFetcher):
         )
 
     async def fetch_attributes(self, uri: str) -> dict:
-        # TODO: it is receiving a token, not a uri + should be responding with uri and attributes
+        # this fetcher is receiving the access token as uri
         passport = self._verify_passport(uri)
-        return {**passport.attr, **{"sub": passport.sub}}
+        # currently returns the uri as an additional attribute
+        return {**passport.attr, **{"uri": passport.sub}}
