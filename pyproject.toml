@@ -13,6 +13,7 @@ dependencies = [
     "fastapi[standard]>=0.115.9",
     "httpx>=0.28.1",
     "pydantic-settings>=2.8.1",
+    "python-jose>=3.5.0",
     "sqlalchemy>=2.0.38",
 ]
 

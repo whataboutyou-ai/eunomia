@@ -30,13 +30,12 @@ class TestRegistryFetcher:
         result = fixture_registry.register_entity(
             sample_entity_create_resource, fixture_db
         )
-        attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
         assert isinstance(result, schemas.EntityInDb)
         assert result.uri == sample_entity_create_resource.uri
         assert result.type == sample_entity_create_resource.type
-        assert "name" in attributes_dict
-        assert attributes_dict["name"] == "Test Resource"
+        assert "name" in result.attributes_dict
+        assert result.attributes_dict["name"] == "Test Resource"
 
     def test_register_entity_duplicate_uri(
         self,
@@ -103,12 +102,11 @@ class TestRegistryFetcher:
         result = fixture_registry.update_entity(
             update_data, override=False, db_session=fixture_db
         )
-        attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
-        assert attributes_dict["name"] == "Updated Resource"
-        assert attributes_dict["description"] == "New description"
+        assert result.attributes_dict["name"] == "Updated Resource"
+        assert result.attributes_dict["description"] == "New description"
         # Should retain original attributes
-        assert attributes_dict["type"] == "document"
+        assert result.attributes_dict["type"] == "document"
 
     def test_update_entity_with_override(
         self,
@@ -133,13 +131,12 @@ class TestRegistryFetcher:
         result = fixture_registry.update_entity(
             update_data, override=True, db_session=fixture_db
         )
-        attributes_dict = {attr.key: attr.value for attr in result.attributes}
 
-        assert attributes_dict["name"] == "Updated Resource"
-        assert attributes_dict["description"] == "New description"
+        assert result.attributes_dict["name"] == "Updated Resource"
+        assert result.attributes_dict["description"] == "New description"
         # Should NOT retain original attributes
-        assert "type" not in attributes_dict
-        assert "owner" not in attributes_dict
+        assert "type" not in result.attributes_dict
+        assert "owner" not in result.attributes_dict
 
     def test_update_entity_not_found(
         self, fixture_db: Session, fixture_registry: RegistryFetcher
@@ -238,9 +235,9 @@ class TestRegistryFetcher:
         )
 
         created = fixture_registry.register_entity(entity, fixture_db)
-        attributes_dict = {attr.key: attr.value for attr in created.attributes}
+
         assert created.uri == "test://resource/lifecycle"
-        assert attributes_dict["name"] == "Lifecycle Test"
+        assert created.attributes_dict["name"] == "Lifecycle Test"
 
         # Update entity
         update = schemas.EntityUpdate(
@@ -254,10 +251,10 @@ class TestRegistryFetcher:
         updated = fixture_registry.update_entity(
             update, override=False, db_session=fixture_db
         )
-        attributes_dict = {attr.key: attr.value for attr in updated.attributes}
-        assert attributes_dict["version"] == "v2.0"
-        assert attributes_dict["status"] == "active"
-        assert attributes_dict["name"] == "Lifecycle Test"  # Should retain
+
+        assert updated.attributes_dict["version"] == "v2.0"
+        assert updated.attributes_dict["status"] == "active"
+        assert updated.attributes_dict["name"] == "Lifecycle Test"  # Should retain
 
         # Delete entity
         fixture_registry.delete_entity("test://resource/lifecycle", fixture_db)
@@ -290,13 +287,12 @@ class TestRegistryFetcher:
         )
 
         created = fixture_registry.register_entity(entity, fixture_db)
-        attributes_dict = {attr.key: attr.value for attr in created.attributes}
 
-        assert attributes_dict["name"] == "Complex Entity"
-        assert attributes_dict["tags"] == ["tag1", "tag2", "tag3"]
-        assert attributes_dict["metadata"] == {
+        assert created.attributes_dict["name"] == "Complex Entity"
+        assert created.attributes_dict["tags"] == ["tag1", "tag2", "tag3"]
+        assert created.attributes_dict["metadata"] == {
             "key": "value",
             "nested": {"inner": "data"},
         }
-        assert attributes_dict["score"] == 42.5
-        assert attributes_dict["active"] is True
+        assert created.attributes_dict["score"] == 42.5
+        assert created.attributes_dict["active"] is True

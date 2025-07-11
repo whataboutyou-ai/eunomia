@@ -96,3 +96,7 @@ class EntityInDb(EntityBase):
     registered_at: datetime = Field(description="Time when this entity was registered")
 
     model_config = ConfigDict(from_attributes=True)
+
+    @property
+    def attributes_dict(self) -> dict[str, Any]:
+        return {attr.key: attr.value for attr in self.attributes}
