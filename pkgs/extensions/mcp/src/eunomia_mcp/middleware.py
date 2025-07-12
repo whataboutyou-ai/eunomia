@@ -59,7 +59,7 @@ class EunomiaMcpMiddleware(Middleware):
             method=context.method,
             component_type=component_type,
             name=component.name,
-            uri=getattr(context.message, "uri", None),
+            uri=uri,
             arguments=getattr(context.message, "arguments", None),
         )
 

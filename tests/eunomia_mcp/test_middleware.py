@@ -121,7 +121,7 @@ class TestEunomiaMcpMiddleware:
         """Test resource extraction for resource component."""
         mock_context.method = "resources/read"
         # Configure mock to return specific values for getattr calls
-        mock_context.message.configure_mock(uri="file://test.txt", arguments=None)
+        mock_context.message.configure_mock(arguments=None)
 
         resource = middleware._extract_resource(mock_context, mock_resource)
 
@@ -129,7 +129,7 @@ class TestEunomiaMcpMiddleware:
         assert resource.attributes["method"] == "resources/read"
         assert resource.attributes["component_type"] == "resources"
         assert resource.attributes["name"] == "test_resource"
-        assert resource.attributes["uri"] == "file://test.txt"
+        assert resource.attributes["uri"] == "mcp:resources:test_resource"
 
     def test_extract_resource_for_prompt(self, middleware, mock_context, mock_prompt):
         """Test resource extraction for prompt component."""
