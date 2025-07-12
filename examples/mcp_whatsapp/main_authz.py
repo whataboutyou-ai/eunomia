@@ -2,10 +2,8 @@ from eunomia_mcp import create_eunomia_middleware
 
 from .main import mcp
 
-middleware = [create_eunomia_middleware()]
-app = mcp.http_app(middleware=middleware)
+middleware = create_eunomia_middleware()
+app = mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8088)
+    mcp.run(transport="http", host="0.0.0.0", port=8088)
