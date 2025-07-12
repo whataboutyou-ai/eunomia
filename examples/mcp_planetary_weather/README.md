@@ -14,7 +14,7 @@ The example shows how to:
 - Define access control policies that restrict tool usage based on parameters
 - Set up audit logging for authorization decisions
 
-The server provides weather information tools for Mars, Jupiter, Saturn, and Venus, but access is controlled through Eunomia policies that, as an example, only allow queries for dates in 2025.
+The server provides weather information tools for Mars, Jupiter, Saturn, and Venus, but access is controlled through Eunomia policies that demonstrate different authorization patterns based on tool names and time parameters.
 
 ## Usage
 
@@ -45,21 +45,16 @@ The example includes a pre-configured policy file (`mcp_policies.json`). Push it
 eunomia-mcp push mcp_policies.json
 ```
 
-### Run the Server
+### Configure the MCP Server
 
-Start the MCP server:
-
-```bash
-python planetary_weather.py
-```
-
-The server will be available at `http://localhost:8080`. You can add it to your MCP configuration file (e.g. `.cursor/mcp.json`):
+You can add it to your MCP configuration file (e.g. `.cursor/mcp.json`):
 
 ```json
 {
   "mcpServers": {
     "planetary-weather": {
-      "url": "http://localhost:8080/mcp/"
+      "command": "python",
+      "args": ["planetary_weather.py"]
     }
   }
 }
@@ -76,47 +71,21 @@ The server implements four weather tools:
 - `get_saturn_weather` - Get weather conditions on Saturn
 - `get_venus_weather` - Get weather conditions on Venus
 
-Each tool accepts a date parameter (defaults to current date) and returns descriptive weather information.
+Each tool accepts a `time` parameter (either "day" or "night", defaults to "day") and returns descriptive weather information.
 
 ### Authorization Policies
 
-The `mcp_policies.json` file defines two main rules:
+The `mcp_policies.json` file defines three rules with different access patterns:
 
-1. **Discovery Access**: Allows all principals to list available tools, resources, and prompts
-2. **Tool Execution**: Allows execution of weather tools, but only for dates starting with "2025"
+1. **Full Access**: Allows listing and calling for Mars and Venus weather tools
+2. **List Only**: Allows listing Jupiter weather tool but not calling it
+3. **Restricted Access**: Allows calling Jupiter weather tool only when the time parameter is "night"
 
-```json
-{
-  "name": "allow-mcp-operations",
-  "effect": "allow",
-  "resource_conditions": [
-    {
-      "path": "attributes.tool_name",
-      "operator": "in",
-      "value": [
-        "get_mars_weather",
-        "get_jupiter_weather",
-        "get_saturn_weather",
-        "get_venus_weather"
-      ]
-    },
-    {
-      "path": "attributes.arguments.request.date",
-      "operator": "startswith",
-      "value": "2025"
-    }
-  ],
-  "actions": ["execute"]
-}
-```
+### Access Patterns
 
-### Authorization Flow
-
-1. Client sends MCP request to call a weather tool
-2. Eunomia middleware intercepts the request
-3. Request is mapped to Eunomia resource format (`mcp:tools:get_mars_weather`)
-4. Eunomia policy engine evaluates access based on tool name and date parameter
-5. If authorized, request proceeds to MCP server; otherwise, access is denied
+- **Mars & Venus**: Can be listed and called with any time parameter
+- **Jupiter**: Can be listed, but can only be called when time is "night"
+- **Saturn**: Not mentioned in policy (implicitly denied for all operations) - will not be seen by the MCP client
 
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/

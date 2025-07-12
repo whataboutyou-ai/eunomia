@@ -4,45 +4,48 @@
   "default_effect": "deny",
   "rules": [
     {
-      "name": "allow-mcp-discovery",
+      "name": "list-and-call",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
         {
-          "path": "attributes.mcp_method",
+          "path": "attributes.name",
           "operator": "in",
-          "value": ["tools/list", "resources/list", "prompts/list"]
+          "value": ["get_venus_weather", "get_mars_weather"]
         }
       ],
-      "actions": ["access"]
+      "actions": ["list", "call"]
     },
     {
-      "name": "allow-mcp-operations",
+      "name": "list-only",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
         {
-          "path": "attributes.mcp_method",
-          "operator": "equals",
-          "value": "tools/call"
-        },
-        {
-          "path": "attributes.tool_name",
+          "path": "attributes.name",
           "operator": "in",
-          "value": [
-            "get_mars_weather",
-            "get_jupiter_weather",
-            "get_saturn_weather",
-            "get_venus_weather"
-          ]
-        },
-        {
-          "path": "attributes.arguments.request.date",
-          "operator": "startswith",
-          "value": "2025"
+          "value": ["get_jupiter_weather"]
         }
       ],
-      "actions": ["execute"]
+      "actions": ["list"]
+    },
+    {
+      "name": "restricted-call",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "in",
+          "value": ["get_jupiter_weather"]
+        },
+        {
+          "path": "attributes.arguments.request.time",
+          "operator": "equals",
+          "value": "night"
+        }
+      ],
+      "actions": ["call"]
     }
   ]
 }
