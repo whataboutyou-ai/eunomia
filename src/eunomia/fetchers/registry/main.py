@@ -16,6 +16,13 @@ class RegistryFetcher(BaseFetcher):
         super().__init__(config)
         db.init_db(self.config.sql_database_url)
 
+    def get_entity(self, uri: str) -> schemas.EntityInDb | None:
+        with db.SessionLocal() as db_session:
+            db_entity = crud.get_entity(uri, db=db_session)
+            if db_entity is not None:
+                return schemas.EntityInDb.model_validate(db_entity)
+            return None
+
     def register_entity(
         self, entity: schemas.EntityCreate, db_session: Session
     ) -> schemas.EntityInDb:
@@ -127,4 +134,9 @@ class RegistryFetcher(BaseFetcher):
             The attributes of the entity.
         """
         with db.SessionLocal() as db_session:
-            return crud.get_entity_attributes(uri, db=db_session)
+            db_entity = crud.get_entity(uri, db=db_session)
+            if db_entity is None:
+                return {}
+
+            entity = schemas.EntityInDb.model_validate(db_entity)
+            return entity.attributes_dict
