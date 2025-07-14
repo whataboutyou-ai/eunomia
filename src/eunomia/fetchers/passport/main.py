@@ -133,4 +133,4 @@ class PassportFetcher(BaseFetcher):
         # this fetcher is receiving the access token as uri
         passport = self._verify_passport(uri)
         # currently returns the uri as an additional attribute
-        return {**passport.attr, **{"uri": passport.sub}}
+        return {**passport.attr, "uri": passport.sub}

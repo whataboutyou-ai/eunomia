@@ -268,7 +268,7 @@ class TestPassportFetcher:
         """Test fetching attributes with valid token"""
         attributes = await passport_fetcher.fetch_attributes(valid_jwt_token)
 
-        expected_attributes = {**valid_passport_jwt.attr, "sub": valid_passport_jwt.sub}
+        expected_attributes = {**valid_passport_jwt.attr, "uri": valid_passport_jwt.sub}
         assert attributes == expected_attributes
 
     @pytest.mark.asyncio
@@ -310,7 +310,7 @@ class TestPassportFetcher:
 
         attributes = await passport_fetcher.fetch_attributes(token)
 
-        expected_attributes = {"sub": "test://resource/1"}
+        expected_attributes = {"uri": "test://resource/1"}
         assert attributes == expected_attributes
 
     def test_integration_issue_and_verify(
@@ -343,7 +343,7 @@ class TestPassportFetcher:
         # Fetch attributes using the token
         attributes = await passport_fetcher.fetch_attributes(token)
 
-        expected_attributes = {**sample_attributes, "sub": sample_uri}
+        expected_attributes = {**sample_attributes, "uri": sample_uri}
         assert attributes == expected_attributes
 
     def test_passport_expiration_timing(self, passport_fetcher, sample_uri):
