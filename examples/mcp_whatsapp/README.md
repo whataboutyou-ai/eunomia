@@ -67,12 +67,11 @@ uv pip install eunomia-ai eunomia-mcp fastmcp
 
    from main import mcp
 
-   middleware = [create_eunomia_middleware()]
-   app = mcp.http_app(middleware=middleware)
+   middleware = create_eunomia_middleware()
+   app = mcp.add_middleware(middleware)
 
    if __name__ == "__main__":
-       import uvicorn
-       uvicorn.run(app, host="0.0.0.0", port=8088)
+      mcp.run(transport="http", host="0.0.0.0", port=8088)
    ```
 
 ### Step 4: Configure MCP Client Connection
@@ -150,10 +149,10 @@ Try asking your client to:
 
 You can modify `mcp_policies.json` to customize the authorization behavior:
 
-- **Add more approved phone numbers**: Add them to the `value` array in the `restrict-send-operations` rule
-- **Allow additional operations**: Modify the `tool_name` conditions
+- **Add more approved phone numbers**: Add them to the `value` array in the `restrict-send-tools` rule
+- **Allow additional operations**: Modify the `attributes.name`'s `value` array with additional tool names
 - **Add time-based restrictions**: Use additional conditions with date/time operators
-- **Implement user-based policies**: Add `principal_conditions` for different users
+- **Implement user-based policies**: Add `attributes.user_id` in the principal conditions
 
 After modifying the policy, redeploy it:
 

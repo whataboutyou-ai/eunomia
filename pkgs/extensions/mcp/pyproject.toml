@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-mcp"
-version = "0.3.6"
+version = "0.3.7"
 description = "Eunomia MCP authorization middleware"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -9,9 +9,9 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "eunomia-sdk>=0.3.6",
-    "pydantic>=2.10.6",
-    "starlette>=0.45.3",
+    "eunomia-sdk>=0.3.7",
+    "fastmcp>=2.10.4",
+    "pydantic>=2.11.7",
     "typer>=0.15.2",
 ]
 

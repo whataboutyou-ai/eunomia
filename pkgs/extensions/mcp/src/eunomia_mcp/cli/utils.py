@@ -39,7 +39,7 @@ DEFAULT_POLICY = {
 
 SAMPLE_SERVER_CODE = '''
 from fastmcp import FastMCP
-from eunomia_mcp import create_eunomia_middleware
+from eunomia_mcp import EunomiaMcpMiddleware
 
 # Create your FastMCP server
 mcp = FastMCP("Secure MCP Server 🔒")
@@ -50,14 +50,13 @@ def add(a: int, b: int) -> int:
     return a + b
 
 # Add Eunomia authorization middleware
-middleware = [create_eunomia_middleware()]
+middleware = EunomiaMcpMiddleware()
 
 # Create ASGI app with authorization
-app = mcp.http_app(middleware=middleware)
+app = mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    mcp.run()
 '''
 
 
