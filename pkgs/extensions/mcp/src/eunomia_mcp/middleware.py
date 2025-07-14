@@ -1,220 +1,207 @@
-import fnmatch
-import json
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 from eunomia_core import schemas
 from eunomia_sdk import EunomiaClient
-from pydantic import ValidationError
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
+from fastmcp.exceptions import ToolError
+from fastmcp.prompts.prompt import Prompt
+from fastmcp.resources.resource import Resource
+from fastmcp.server.dependencies import get_http_headers
+from fastmcp.server.middleware import CallNext, Middleware, MiddlewareContext
+from fastmcp.tools.tool import Tool
+from fastmcp.utilities.components import FastMCPComponent
+from mcp import types
 
-from eunomia_mcp.schemas import JsonRpcError, JsonRpcErrorResponse, JsonRpcRequest
+from eunomia_mcp.schemas import McpAttributes
 
 logger = logging.getLogger(__name__)
 
 
-class EunomiaMcpMiddleware(BaseHTTPMiddleware):
+class EunomiaMcpMiddleware(Middleware):
     """
     Eunomia authorization middleware for MCP servers.
-
-    This middleware intercepts JSON-RPC 2.0 requests and validates them against
-    Eunomia policies before allowing them to proceed to the MCP server.
     """
 
     def __init__(
         self,
-        app,
         eunomia_client: Optional[EunomiaClient] = None,
         enable_audit_logging: bool = True,
-        bypass_methods: Optional[list[str]] = None,
     ):
-        super().__init__(app)
         self._eunomia_client = eunomia_client or EunomiaClient()
         self._enable_audit_logging = enable_audit_logging
-        self._bypass_methods = bypass_methods or [
-            "initialize",
-            "ping",
-            "notifications/*",
-        ]
 
-    async def dispatch(self, request: Request, call_next) -> Response:
-        """Main middleware dispatch method."""
+    def _extract_principal(self) -> schemas.PrincipalCheck:
+        headers = get_http_headers()
 
-        # Only process JSON-RPC requests
-        if not self._is_jsonrpc_request(request):
-            return await call_next(request)
+        agent_id = headers.get("x-agent-id", "unknown")
+        user_id = headers.get("x-user-id", "unknown")
+        user_agent = headers.get("user-agent", "undefined")
+        api_key = headers.get("authorization")
 
-        # Parse and validate JSON-RPC request
-        try:
-            body = await request.body()
-            raw_data = json.loads(body.decode())
-            jsonrpc_request = JsonRpcRequest(**raw_data)
-        except (json.JSONDecodeError, UnicodeDecodeError) as e:
-            return JsonRpcErrorResponse(
-                error=JsonRpcError(code=-32700, message="Parse error", data=str(e))
-            ).as_starlette_json_response()
-        except ValidationError as e:
-            return JsonRpcErrorResponse(
-                error=JsonRpcError(
-                    code=-32600,
-                    message="Invalid Request",
-                    data=f"Invalid JSON-RPC 2.0 format: {str(e)}",
-                )
-            ).as_starlette_json_response()
-
-        # Skip authorization for bypass methods
-        if any(
-            fnmatch.fnmatch(jsonrpc_request.method, pattern)
-            for pattern in self._bypass_methods
-        ):
-            return await call_next(request)
-
-        # Perform authorization check
-        auth_result = await self._authorize_request(jsonrpc_request, request)
-
-        if not auth_result.allowed:
-            if self._enable_audit_logging:
-                self._log_violation(request, jsonrpc_request, auth_result.reason)
-            return JsonRpcErrorResponse(
-                error=JsonRpcError(
-                    code=-32603, message="Unauthorized", data=auth_result.reason
-                ),
-                id=jsonrpc_request.id,
-            ).as_starlette_json_response()
-
-        # Log successful authorization
-        if self._enable_audit_logging:
-            self._log_authorized_request(request, jsonrpc_request)
-
-        # Reconstruct request body for downstream processing
-        request._body = body
-
-        return await call_next(request)
-
-    def _is_jsonrpc_request(self, request: Request) -> bool:
-        """Check if request is a JSON-RPC request."""
-        content_type = request.headers.get("content-type", "")
-        return request.method == "POST" and (
-            "application/json" in content_type.lower()
-            or "application/json-rpc" in content_type.lower()
-        )
-
-    async def _authorize_request(
-        self, jsonrpc_request: JsonRpcRequest, request: Request
-    ) -> schemas.CheckResponse:
-        """Perform authorization check using Eunomia."""
-        try:
-            # Extract principal information
-            principal_uri, principal_attributes = self._extract_principal_info(request)
-
-            # Map MCP method to action and resource
-            params = jsonrpc_request.get_dict_params()
-            action, resource_uri, resource_attributes = (
-                self._map_method_to_action_and_resource(jsonrpc_request.method, params)
-            )
-
-            return self._eunomia_client.check(
-                principal_uri=principal_uri,
-                principal_attributes=principal_attributes,
-                resource_uri=resource_uri,
-                resource_attributes=resource_attributes,
-                action=action,
-            )
-
-        except Exception as e:
-            logger.error(f"Authorization check failed: {e}")
-            return schemas.CheckResponse(
-                allowed=False, reason=f"Authorization system error: {str(e)}"
-            )
-
-    def _extract_principal_info(self, request: Request) -> tuple[str, dict[str, Any]]:
-        """Extract principal information from request."""
-        uri = None
-        attributes = {}
-
-        # Extract from custom headers
-        agent_id = request.headers.get("X-Agent-ID")
-        user_id = request.headers.get("X-User-ID")
-        api_key = request.headers.get("Authorization")
-
-        if agent_id:
-            uri = f"agent:{agent_id}"
-            attributes["agent_id"] = agent_id
-
-        if user_id:
-            attributes["user_id"] = user_id
-
+        uri = f"agent:{agent_id}"
+        attributes = {
+            "agent_id": agent_id,
+            "user_id": user_id,
+            "user_agent": user_agent,
+        }
         if api_key:
             attributes["api_key"] = api_key.replace("Bearer ", "")
 
-        # Default fallback
-        if not uri:
-            uri = "agent:unknown"
-            attributes["type"] = "unknown_agent"
+        return schemas.PrincipalCheck(uri=uri, attributes=attributes)
 
-        return uri, attributes
+    def _extract_resource(
+        self, context: MiddlewareContext, component: FastMCPComponent
+    ) -> schemas.ResourceCheck:
+        component_type = context.method.split("/")[0]
 
-    def _map_method_to_action_and_resource(
-        self, method: str, params: dict[str, Any]
-    ) -> tuple[str, str, dict[str, Any]]:
-        """Map MCP JSON-RPC method to Eunomia resource/action."""
-        known_methods = [
-            "tools/list",
-            "prompts/list",
-            "resources/list",
-            "tools/call",
-            "resources/read",
-            "prompts/get",
-        ]
+        uri = f"mcp:{component_type}:{component.name}"
+        mcp_attributes = McpAttributes(
+            method=context.method,
+            component_type=component_type,
+            name=component.name,
+            uri=uri,
+            arguments=getattr(context.message, "arguments", None),
+        )
 
-        if method in known_methods:
-            resource_type = method.split("/")[0]
-            uri = f"mcp:{resource_type}"
+        return schemas.ResourceCheck(
+            uri=uri, attributes=mcp_attributes.model_dump(exclude_none=True)
+        )
+
+    def _authorize_call(
+        self, context: MiddlewareContext, component: FastMCPComponent
+    ) -> None:
+        if not component.enabled:
+            raise ToolError(f"Access denied: {component.name} is disabled")
+
+        principal = self._extract_principal()
+        action = context.method.split("/")[1]
+        resource = self._extract_resource(context, component)
+
+        result = self._eunomia_client.check(
+            principal_uri=principal.uri,
+            principal_attributes=principal.attributes,
+            resource_uri=resource.uri,
+            resource_attributes=resource.attributes,
+            action=action,
+        )
+
+        if self._enable_audit_logging:
+            self._log_authorization(
+                principal,
+                resource,
+                context.method,
+                result.reason,
+                is_violation=(not result.allowed),
+            )
+
+        if not result.allowed:
+            raise ToolError(f"Access denied: {result.reason}")
+
+    def _authorize_list(
+        self, context: MiddlewareContext, components: list[FastMCPComponent]
+    ) -> list[FastMCPComponent]:
+        if components:
+            principal = self._extract_principal()
+            action = context.method.split("/")[1]
+
+            # Construct requests for bulk check
+            resources = [self._extract_resource(context, c) for c in components]
+
+            # Perform all checks in bulk
+            results = self._eunomia_client.bulk_check(
+                [
+                    schemas.CheckRequest(principal=principal, resource=r, action=action)
+                    for r in resources
+                ]
+            )
+
+            # Disable components based on its authorization result
+            filtered_components = []
+            for result, component, resource in zip(results, components, resources):
+                if result.allowed:
+                    filtered_components.append(component)
+
+                if self._enable_audit_logging:
+                    self._log_authorization(
+                        principal,
+                        resource,
+                        context.method,
+                        result.reason,
+                        is_violation=(not result.allowed),
+                    )
+
+            return filtered_components
+        return []
+
+    def _log_authorization(
+        self,
+        principal: schemas.PrincipalCheck,
+        resource: schemas.ResourceCheck,
+        method: str,
+        reason: str,
+        is_violation: bool,
+    ):
+        info = (
+            f"MCP method: {method} | "
+            f"MCP uri: {resource.uri} | "
+            f"User-Agent: {principal.attributes.get('user_agent')}"
+        )
+
+        if is_violation:
+            logger.warning(f"Authorization violation: {reason} | " + info)
         else:
-            resource_type = "unknown"
-            uri = f"mcp:method:{method}"
+            logger.info(f"Authorized request: {reason} | " + info)
 
-        action = "access"
-        attributes = {
-            "type": "mcp_resource",
-            "mcp_method": method,
-            "resource_type": resource_type,
-            "arguments": params.get("arguments", {}),
-        }
+    async def on_call_tool(
+        self,
+        context: MiddlewareContext[types.CallToolRequestParams],
+        call_next: CallNext[types.CallToolRequestParams, types.CallToolResult],
+    ) -> types.CallToolResult:
+        tool = await context.fastmcp_context.fastmcp.get_tool(context.message.name)
+        self._authorize_call(context, tool)
+        result = await call_next(context)
+        return result
 
-        if method == "tools/call":
-            action = "execute"
-            uri = uri + f":{params.get('name')}"
-            attributes["tool_name"] = params.get("name")
-        elif method == "resources/read":
-            action = "read"
-            uri = uri + f":{params.get('uri')}"
-            attributes["resource_uri"] = params.get("uri")
-        elif method == "prompts/get":
-            action = "read"
-            uri = uri + f":{params.get('name')}"
-            attributes["prompt_name"] = params.get("name")
-
-        return action, uri, attributes
-
-    def _log_violation(
-        self, request: Request, jsonrpc_request: JsonRpcRequest, reason: str
-    ):
-        """Log authorization violations."""
-        logger.warning(
-            f"Authorization violation: {reason} | "
-            f"Method: {jsonrpc_request.method} | "
-            f"Client: {request.client.host if request.client else 'unknown'} | "
-            f"User-Agent: {request.headers.get('User-Agent', 'unknown')}"
+    async def on_read_resource(
+        self,
+        context: MiddlewareContext[types.ReadResourceRequestParams],
+        call_next: CallNext[types.ReadResourceRequestParams, types.ReadResourceResult],
+    ) -> types.ReadResourceResult:
+        resource = await context.fastmcp_context.fastmcp.get_resource(
+            context.message.uri
         )
+        self._authorize_call(context, resource)
+        return await call_next(context)
 
-    def _log_authorized_request(
-        self, request: Request, jsonrpc_request: JsonRpcRequest
-    ):
-        """Log authorized requests."""
-        logger.info(
-            f"Authorized MCP request: {jsonrpc_request.method} | "
-            f"Client: {request.client.host if request.client else 'unknown'}"
-        )
+    async def on_get_prompt(
+        self,
+        context: MiddlewareContext[types.GetPromptRequestParams],
+        call_next: CallNext[types.GetPromptRequestParams, types.GetPromptResult],
+    ) -> types.GetPromptResult:
+        prompt = await context.fastmcp_context.fastmcp.get_prompt(context.message.name)
+        self._authorize_call(context, prompt)
+        return await call_next(context)
+
+    async def on_list_tools(
+        self,
+        context: MiddlewareContext[types.ListToolsRequest],
+        call_next: CallNext[types.ListToolsRequest, list[Tool]],
+    ) -> list[Tool]:
+        result = await call_next(context)
+        return self._authorize_list(context, result)
+
+    async def on_list_resources(
+        self,
+        context: MiddlewareContext[types.ListResourcesRequest],
+        call_next: CallNext[types.ListResourcesRequest, list[Resource]],
+    ) -> list[Resource]:
+        result = await call_next(context)
+        return self._authorize_list(context, result)
+
+    async def on_list_prompts(
+        self,
+        context: MiddlewareContext[types.ListPromptsRequest],
+        call_next: CallNext[types.ListPromptsRequest, list[Prompt]],
+    ) -> list[Prompt]:
+        result = await call_next(context)
+        return self._authorize_list(context, result)

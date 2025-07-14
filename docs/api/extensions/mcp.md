@@ -51,7 +51,7 @@ pip install eunomia-mcp
 
 ```python
 from fastmcp import FastMCP
-from eunomia_mcp import create_eunomia_middleware
+from eunomia_mcp import EunomiaMcpMiddleware
 
 # Create your FastMCP server
 mcp = FastMCP("Secure MCP Server 🔒")
@@ -62,14 +62,13 @@ def add(a: int, b: int) -> int:
     return a + b
 
 # Add Eunomia authorization middleware
-middleware = [create_eunomia_middleware()]
+middleware = EunomiaMcpMiddleware()
 
 # Create ASGI app with authorization
-app = mcp.http_app(middleware=middleware)
+app = mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    mcp.run()
 ```
 
 ### Start Eunomia Server
@@ -98,19 +97,17 @@ middleware = [
         eunomia_endpoint="https://your-eunomia-server.com",
         eunomia_api_key="your-api-key",
         enable_audit_logging=True,
-        bypass_methods=["initialize", "notifications/*", "ping"]
     )
 ]
 ```
 
 #### Parameters
 
-| Parameter              | Type        | Default                             | Description                            |
-| ---------------------- | ----------- | ----------------------------------- | -------------------------------------- |
-| `eunomia_endpoint`     | `str`       | `http://localhost:8000`             | Eunomia server URL                     |
-| `eunomia_api_key`      | `str`       | `None`                              | API key (or set `WAY_API_KEY` env var) |
-| `enable_audit_logging` | `bool`      | `True`                              | Enable request/violation logging       |
-| `bypass_methods`       | `list[str]` | `["initialize", "notifications/*"]` | Methods to skip authorization          |
+| Parameter              | Type   | Default                 | Description                            |
+| ---------------------- | ------ | ----------------------- | -------------------------------------- |
+| `eunomia_endpoint`     | `str`  | `http://localhost:8000` | Eunomia server URL                     |
+| `eunomia_api_key`      | `str`  | `None`                  | API key (or set `WAY_API_KEY` env var) |
+| `enable_audit_logging` | `bool` | `True`                  | Enable request/violation logging       |
 
 ### Environment Variables
 
@@ -176,17 +173,24 @@ eunomia-mcp push mcp_policies.json --overwrite
 
 ### MCP Method Mappings
 
-MCP JSON-RPC methods are mapped to Eunomia resources:
+| MCP Method       | Resource URI           | Action | Middleware behavior                       |
+| ---------------- | ---------------------- | ------ | ----------------------------------------- |
+| `tools/list`     | `mcp:tools:{name}`     | `list` | Filters the server's response             |
+| `resources/list` | `mcp:resources:{name}` | `list` | Filters the server's response             |
+| `prompts/list`   | `mcp:prompts:{name}`   | `list` | Filters the server's response             |
+| `tools/call`     | `mcp:tools:{name}`     | `call` | Blocks/forwards the request to the server |
+| `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
+| `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-| MCP Method       | Resource URI          | Action    | Description              |
-| ---------------- | --------------------- | --------- | ------------------------ |
-| `tools/list`     | `mcp:tools`           | `access`  | List available tools     |
-| `tools/call`     | `mcp:tools:{name}`    | `execute` | Execute specific tool    |
-| `resources/list` | `mcp:resources`       | `access`  | List available resources |
-| `resources/read` | `mcp:resource:{uri}`  | `read`    | Read specific resource   |
-| `prompts/list`   | `mcp:prompts`         | `access`  | List available prompts   |
-| `prompts/get`    | `mcp:prompt:{name}`   | `read`    | Get specific prompt      |
-| Other            | `mcp:method:{method}` | `access`  | Any other method         |
+The Middleware extracts additional attributes from the request that are passed to the decision engine that can be referenced in policies. The attributes are in the form of:
+
+| Attribute        | Type              | Description                                                          |
+| ---------------- | ----------------- | -------------------------------------------------------------------- |
+| `method`         | `str`             | The MCP method being called                                          |
+| `component_type` | `str`             | The type of component being called (`tools`, `prompts`, `resources`) |
+| `name`           | `str`             | The name of the component being called (e.g. `file_read`)            |
+| `uri`            | `str`             | The URI of the component being called (e.g. `mcp:tools:file_read`)   |
+| `arguments`      | `dict` (optional) | The arguments passed to the component being called                   |
 
 ### Agent Authentication
 
@@ -196,7 +200,8 @@ Agents are identified through HTTP headers:
 POST /mcp HTTP/1.1
 X-Agent-ID: claude
 X-User-ID: user123
-Authorization: Bearer your-api-key
+User-Agent: Claude
+Authorization: Bearer api-key-here
 Content-Type: application/json
 ```
 
@@ -204,64 +209,43 @@ Content-Type: application/json
 
 The middleware extracts principals as follows:
 
-| Header                      | Principal URI  | Attributes               |
-| --------------------------- | -------------- | ------------------------ |
-| `X-Agent-ID: claude`        | `agent:claude` | `{"agent_id": "claude"}` |
-| `X-User-ID: user123`        |                | `{"user_id": "user123"}` |
-| `Authorization: Bearer xyz` |                | `{"api_key": "xyz"}`     |
+| Header                      | Principal URI  | Attributes                 |
+| --------------------------- | -------------- | -------------------------- |
+| `X-Agent-ID: claude`        | `agent:claude` | `{"agent_id": "claude"}`   |
+| `X-User-ID: user123`        |                | `{"user_id": "user123"}`   |
+| `User-Agent: Claude`        |                | `{"user_agent": "Claude"}` |
+| `Authorization: Bearer xyz` |                | `{"api_key": "xyz"}`       |
 
 #### Custom Principal Extraction
 
 Override the default principal extraction logic:
 
 ```python
+from eunomia_core import schemas
 from eunomia_mcp import EunomiaMcpMiddleware
-from starlette.requests import Request
 
 class CustomAuthMiddleware(EunomiaMcpMiddleware):
-    def _extract_principal_info(self, request: Request) -> tuple[str, dict]:
+    def _extract_principal(self) -> schemas.PrincipalCheck:
+        headers = get_http_headers()
+        token = headers.get("Authorization", "").replace("Bearer ", "")
+
         # Extract from JWT token
-        token = request.headers.get("Authorization", "").replace("Bearer ", "")
         if token:
             payload = decode_jwt(token)  # Your JWT decoding logic
-            return f"user:{payload['sub']}", {
-                "role": payload.get("role"),
-                "department": payload.get("dept")
+            return schemas.PrincipalCheck(
+                uri=f"user:{payload['sub']}",
+                attributes={
+                    "role": payload.get("role"),
+                    "department": payload.get("dept")
             }
+            )
 
         # Fallback to default
-        return super()._extract_principal_info(request)
+        return super()._extract_principal()
 
 # Use custom middleware
-from starlette.middleware import Middleware
-middleware = [Middleware(CustomAuthMiddleware, eunomia_client=client)]
+middleware = CustomAuthMiddleware()
 ```
-
-## Error Handling
-
-### Authorization Errors
-
-Denied requests return JSON-RPC errors:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32603,
-    "message": "Unauthorized",
-    "data": "Access denied for tools/call"
-  },
-  "id": 1
-}
-```
-
-### Common Error Codes
-
-| Code     | Message         | Cause                   |
-| -------- | --------------- | ----------------------- |
-| `-32700` | Parse error     | Invalid JSON in request |
-| `-32600` | Invalid Request | Malformed JSON-RPC 2.0  |
-| `-32603` | Unauthorized    | Authorization denied    |
 
 ## Logging & Monitoring
 
@@ -277,8 +261,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("eunomia_mcp")
 
 # Log messages include:
-# INFO: Authorized MCP request: tools/call | Client: 192.168.1.100
-# WARNING: Authorization violation: Access denied | Method: tools/call | Client: 192.168.1.100
+# INFO: Authorized request | MCP method: tools/call | MCP uri: mcp:tools:file_read | User-Agent: Claude
+# WARNING: Authorization violation: Access denied for tools/call | MCP method: tools/call | MCP uri: mcp:tools:file_read | User-Agent: Claude
 ```
 
 ### Log Categories
@@ -303,21 +287,16 @@ middleware = [
         eunomia_endpoint="https://eunomia.yourcompany.com",
         eunomia_api_key=os.getenv("EUNOMIA_API_KEY"),
         enable_audit_logging=True,
-        bypass_methods=["initialize", "capabilities", "notifications/*"]
     )
 ]
 
-app = mcp.http_app(middleware=middleware)
+app = mcp.add_middleware(middleware)
 
-# Deploy with production ASGI server
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        app,
+    mcp.run(
+        transport="http",
         host="0.0.0.0",
         port=8080,
-        workers=4,
-        log_level="info"
     )
 ```
 

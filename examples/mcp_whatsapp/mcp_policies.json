@@ -1,51 +1,51 @@
 {
   "version": "1.0",
   "name": "mcp-whatsapp-policy",
+  "description": "Policy for MCP Whatsapp",
   "default_effect": "deny",
   "rules": [
     {
-      "name": "allow-mcp-discovery",
+      "name": "unrestricted-listing",
+      "description": "Allow all principals to list all tools, resources, and prompts",
       "effect": "allow",
       "principal_conditions": [],
-      "resource_conditions": [
-        {
-          "path": "attributes.mcp_method",
-          "operator": "in",
-          "value": ["tools/list", "resources/list", "prompts/list"]
-        }
-      ],
-      "actions": ["access"]
+      "resource_conditions": [],
+      "actions": ["list"]
     },
     {
-      "name": "allow-read-operations",
+      "name": "allow-read-tools",
+      "description": "Allow Cursor to call read-only tools",
       "effect": "allow",
-      "principal_conditions": [],
+      "principal_conditions": [
+        {
+          "path": "attributes.user_agent",
+          "operator": "contains",
+          "value": "Cursor"
+        }
+      ],
       "resource_conditions": [
         {
-          "path": "attributes.mcp_method",
-          "operator": "equals",
-          "value": "tools/call"
-        },
-        {
-          "path": "attributes.tool_name",
+          "path": "attributes.name",
           "operator": "not_in",
           "value": ["send_message", "send_file", "send_audio_message"]
         }
       ],
-      "actions": ["execute"]
+      "actions": ["call"]
     },
     {
-      "name": "restrict-send-operations",
+      "name": "restrict-send-tools",
+      "description": "Allow Cursor to call send-only tools to specific recipients only",
       "effect": "allow",
-      "principal_conditions": [],
+      "principal_conditions": [
+        {
+          "path": "attributes.user_agent",
+          "operator": "contains",
+          "value": "Cursor"
+        }
+      ],
       "resource_conditions": [
         {
-          "path": "attributes.mcp_method",
-          "operator": "equals",
-          "value": "tools/call"
-        },
-        {
-          "path": "attributes.tool_name",
+          "path": "attributes.name",
           "operator": "in",
           "value": ["send_message", "send_file", "send_audio_message"]
         },
@@ -55,7 +55,7 @@
           "value": ["PHONE_NUMBER_1", "PHONE_NUMBER_2", "PHONE_NUMBER_3"]
         }
       ],
-      "actions": ["execute"]
+      "actions": ["call"]
     }
   ]
 }
