@@ -4,38 +4,54 @@ The Eunomia MCP Authorization Middleware provides **policy-based authorization**
 
 ### Features
 
-- 🔒 **Policy-Based Authorization**: Control which agents can access specific MCP resources and tools
-- 📊 **Comprehensive Audit Logging**: Track all authorization decisions and security violations
-- ⚡ **Zero-Configuration Integration**: One-line middleware setup with FastMCP servers
-- 🔧 **Flexible Policy Management**: JSON-based policies with CLI tooling for management
-- 🎯 **MCP Protocol Aware**: Built-in understanding of MCP methods (tools, resources, prompts)
-- 🚀 **Production Ready**: Configurable endpoints, API keys, and bypass rules
+- 🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
+- 📊 **Audit Logging**: Track all authorization decisions and violations
+- ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
+- 🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
+- 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
 ### Architecture
+
+The Eunomia middleware intercepts all MCP requests to your server and automatically maps MCP methods to authorization checks.
+
+#### Listing Operations
+
+The middleware behaves as a filter for listing operations (`tools/list`, `resources/list`, `prompts/list`), hiding to the client components that are not authorized by the defined policies.
 
 ```mermaid
 sequenceDiagram
     participant MCPClient as MCP Client
     participant EunomiaMiddleware as Eunomia Middleware
-    participant MCPServer as MCP Server
+    participant MCPServer as FastMCP Server
     participant EunomiaServer as Eunomia Server
 
-    MCPClient->>EunomiaMiddleware: MCP Request
-    Note over MCPClient, EunomiaMiddleware: Middleware intercepts request to server
-    EunomiaMiddleware->>EunomiaServer: Authorization Check
-    EunomiaServer->>EunomiaMiddleware: Authorization Decision (allow/deny)
-    EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
-    EunomiaMiddleware->>MCPServer: MCP Request (if allowed)
-    MCPServer-->>MCPClient: MCP Response (if allowed)
+    MCPClient->>EunomiaMiddleware: MCP Listing Request (e.g., tools/list)
+    EunomiaMiddleware->>MCPServer: MCP Listing Request
+    MCPServer-->>EunomiaMiddleware: MCP Listing Response
+    EunomiaMiddleware->>EunomiaServer: Authorization Checks
+    EunomiaServer->>EunomiaMiddleware: Authorization Decisions
+    EunomiaMiddleware-->>MCPClient: Filtered MCP Listing Response
 ```
 
-The middleware operates as a transparent authorization layer that:
+#### Execution Operations
 
-1. **Intercepts** JSON-RPC 2.0 requests to your MCP server
-2. **Extracts** principal information from request headers
-3. **Maps** MCP methods to Eunomia resources and actions
-4. **Authorizes** requests against your defined policies
-5. **Logs** all authorization decisions for audit trails
+The middleware behaves as a firewall for execution operations (`tools/call`, `resources/read`, `prompts/get`), blocking operations that are not authorized by the defined policies.
+
+```mermaid
+sequenceDiagram
+    participant MCPClient as MCP Client
+    participant EunomiaMiddleware as Eunomia Middleware
+    participant MCPServer as FastMCP Server
+    participant EunomiaServer as Eunomia Server
+
+    MCPClient->>EunomiaMiddleware: MCP Execution Request (e.g., tools/call)
+    EunomiaMiddleware->>EunomiaServer: Authorization Check
+    EunomiaServer->>EunomiaMiddleware: Authorization Decision
+    EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
+    EunomiaMiddleware->>MCPServer: MCP Execution Request (if allowed)
+    MCPServer-->>EunomiaMiddleware: MCP Execution Response (if allowed)
+    EunomiaMiddleware-->>MCPClient: MCP Execution Response (if allowed)
+```
 
 ## Installation
 
@@ -182,7 +198,7 @@ eunomia-mcp push mcp_policies.json --overwrite
 | `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
 | `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-The Middleware extracts additional attributes from the request that are passed to the decision engine that can be referenced in policies. The attributes are in the form of:
+The middleware extracts contextual attributes from the request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 
 | Attribute        | Type              | Description                                                          |
 | ---------------- | ----------------- | -------------------------------------------------------------------- |
