@@ -69,6 +69,12 @@ class FetcherFactory:
         cls._instances = instances
         cls._routers = routers
 
+        # Call post_init for all fetchers
+        for fetcher in cls._instances.values():
+            fetcher.post_init()
+
+        logging.info("All fetchers initialized")
+
     @classmethod
     def get_fetcher(cls, fetcher_id: str) -> BaseFetcher:
         if fetcher_id not in cls._instances:

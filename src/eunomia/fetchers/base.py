@@ -15,5 +15,12 @@ class BaseFetcher(ABC):
     def __init__(self, config: BaseFetcherConfig):
         self.config = config
 
+    def post_init(self) -> None:
+        """
+        Optional method that is called after all fetchers are initialized.
+        It can be used for initialization that depends on other fetchers.
+        """
+        pass
+
     @abstractmethod
     async def fetch_attributes(self, uri: str) -> dict: ...
