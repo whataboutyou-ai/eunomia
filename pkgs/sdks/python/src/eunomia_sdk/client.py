@@ -15,14 +15,14 @@ class EunomiaClient:
     ----------
     endpoint : str, optional
         The base URL endpoint of the Eunomia server.
-        Defaults to "http://localhost:8000" if not provided.
+        Defaults to "http://localhost:8421" if not provided.
     api_key : str, optional
         The API key for authenticating with the server.
         Defaults to the environment variable "WAY_API_KEY" if not provided.
     """
 
     def __init__(self, endpoint: str | None = None, api_key: str | None = None) -> None:
-        self._endpoint = endpoint if endpoint is not None else "http://localhost:8000"
+        self._endpoint = endpoint if endpoint is not None else "http://localhost:8421"
         self._api_key = (
             api_key if api_key is not None else os.getenv("WAY_API_KEY", None)
         )

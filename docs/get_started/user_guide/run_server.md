@@ -30,7 +30,7 @@ If you have installed the `eunomia-ai` package, you can start the Eunomia server
 eunomia server
 ```
 
-The server will start and listen for requests on address **`127.0.0.1`** and port **`8000`**. You can change the address and port by using the `--host` and `--port` flags:
+The server will start and listen for requests on address **`127.0.0.1`** and port **`8421`**. You can change the address and port by using the `--host` and `--port` flags:
 
 ```bash
 eunomia server --host 0.0.0.0 --port 8080
@@ -47,19 +47,19 @@ eunomia server --reload
 You can also run the Eunomia server using the Docker image:
 
 ```bash
-docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
+docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
 ```
 
 Pin to a specific version if needed:
 
 ```bash
-docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:0.3.5
+docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:0.3.5
 ```
 
 Modify the server configuration by providing environment variables:
 
 ```bash
-docker run -d -p 8000:8000 --name eunomia \
+docker run -d -p 8421:8421 --name eunomia \
     -e DEBUG=True \
     -e ENGINE_SQL_DATABASE_URL=postgresql://user:password@host:port/database \
     ttommitt/eunomia-server:latest

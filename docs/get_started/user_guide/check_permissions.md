@@ -44,12 +44,12 @@ In this option, you provide only the **`uri`** for both the principal and resour
     ```bash
     # Option 1: Using identifiers only.
     # Allowed action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"principal_uri": "registered-principal-001", "resource_uri": "it-desk-agent"}'
 
     # Denied action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"principal_uri": "registered-principal-003", "resource_uri": "hr-agent"}'
     ```
@@ -100,20 +100,20 @@ In this option, you do not provide registered identifiers for the entities. Inst
     ```bash
     # Option 2: Using new entities (attributes provided at runtime).
     # Allowed action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"resource_uri": "it-desk-agent", "principal_attributes": {"department": "it"}}'
 
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"resource_uri": "hr-agent", "principal_attributes": {"department": "hr", "role": "manager"}}'
 
     # Denied action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"resource_uri": "it-desk-agent", "principal_attributes": {"department": "sales"}}'
 
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
          -H "Content-Type: application/json" \
          -d '{"resource_uri": "hr-agent", "principal_attributes": {"department": "hr", "role": "analyst"}}'
     ```
@@ -166,16 +166,16 @@ In this option, you provide both the registered **`uri`** and additional attribu
     ```bash
     # Option 3: Using identifiers and additional runtime attributes.
     # Allowed action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
         -H "Content-Type: application/json" \
         -d '{"principal_uri": "registered-principal-001", "principal_attributes": {"department": "it"}, "resource_uri": "it-desk-agent", "resource_attributes": {"current_location": "HQ"}}'
 
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
         -H "Content-Type: application/json" \
         -d '{"principal_uri": "registered-principal-002", "principal_attributes": {"department": "hr", "role": "manager"}, "resource_uri": "hr-agent", "resource_attributes": {"during_working_hours": "yes"}}'
 
     # Denied action
-    curl -X POST 'http://localhost:8000/check' \
+    curl -X POST 'http://localhost:8421/check' \
         -H "Content-Type: application/json" \
         -d '{"principal_uri": "registered-principal-003", "principal_attributes": {"department": "sales"}, "resource_uri": "it-desk-agent", "resource_attributes": {"current_location": "Remote"}}'
     ```

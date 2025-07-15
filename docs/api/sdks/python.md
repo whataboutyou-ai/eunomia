@@ -19,7 +19,7 @@ Use the standard API for authorization checks in your application:
 ```python
 from eunomia_sdk import EunomiaClient
 
-client = EunomiaClient(endpoint="http://localhost:8000")
+client = EunomiaClient(endpoint="http://localhost:8421")
 
 # Check if a principal has permissions to perform an action on a resource
 response = client.check(
@@ -40,7 +40,7 @@ from eunomia_sdk import EunomiaClient
 
 # For admin API usage authentication via API key might be required
 client = EunomiaClient(
-    endpoint="http://localhost:8000",
+    endpoint="http://localhost:8421",
     api_key="your-admin-api-key"  # or set WAY_API_KEY environment variable
 )
 

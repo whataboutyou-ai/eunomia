@@ -105,7 +105,7 @@ middleware = [
 
 | Parameter              | Type   | Default                 | Description                            |
 | ---------------------- | ------ | ----------------------- | -------------------------------------- |
-| `eunomia_endpoint`     | `str`  | `http://localhost:8000` | Eunomia server URL                     |
+| `eunomia_endpoint`     | `str`  | `http://localhost:8421` | Eunomia server URL                     |
 | `eunomia_api_key`      | `str`  | `None`                  | API key (or set `WAY_API_KEY` env var) |
 | `enable_audit_logging` | `bool` | `True`                  | Enable request/violation logging       |
 

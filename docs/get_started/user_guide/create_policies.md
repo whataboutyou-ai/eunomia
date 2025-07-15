@@ -32,7 +32,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/admin/policies/simple?name=it-desk-policy' \
+    curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \
     -H "Content-Type: application/json" \
     -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
     ```

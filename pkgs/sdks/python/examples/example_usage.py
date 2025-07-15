@@ -3,7 +3,7 @@ from eunomia_sdk.client import EunomiaClient
 
 
 def run():
-    client = EunomiaClient(endpoint="http://localhost:8000")
+    client = EunomiaClient(endpoint="http://localhost:8421")
 
     try:
         # Register a principal

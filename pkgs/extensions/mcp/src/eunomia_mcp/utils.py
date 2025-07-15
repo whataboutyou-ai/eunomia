@@ -17,7 +17,7 @@ def create_eunomia_middleware(
     Parameters
     ----------
     eunomia_endpoint : str, optional
-        Eunomia server endpoint (defaults to localhost:8000)
+        Eunomia server endpoint (defaults to localhost:8421)
     eunomia_api_key : str, optional
         API key for Eunomia server (or set WAY_API_KEY env var)
     enable_audit_logging : bool, optional

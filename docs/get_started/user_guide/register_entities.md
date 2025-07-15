@@ -60,7 +60,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/admin/fetchers/registry/entities' \
+    curl -X POST 'http://localhost:8421/admin/fetchers/registry/entities' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "resource",
@@ -71,7 +71,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
                }
              }'
 
-    curl -X POST 'http://localhost:8000/admin/fetchers/registry/entities' \
+    curl -X POST 'http://localhost:8421/admin/fetchers/registry/entities' \
          -H "Content-Type: application/json" \
          -d '{
                "type": "principal",

@@ -54,11 +54,11 @@ You can use the `POST /admin/policies/simple` endpoint for this.
 
 === "Curl"
     ```bash
-    curl -X POST 'http://localhost:8000/admin/policies/simple?name=it-desk-policy' \
+    curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \
       -H "Content-Type: application/json" \
       -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
 
-    curl -X POST 'http://localhost:8000/admin/policies/simple?name=hr-policy' \
+    curl -X POST 'http://localhost:8421/admin/policies/simple?name=hr-policy' \
       -H "Content-Type: application/json" \
       -d '{"principal": {"attributes": {"department": "hr", "role": "manager"}}, "resource": {"attributes": {"agent-id": "hr-agent"}}, "action": "access"}'
     ```
@@ -129,11 +129,11 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
 === "Curl"
     ```bash
     # allowed access
-    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
-    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
+    curl -X POST 'http://localhost:8421/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
+    curl -X POST 'http://localhost:8421/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "manager"}}}'
     # denied access
-    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
-    curl -X POST 'http://localhost:8000/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
+    curl -X POST 'http://localhost:8421/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "sales"}}}'
+    curl -X POST 'http://localhost:8421/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "hr-agent"}}, "principal": {"attributes": {"department": "hr", "role": "analyst"}}}'
     ```
 
 === "Output"

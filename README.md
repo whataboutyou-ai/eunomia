@@ -53,7 +53,7 @@ eunomia server
 Or use the Docker image instead:
 
 ```bash
-docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
+docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
 ```
 
 ### Usage
@@ -155,7 +155,7 @@ The simple policy creation endpoint has been renamed to `/policies/simple` for c
 A new endpoint has been added for creating full policies:
 
 ```bash
-curl -X POST "http://localhost:8000/policies" \
+curl -X POST "http://localhost:8421/policies" \
   -H "Content-Type: application/json" \
   -d '{"version": "1.0", "name": "...", "default_effect": "...", "rules": []}'
 ```
@@ -170,12 +170,12 @@ The authorization endpoint has been renamed for clarity; update your requests to
 
 ```bash
 # Before (v0.3.1)
-curl -X POST "http://localhost:8000/check-access" \
+curl -X POST "http://localhost:8421/check-access" \
   -H "Content-Type: application/json" \
   -d '{"principal": {...}, "action": "...", "resource": {...}}'
 
 # After (v0.3.2)
-curl -X POST "http://localhost:8000/check" \
+curl -X POST "http://localhost:8421/check" \
   -H "Content-Type: application/json" \
   -d '{"principal": {...}, "action": "...", "resource": {...}}'
 ```
@@ -185,7 +185,7 @@ curl -X POST "http://localhost:8000/check" \
 A new bulk authorization endpoint has been added for improved performance when checking multiple permissions:
 
 ```bash
-curl -X POST "http://localhost:8000/check/bulk" \
+curl -X POST "http://localhost:8421/check/bulk" \
   -H "Content-Type: application/json" \
   -d '[
     {"principal": {...}, "action": "...", "resource": {...}},
