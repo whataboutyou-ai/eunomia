@@ -462,16 +462,16 @@ class TestConstants:
         assert len(DEFAULT_POLICY["rules"]) == 2
 
         # Check first rule
-        discovery_rule = DEFAULT_POLICY["rules"][0]
-        assert discovery_rule["name"] == "allow-mcp-discovery"
-        assert discovery_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert discovery_rule["actions"] == ["access"]
+        listing_rule = DEFAULT_POLICY["rules"][0]
+        assert listing_rule["name"] == "unrestricted-listing"
+        assert listing_rule["effect"] == enums.PolicyEffect.ALLOW
+        assert listing_rule["actions"] == ["list"]
 
         # Check second rule
-        ops_rule = DEFAULT_POLICY["rules"][1]
-        assert ops_rule["name"] == "allow-mcp-operations"
-        assert ops_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert ops_rule["actions"] == ["execute", "read"]
+        execution_rule = DEFAULT_POLICY["rules"][1]
+        assert execution_rule["name"] == "unrestricted-execution"
+        assert execution_rule["effect"] == enums.PolicyEffect.ALLOW
+        assert execution_rule["actions"] == ["call", "read", "get"]
 
     def test_sample_server_code_structure(self):
         """Test that SAMPLE_SERVER_CODE contains expected components."""
