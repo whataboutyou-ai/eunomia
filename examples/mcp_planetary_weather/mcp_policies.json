@@ -5,6 +5,7 @@
   "rules": [
     {
       "name": "list-and-call",
+      "description": "All principals can list and call the specified tools",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -18,6 +19,7 @@
     },
     {
       "name": "list-only",
+      "description": "All principals can list the specified tool",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -31,6 +33,7 @@
     },
     {
       "name": "restricted-call",
+      "description": "All principals can call the specified tool with restricted arguments",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
