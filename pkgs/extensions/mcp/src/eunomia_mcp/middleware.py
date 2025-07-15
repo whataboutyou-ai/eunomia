@@ -159,8 +159,7 @@ class EunomiaMcpMiddleware(Middleware):
     ) -> types.CallToolResult:
         tool = await context.fastmcp_context.fastmcp.get_tool(context.message.name)
         self._authorize_execution(context, tool)
-        result = await call_next(context)
-        return result
+        return await call_next(context)
 
     async def on_read_resource(
         self,
@@ -187,21 +186,21 @@ class EunomiaMcpMiddleware(Middleware):
         context: MiddlewareContext[types.ListToolsRequest],
         call_next: CallNext[types.ListToolsRequest, list[Tool]],
     ) -> list[Tool]:
-        result = await call_next(context)
-        return self._authorize_listing(context, result)
+        tools = await call_next(context)
+        return self._authorize_listing(context, tools)
 
     async def on_list_resources(
         self,
         context: MiddlewareContext[types.ListResourcesRequest],
         call_next: CallNext[types.ListResourcesRequest, list[Resource]],
     ) -> list[Resource]:
-        result = await call_next(context)
-        return self._authorize_listing(context, result)
+        resources = await call_next(context)
+        return self._authorize_listing(context, resources)
 
     async def on_list_prompts(
         self,
         context: MiddlewareContext[types.ListPromptsRequest],
         call_next: CallNext[types.ListPromptsRequest, list[Prompt]],
     ) -> list[Prompt]:
-        result = await call_next(context)
-        return self._authorize_listing(context, result)
+        prompts = await call_next(context)
+        return self._authorize_listing(context, prompts)

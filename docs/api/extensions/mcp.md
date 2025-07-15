@@ -138,43 +138,42 @@ export PYTHONLOGLEVEL=INFO
 
 ## Policy Management CLI
 
-The extension includes a CLI tool for managing MCP authorization policies:
+Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization policies:
 
-### Initialize Project
-
-Create a new policy configuration:
+#### Initialize a New Project
 
 ```bash
-# Create default policy file
+# Create a default policy configuration file
 eunomia-mcp init
 
-# Create with custom name
+# Create policy configuration file with custom name
 eunomia-mcp init --policy-file my_policies.json
 
-# Generate policy + sample MCP server
+# Generate both policy configuration file and a sample MCP server
 eunomia-mcp init --sample
 ```
 
-### Validate Policies
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
 
-Verify your policy configuration:
+### Validate Policy Configuration
 
 ```bash
-# Validate policy syntax
+# Validate your policy file
 eunomia-mcp validate mcp_policies.json
 ```
 
-### Deploy Policies
-
-Push policies to your Eunomia server:
+### Push Policies to Eunomia
 
 ```bash
-# Push policies to server
+# Push your policy to Eunomia server
 eunomia-mcp push mcp_policies.json
 
-# Overwrite existing policies
+# Push your policy and overwrite existing ones
 eunomia-mcp push mcp_policies.json --overwrite
 ```
+
+!!! info
+    You need the Eunomia server running for the push operation.
 
 ### Development Workflow
 
@@ -198,15 +197,15 @@ eunomia-mcp push mcp_policies.json --overwrite
 | `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
 | `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-The middleware extracts contextual attributes from the request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
+The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 
-| Attribute        | Type              | Description                                                          |
-| ---------------- | ----------------- | -------------------------------------------------------------------- |
-| `method`         | `str`             | The MCP method being called                                          |
-| `component_type` | `str`             | The type of component being called (`tools`, `prompts`, `resources`) |
-| `name`           | `str`             | The name of the component being called (e.g. `file_read`)            |
-| `uri`            | `str`             | The URI of the component being called (e.g. `mcp:tools:file_read`)   |
-| `arguments`      | `dict` (optional) | The arguments passed to the component being called                   |
+| Attribute        | Type              | Description                                              | Sample value           |
+| ---------------- | ----------------- | -------------------------------------------------------- | ---------------------- |
+| `method`         | `str`             | The MCP method                                           | `tools/list`           |
+| `component_type` | `str`             | The type of component: `tools`, `resources` or `prompts` | `tools`                |
+| `name`           | `str`             | The name of the component                                | `file_read`            |
+| `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
+| `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
 ### Agent Authentication
 
@@ -360,3 +359,4 @@ logging.getLogger("eunomia_sdk").setLevel(logging.DEBUG)
 
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
+[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates

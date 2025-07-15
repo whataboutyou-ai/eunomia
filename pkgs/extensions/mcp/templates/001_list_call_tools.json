@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "name": "mcp-template-policy-001",
+  "description": "Template policy for tool listing and calling tools",
+  "default_effect": "deny",
+  "rules": [
+    {
+      "name": "list-read-write-tools",
+      "description": "Allow listing the read and write tools",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "in",
+          "value": ["read_file", "write_file"]
+        }
+      ],
+      "actions": ["list"]
+    },
+    {
+      "name": "call-read-tool",
+      "description": "Allow calling the read tool",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "equals",
+          "value": "read_file"
+        }
+      ],
+      "actions": ["call"]
+    },
+    {
+      "name": "call-write-tool-for-notes",
+      "description": "Allow calling the write tool only for files in the user's notes directory",
+      "effect": "allow",
+      "principal_conditions": [],
+      "resource_conditions": [
+        {
+          "path": "attributes.name",
+          "operator": "equals",
+          "value": "write_file"
+        },
+        {
+          "path": "attributes.arguments.path",
+          "operator": "startswith",
+          "value": "/home/user/notes/"
+        }
+      ],
+      "actions": ["call"]
+    }
+  ]
+}

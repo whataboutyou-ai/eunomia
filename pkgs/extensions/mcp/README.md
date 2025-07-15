@@ -125,7 +125,7 @@ app = mcp.http_app(middleware=middleware)
 
 ### Policy Configuration
 
-Use the `eunomia-mcp` CLI to manage your MCP authorization policies:
+Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization policies:
 
 #### Initialize a New Project
 
@@ -140,7 +140,7 @@ eunomia-mcp init --policy-file my_policies.json
 eunomia-mcp init --sample
 ```
 
-You can now edit the policy configuration file to your liking.
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
 
 #### Validate Policy Configuration
 
@@ -177,15 +177,15 @@ eunomia-mcp push mcp_policies.json --overwrite
 | `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
 | `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-The middleware extracts contextual attributes from the request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
+The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 
-| Attribute        | Type              | Description                                                          |
-| ---------------- | ----------------- | -------------------------------------------------------------------- |
-| `method`         | `str`             | The MCP method being called                                          |
-| `component_type` | `str`             | The type of component being called (`tools`, `prompts`, `resources`) |
-| `name`           | `str`             | The name of the component being called (e.g. `file_read`)            |
-| `uri`            | `str`             | The URI of the component being called (e.g. `mcp:tools:file_read`)   |
-| `arguments`      | `dict` (optional) | The arguments passed to the component being called                   |
+| Attribute        | Type              | Description                                              | Sample value           |
+| ---------------- | ----------------- | -------------------------------------------------------- | ---------------------- |
+| `method`         | `str`             | The MCP method                                           | `tools/list`           |
+| `component_type` | `str`             | The type of component: `tools`, `resources` or `prompts` | `tools`                |
+| `name`           | `str`             | The name of the component                                | `file_read`            |
+| `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
+| `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
 ### Authentication
 
@@ -247,3 +247,4 @@ logger = logging.getLogger("eunomia_mcp")
 [eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
 [example-planetary-weather-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_planetary_weather
 [example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp
+[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
