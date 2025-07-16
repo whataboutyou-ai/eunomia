@@ -43,7 +43,7 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
 === "Curl"
     ```bash
     # Update an entity
-    curl -X PUT 'http://localhost:8000/admin/fetchers/registry/entities/generated-uri-123' \
+    curl -X PUT 'http://localhost:8421/admin/fetchers/registry/entities/generated-uri-123' \
          -H "Content-Type: application/json" \
          -d '{
                "uri": "generated-uri-123",
@@ -56,7 +56,7 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
              }'
 
     # Delete an entity
-    curl -X DELETE 'http://localhost:8000/admin/fetchers/registry/entities/generated-uri-123' \
+    curl -X DELETE 'http://localhost:8421/admin/fetchers/registry/entities/generated-uri-123' \
          -H "Content-Type: application/json" \
          -d '{"uri": "generated-uri-123"}'
     ```

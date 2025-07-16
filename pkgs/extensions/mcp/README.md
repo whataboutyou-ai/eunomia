@@ -96,7 +96,7 @@ if __name__ == "__main__":
 > Run it in the background with Docker:
 >
 > ```bash
-> docker run -d -p 8000:8000 --name eunomia ttommitt/eunomia-server:latest
+> docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
 > ```
 >
 > Or refer to the [Eunomia documentation][eunomia-docs-run-server] for more options.

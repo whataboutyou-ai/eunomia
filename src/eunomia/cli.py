@@ -13,7 +13,7 @@ def get_version():
 
 
 @app.command()
-def server(host: str = "127.0.0.1", port: int = 8000, reload: bool = False):
+def server(host: str = "127.0.0.1", port: int = 8421, reload: bool = False):
     """Run the Eunomia API server"""
     uvicorn.run("eunomia.api:app", host=host, port=port, reload=reload)
 

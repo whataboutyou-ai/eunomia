@@ -3,7 +3,7 @@ import { CheckRequest, EntityType, EunomiaClient } from "eunomia-sdk";
 
 async function run(): Promise<void> {
   const client = new EunomiaClient({
-    endpoint: "http://localhost:8000",
+    endpoint: "http://localhost:8421",
   });
 
   try {

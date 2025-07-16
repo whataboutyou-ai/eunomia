@@ -20,7 +20,7 @@ Use the standard API for authorization checks in your application:
 import { EunomiaClient } from "eunomia-sdk";
 
 const client = new EunomiaClient({
-  endpoint: "http://localhost:8000"
+  endpoint: "http://localhost:8421",
 });
 
 // Check if a principal has permissions to perform an action on a resource
@@ -38,7 +38,7 @@ import { EunomiaClient, EntityType } from "eunomia-sdk";
 
 // For admin API usage authentication via API key might be required
 const client = new EunomiaClient({
-  endpoint: "http://localhost:8000",
+  endpoint: "http://localhost:8421",
   apiKey: "my-api-key",
 });
 
@@ -51,7 +51,6 @@ const resource = await client.registerEntity({
     type: "document",
     classification: "confidential",
   },
-  
 });
 
 // Register a principal with metadata
@@ -74,7 +73,7 @@ A client for interacting with the Eunomia server.
 
 Creates a new `EunomiaClient` instance with the following options:
 
-- `endpoint`: The base URL endpoint of the Eunomia server, defaults to "http://localhost:8000"
+- `endpoint`: The base URL endpoint of the Eunomia server, defaults to "http://localhost:8421"
 - `apiKey`: The API key for authentication, defaults to the env variable `WAY_API_KEY`
 
 #### check
