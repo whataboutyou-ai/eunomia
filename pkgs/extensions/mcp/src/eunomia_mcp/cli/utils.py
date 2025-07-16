@@ -6,33 +6,24 @@ from eunomia_sdk import EunomiaClient
 DEFAULT_POLICY = {
     "version": "1.0",
     "name": "mcp-default-policy",
+    "description": "Default policy for a MCP server",
     "default_effect": enums.PolicyEffect.DENY,
     "rules": [
         {
-            "name": "allow-mcp-discovery",
+            "name": "unrestricted-listing",
+            "description": "All principals can list tools, resources, and prompts",
             "effect": enums.PolicyEffect.ALLOW,
             "principal_conditions": [],
-            "resource_conditions": [
-                {
-                    "path": "attributes.mcp_method",
-                    "operator": enums.ConditionOperator.IN,
-                    "value": ["tools/list", "resources/list", "prompts/list"],
-                },
-            ],
-            "actions": ["access"],
+            "resource_conditions": [],
+            "actions": ["list"],
         },
         {
-            "name": "allow-mcp-operations",
+            "name": "unrestricted-execution",
+            "description": "All principals can call tools, read resources, and get prompts",
             "effect": enums.PolicyEffect.ALLOW,
             "principal_conditions": [],
-            "resource_conditions": [
-                {
-                    "path": "attributes.mcp_method",
-                    "operator": enums.ConditionOperator.IN,
-                    "value": ["tools/call", "resources/read", "prompts/get"],
-                },
-            ],
-            "actions": ["execute", "read"],
+            "resource_conditions": [],
+            "actions": ["call", "read", "get"],
         },
     ],
 }

@@ -67,7 +67,7 @@ class EunomiaMcpMiddleware(Middleware):
             uri=uri, attributes=mcp_attributes.model_dump(exclude_none=True)
         )
 
-    def _authorize_call(
+    def _authorize_execution(
         self, context: MiddlewareContext, component: FastMCPComponent
     ) -> None:
         if not component.enabled:
@@ -97,7 +97,7 @@ class EunomiaMcpMiddleware(Middleware):
         if not result.allowed:
             raise ToolError(f"Access denied: {result.reason}")
 
-    def _authorize_list(
+    def _authorize_listing(
         self, context: MiddlewareContext, components: list[FastMCPComponent]
     ) -> list[FastMCPComponent]:
         if components:
@@ -158,9 +158,8 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.CallToolRequestParams, types.CallToolResult],
     ) -> types.CallToolResult:
         tool = await context.fastmcp_context.fastmcp.get_tool(context.message.name)
-        self._authorize_call(context, tool)
-        result = await call_next(context)
-        return result
+        self._authorize_execution(context, tool)
+        return await call_next(context)
 
     async def on_read_resource(
         self,
@@ -170,7 +169,7 @@ class EunomiaMcpMiddleware(Middleware):
         resource = await context.fastmcp_context.fastmcp.get_resource(
             context.message.uri
         )
-        self._authorize_call(context, resource)
+        self._authorize_execution(context, resource)
         return await call_next(context)
 
     async def on_get_prompt(
@@ -179,7 +178,7 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.GetPromptRequestParams, types.GetPromptResult],
     ) -> types.GetPromptResult:
         prompt = await context.fastmcp_context.fastmcp.get_prompt(context.message.name)
-        self._authorize_call(context, prompt)
+        self._authorize_execution(context, prompt)
         return await call_next(context)
 
     async def on_list_tools(
@@ -187,21 +186,21 @@ class EunomiaMcpMiddleware(Middleware):
         context: MiddlewareContext[types.ListToolsRequest],
         call_next: CallNext[types.ListToolsRequest, list[Tool]],
     ) -> list[Tool]:
-        result = await call_next(context)
-        return self._authorize_list(context, result)
+        tools = await call_next(context)
+        return self._authorize_listing(context, tools)
 
     async def on_list_resources(
         self,
         context: MiddlewareContext[types.ListResourcesRequest],
         call_next: CallNext[types.ListResourcesRequest, list[Resource]],
     ) -> list[Resource]:
-        result = await call_next(context)
-        return self._authorize_list(context, result)
+        resources = await call_next(context)
+        return self._authorize_listing(context, resources)
 
     async def on_list_prompts(
         self,
         context: MiddlewareContext[types.ListPromptsRequest],
         call_next: CallNext[types.ListPromptsRequest, list[Prompt]],
     ) -> list[Prompt]:
-        result = await call_next(context)
-        return self._authorize_list(context, result)
+        prompts = await call_next(context)
+        return self._authorize_listing(context, prompts)

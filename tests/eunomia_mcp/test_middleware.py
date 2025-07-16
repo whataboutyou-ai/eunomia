@@ -145,7 +145,7 @@ class TestEunomiaMcpMiddleware:
         assert resource.attributes["name"] == "test_prompt"
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_call_success(
+    def test_authorize_execution_success(
         self, mock_get_headers, middleware, mock_context, mock_tool
     ):
         """Test successful authorization for component call."""
@@ -155,12 +155,12 @@ class TestEunomiaMcpMiddleware:
         )
 
         # Should not raise any exception
-        middleware._authorize_call(mock_context, mock_tool)
+        middleware._authorize_execution(mock_context, mock_tool)
 
         middleware._eunomia_client.check.assert_called_once()
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_call_failure(
+    def test_authorize_execution_failure(
         self, mock_get_headers, middleware, mock_context, mock_tool
     ):
         """Test authorization failure for component call."""
@@ -170,19 +170,21 @@ class TestEunomiaMcpMiddleware:
         )
 
         with pytest.raises(ToolError, match="Access denied"):
-            middleware._authorize_call(mock_context, mock_tool)
+            middleware._authorize_execution(mock_context, mock_tool)
 
-    def test_authorize_call_disabled_component(
+    def test_authorize_execution_disabled_component(
         self, middleware, mock_context, mock_tool
     ):
         """Test authorization failure for disabled component."""
         mock_tool.enabled = False
 
         with pytest.raises(ToolError, match="Access denied: test_tool is disabled"):
-            middleware._authorize_call(mock_context, mock_tool)
+            middleware._authorize_execution(mock_context, mock_tool)
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_list_success(self, mock_get_headers, middleware, mock_context):
+    def test_authorize_listing_success(
+        self, mock_get_headers, middleware, mock_context
+    ):
         """Test successful authorization for list operation."""
         mock_get_headers.return_value = {"x-agent-id": "test-agent"}
         mock_context.method = "tools/list"
@@ -203,14 +205,14 @@ class TestEunomiaMcpMiddleware:
             CheckResponse(allowed=True, reason="Authorized"),
         ]
 
-        result = middleware._authorize_list(mock_context, components)
+        result = middleware._authorize_listing(mock_context, components)
 
         assert len(result) == 2
         assert result == components
         middleware._eunomia_client.bulk_check.assert_called_once()
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_list_partial_filtering(
+    def test_authorize_listing_partial_filtering(
         self, mock_get_headers, middleware, mock_context
     ):
         """Test partial filtering in list operation."""
@@ -233,14 +235,14 @@ class TestEunomiaMcpMiddleware:
             CheckResponse(allowed=False, reason="Access denied"),
         ]
 
-        result = middleware._authorize_list(mock_context, components)
+        result = middleware._authorize_listing(mock_context, components)
 
         assert len(result) == 1
         assert result[0] == tool1
 
-    def test_authorize_list_empty_components(self, middleware, mock_context):
+    def test_authorize_listing_empty_components(self, middleware, mock_context):
         """Test authorization with empty components list."""
-        result = middleware._authorize_list(mock_context, [])
+        result = middleware._authorize_listing(mock_context, [])
         assert result == []
 
     @patch("eunomia_mcp.middleware.logger")
@@ -300,7 +302,7 @@ class TestEunomiaMcpMiddleware:
             )
         )
 
-        with patch.object(middleware, "_authorize_call") as mock_authorize:
+        with patch.object(middleware, "_authorize_execution") as mock_authorize:
             result = await middleware.on_call_tool(mock_context, call_next)
 
             mock_authorize.assert_called_once_with(mock_context, mock_tool)
@@ -319,7 +321,7 @@ class TestEunomiaMcpMiddleware:
         call_next = AsyncMock()
 
         with patch.object(
-            middleware, "_authorize_call", side_effect=ToolError("Access denied")
+            middleware, "_authorize_execution", side_effect=ToolError("Access denied")
         ):
             with pytest.raises(ToolError, match="Access denied"):
                 await middleware.on_call_tool(mock_context, call_next)
@@ -345,7 +347,7 @@ class TestEunomiaMcpMiddleware:
             )
         )
 
-        with patch.object(middleware, "_authorize_call") as mock_authorize:
+        with patch.object(middleware, "_authorize_execution") as mock_authorize:
             result = await middleware.on_read_resource(mock_context, call_next)
 
             mock_authorize.assert_called_once_with(mock_context, mock_resource)
@@ -370,7 +372,7 @@ class TestEunomiaMcpMiddleware:
             )
         )
 
-        with patch.object(middleware, "_authorize_call") as mock_authorize:
+        with patch.object(middleware, "_authorize_execution") as mock_authorize:
             result = await middleware.on_get_prompt(mock_context, call_next)
 
             mock_authorize.assert_called_once_with(mock_context, mock_prompt)
@@ -389,7 +391,7 @@ class TestEunomiaMcpMiddleware:
         call_next = AsyncMock(return_value=tools)
 
         with patch.object(
-            middleware, "_authorize_list", return_value=tools
+            middleware, "_authorize_listing", return_value=tools
         ) as mock_authorize:
             result = await middleware.on_list_tools(mock_context, call_next)
 
@@ -409,7 +411,7 @@ class TestEunomiaMcpMiddleware:
         call_next = AsyncMock(return_value=resources)
 
         with patch.object(
-            middleware, "_authorize_list", return_value=resources
+            middleware, "_authorize_listing", return_value=resources
         ) as mock_authorize:
             result = await middleware.on_list_resources(mock_context, call_next)
 
@@ -429,7 +431,7 @@ class TestEunomiaMcpMiddleware:
         call_next = AsyncMock(return_value=prompts)
 
         with patch.object(
-            middleware, "_authorize_list", return_value=prompts
+            middleware, "_authorize_listing", return_value=prompts
         ) as mock_authorize:
             result = await middleware.on_list_prompts(mock_context, call_next)
 

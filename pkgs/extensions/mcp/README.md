@@ -6,28 +6,53 @@ Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [Fas
 
 ### Features
 
-- 🔒 **Policy-Based Authorization**: Control which agents can access which MCP resources and tools
+- 🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
 - 📊 **Audit Logging**: Track all authorization decisions and violations
 - ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
-- 🔧 **Flexible Configuration**: JSON-based policies with support for complex rules
+- 🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
 - 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
 ### Architecture
+
+The Eunomia middleware intercepts all MCP requests to your server and automatically maps MCP methods to authorization checks.
+
+#### Listing Operations
+
+The middleware behaves as a filter for listing operations (`tools/list`, `resources/list`, `prompts/list`), hiding to the client components that are not authorized by the defined policies.
 
 ```mermaid
 sequenceDiagram
     participant MCPClient as MCP Client
     participant EunomiaMiddleware as Eunomia Middleware
-    participant MCPServer as MCP Server
+    participant MCPServer as FastMCP Server
     participant EunomiaServer as Eunomia Server
 
-    MCPClient->>EunomiaMiddleware: MCP Request
-    Note over MCPClient, EunomiaMiddleware: Middleware intercepts request to server
+    MCPClient->>EunomiaMiddleware: MCP Listing Request (e.g., tools/list)
+    EunomiaMiddleware->>MCPServer: MCP Listing Request
+    MCPServer-->>EunomiaMiddleware: MCP Listing Response
+    EunomiaMiddleware->>EunomiaServer: Authorization Checks
+    EunomiaServer->>EunomiaMiddleware: Authorization Decisions
+    EunomiaMiddleware-->>MCPClient: Filtered MCP Listing Response
+```
+
+#### Execution Operations
+
+The middleware behaves as a firewall for execution operations (`tools/call`, `resources/read`, `prompts/get`), blocking operations that are not authorized by the defined policies.
+
+```mermaid
+sequenceDiagram
+    participant MCPClient as MCP Client
+    participant EunomiaMiddleware as Eunomia Middleware
+    participant MCPServer as FastMCP Server
+    participant EunomiaServer as Eunomia Server
+
+    MCPClient->>EunomiaMiddleware: MCP Execution Request (e.g., tools/call)
     EunomiaMiddleware->>EunomiaServer: Authorization Check
-    EunomiaServer->>EunomiaMiddleware: Authorization Decision (allow/deny)
+    EunomiaServer->>EunomiaMiddleware: Authorization Decision
     EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
-    EunomiaMiddleware->>MCPServer: MCP Request (if allowed)
-    MCPServer-->>MCPClient: MCP Response (if allowed)
+    EunomiaMiddleware->>MCPServer: MCP Execution Request (if allowed)
+    MCPServer-->>EunomiaMiddleware: MCP Execution Response (if allowed)
+    EunomiaMiddleware-->>MCPClient: MCP Execution Response (if allowed)
 ```
 
 ### Installation
@@ -100,7 +125,7 @@ app = mcp.http_app(middleware=middleware)
 
 ### Policy Configuration
 
-Use the `eunomia-mcp` CLI to manage your MCP authorization policies:
+Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization policies:
 
 #### Initialize a New Project
 
@@ -115,7 +140,7 @@ eunomia-mcp init --policy-file my_policies.json
 eunomia-mcp init --sample
 ```
 
-You can now edit the policy configuration file to your liking.
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
 
 #### Validate Policy Configuration
 
@@ -152,15 +177,15 @@ eunomia-mcp push mcp_policies.json --overwrite
 | `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
 | `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-The Middleware extracts additional attributes from the request that are passed to the decision engine that can be referenced in policies. The attributes are in the form of:
+The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 
-| Attribute        | Type              | Description                                                          |
-| ---------------- | ----------------- | -------------------------------------------------------------------- |
-| `method`         | `str`             | The MCP method being called                                          |
-| `component_type` | `str`             | The type of component being called (`tools`, `prompts`, `resources`) |
-| `name`           | `str`             | The name of the component being called (e.g. `file_read`)            |
-| `uri`            | `str`             | The URI of the component being called (e.g. `mcp:tools:file_read`)   |
-| `arguments`      | `dict` (optional) | The arguments passed to the component being called                   |
+| Attribute        | Type              | Description                                              | Sample value           |
+| ---------------- | ----------------- | -------------------------------------------------------- | ---------------------- |
+| `method`         | `str`             | The MCP method                                           | `tools/list`           |
+| `component_type` | `str`             | The type of component: `tools`, `resources` or `prompts` | `tools`                |
+| `name`           | `str`             | The name of the component                                | `file_read`            |
+| `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
+| `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
 ### Authentication
 
@@ -222,3 +247,4 @@ logger = logging.getLogger("eunomia_mcp")
 [eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
 [example-planetary-weather-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_planetary_weather
 [example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp
+[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates

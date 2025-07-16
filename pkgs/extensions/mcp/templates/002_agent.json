@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "name": "mcp-template-policy-002",
+  "description": "Template policy for restricting access to a specific agent only",
+  "default_effect": "deny",
+  "rules": [
+    {
+      "name": "allow-cursor-agents",
+      "description": "Allow all operations for Cursor agents only",
+      "effect": "allow",
+      "principal_conditions": [
+        {
+          "path": "attributes.user_agent",
+          "operator": "contains",
+          "value": "Cursor"
+        }
+      ],
+      "resource_conditions": [],
+      "actions": ["list", "call", "read", "get"]
+    }
+  ]
+}
