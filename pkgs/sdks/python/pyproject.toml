@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-sdk"
-version = "0.3.7"
+version = "0.3.8"
 description = "Eunomia SDK for Python"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
@@ -9,7 +9,7 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "eunomia-core>=0.3.7",
+    "eunomia-core>=0.3.8",
     "httpx>=0.28.1",
 ]
 
