@@ -32,6 +32,32 @@ export WAY_API_KEY=your-secret-api-key
 export PYTHONLOGLEVEL=INFO
 ```
 
+### Connecting to Remote MCP Servers
+
+You can use the Eunomia MCP Middleware even if you are connecting to a remote MCP server that you don't control.
+
+To do so, you can use a proxy server that will forward the requests to the remote server and apply the Eunomia MCP Middleware to the proxy server.
+
+```python
+from eunomia_mcp.middleware import EunomiaMcpMiddleware
+from fastmcp import FastMCP
+
+config = {
+    "mcpServers": {
+        "default": {
+            "command": "npx",
+            "args": ["-y", "mcp-remote", "https://mcp.example.com/v1/sse"],
+        }
+    }
+}
+
+proxy = FastMCP.as_proxy(config, name="Proxy with Eunomia Middleware")
+proxy.add_middleware(EunomiaMcpMiddleware())
+
+if __name__ == "__main__":
+    proxy.run()
+```
+
 ## Logging & Monitoring
 
 ### Audit Logging
