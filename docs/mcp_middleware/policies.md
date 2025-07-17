@@ -1,14 +1,10 @@
-# Configure Policies
-
 Define fine-grained access control rules for your MCP server using JSON-based policies and CLI tools.
 
 ## Policy Management CLI
 
-Use the `eunomia-mcp` CLI to manage your MCP authorization policies:
+Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization policies.
 
-## Creating Your First Policy
-
-### Initialize a New Project
+### Creating Your First Policy
 
 ```bash
 # Create a default policy configuration file
@@ -21,25 +17,16 @@ eunomia-mcp init --policy-file my_policies.json
 eunomia-mcp init --sample
 ```
 
-You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][eunomia-github-policy-templates] for example policies and rules.
 
-### Development Workflow
-
-1. **Initialize**: `eunomia-mcp init --sample`
-2. **Customize**: Edit generated policy file
-3. **Validate**: `eunomia-mcp validate policies.json`
-4. **Start Server**: `eunomia server`
-5. **Deploy**: `eunomia-mcp push policies.json`
-6. **Test**: Run your MCP server with middleware
-
-## Validating Policies
+### Validating Policies
 
 ```bash
 # Validate your policy file
 eunomia-mcp validate mcp_policies.json
 ```
 
-## Deploying Policies
+### Deploying Policies
 
 ```bash
 # Push your policy to Eunomia server
@@ -50,9 +37,20 @@ eunomia-mcp push mcp_policies.json --overwrite
 ```
 
 !!! info
-    You need the Eunomia server running for the push operation.
+You need the Eunomia server running for the push operation.
 
-## MCP Method Mappings
+Workflow:
+
+1. **Initialize**: `eunomia-mcp init`
+2. **Customize**: Edit generated policy file
+3. **Validate**: `eunomia-mcp validate mcp_policies.json`
+4. **Start Server**: `eunomia server`
+5. **Deploy**: `eunomia-mcp push mcp_policies.json`
+6. **Run**: Run your MCP server with middleware
+
+## MCP Context Extraction
+
+### Methods Mapping
 
 The middleware automatically maps MCP methods to authorization checks:
 
@@ -65,9 +63,9 @@ The middleware automatically maps MCP methods to authorization checks:
 | `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
 | `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
 
-## Available Context Attributes
+### Contextual Attributes
 
-The middleware extracts contextual attributes from MCP requests that can be referenced in your policies:
+The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 
 | Attribute        | Type              | Description                                              | Sample value           |
 | ---------------- | ----------------- | -------------------------------------------------------- | ---------------------- |
@@ -77,9 +75,6 @@ The middleware extracts contextual attributes from MCP requests that can be refe
 | `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
 | `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
-## Next Steps
+You now have an MCP server with authorization that enforces customized policies. Explore [agent authentication](authentication.md) to further secure your server.
 
-- **[Customize Authentication](authentication.md)**: Configure how agents are identified
-- **[Monitor Access](monitoring.md)**: Set up logging and audit trails
-
-[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
+[eunomia-github-policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates

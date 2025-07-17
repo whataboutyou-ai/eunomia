@@ -1,10 +1,11 @@
-# MCP Middleware
+Add **policy-based authorization** to your [Model Context Protocol (MCP)][mcp-docs] servers built with [FastMCP][fastmcp-docs] with one line of code.
 
-Add **policy-based authorization** to your [Model Context Protocol (MCP)][mcp-docs] servers built with [FastMCP][fastmcp-docs] with minimal code changes.
+!!! tip "Note"
+    Eunomia is the [official authorization middleware][fastmcp-eunomia-docs] of FastMCP!
 
-## What is MCP Middleware?
+## What is Eunomia MCP Middleware?
 
-The Eunomia MCP Middleware provides security and access control for MCP servers by intercepting requests and applying policy-based authorization decisions. It integrates seamlessly with FastMCP servers and provides comprehensive audit logging.
+With the Eunomia MCP Middleware, you can control which tools, resources and prompts MCP clients can view and execute on your server. Define dynamic JSON-based policies and obtain a comprehensive audit log of all access attempts and violations.
 
 ### Key Features
 
@@ -16,41 +17,11 @@ The Eunomia MCP Middleware provides security and access control for MCP servers 
 
 ## How It Works
 
-The middleware intercepts all MCP requests to your server and automatically maps MCP methods to authorization checks:
+The Eunomia middleware intercepts all MCP requests to your server and automatically maps MCP methods to authorization checks.
 
-- **Listing Operations** (`tools/list`, `resources/list`, `prompts/list`): Filters responses to hide unauthorized components
-- **Execution Operations** (`tools/call`, `resources/read`, `prompts/get`): Blocks unauthorized requests
+### Listing Operations
 
-## User Workflows
-
-Choose your path based on what you want to accomplish:
-
-### 🚀 [Get Started Quickly](quickstart.md)
-*I want to add authorization to my MCP server*
-
-Set up the middleware with your existing FastMCP server in under 5 minutes.
-
-### 🔧 [Configure Policies](policies.md)
-*I want to define who can access what*
-
-Create and manage authorization policies using our CLI tools and configuration files.
-
-### 👥 [Customize Authentication](authentication.md)
-*I want to control how agents are identified*
-
-Configure custom principal extraction, JWT tokens, and authentication flows.
-
-### 📊 [Monitor & Audit](monitoring.md)
-*I want to track access and troubleshoot issues*
-
-Set up logging, monitoring, and debugging for your authorization system.
-
-### 🏗️ [Advanced Setup](advanced.md)
-*I want production-ready configuration*
-
-Deploy with custom endpoints, API keys, and enterprise features.
-
-## Architecture Overview
+The middleware behaves as a filter for listing operations (`tools/list`, `resources/list`, `prompts/list`), hiding to the client components that are not authorized by the defined policies.
 
 ```mermaid
 sequenceDiagram
@@ -59,16 +30,32 @@ sequenceDiagram
     participant MCPServer as FastMCP Server
     participant EunomiaServer as Eunomia Server
 
-    MCPClient->>EunomiaMiddleware: MCP Request
+    MCPClient->>EunomiaMiddleware: MCP Listing Request (e.g., tools/list)
+    EunomiaMiddleware->>MCPServer: MCP Listing Request
+    MCPServer-->>EunomiaMiddleware: MCP Listing Response
+    EunomiaMiddleware->>EunomiaServer: Authorization Checks
+    EunomiaServer->>EunomiaMiddleware: Authorization Decisions
+    EunomiaMiddleware-->>MCPClient: Filtered MCP Listing Response
+```
+
+### Execution Operations
+
+The middleware behaves as a firewall for execution operations (`tools/call`, `resources/read`, `prompts/get`), blocking operations that are not authorized by the defined policies.
+
+```mermaid
+sequenceDiagram
+    participant MCPClient as MCP Client
+    participant EunomiaMiddleware as Eunomia Middleware
+    participant MCPServer as FastMCP Server
+    participant EunomiaServer as Eunomia Server
+
+    MCPClient->>EunomiaMiddleware: MCP Execution Request (e.g., tools/call)
     EunomiaMiddleware->>EunomiaServer: Authorization Check
-    EunomiaServer->>EunomiaMiddleware: Decision
-    alt Authorized
-        EunomiaMiddleware->>MCPServer: Forward Request
-        MCPServer-->>EunomiaMiddleware: Response
-        EunomiaMiddleware-->>MCPClient: Response
-    else Denied
-        EunomiaMiddleware-->>MCPClient: Unauthorized Error
-    end
+    EunomiaServer->>EunomiaMiddleware: Authorization Decision
+    EunomiaMiddleware-->>MCPClient: MCP Unauthorized Error (if denied)
+    EunomiaMiddleware->>MCPServer: MCP Execution Request (if allowed)
+    MCPServer-->>EunomiaMiddleware: MCP Execution Response (if allowed)
+    EunomiaMiddleware-->>MCPClient: MCP Execution Response (if allowed)
 ```
 
 ## Installation
@@ -77,7 +64,18 @@ sequenceDiagram
 pip install eunomia-mcp
 ```
 
-The middleware requires a running [Eunomia server](../get_started/user_guide/run_server.md) to make authorization decisions.
+!!! info
+    The middleware requires a running [Eunomia server](../get_started/user_guide/run_server.md) to make authorization decisions.
+
+## User Workflows
+
+Choose your path based on what you want to accomplish:
+
+- 🚀 [Quickstart Guide](quickstart.md): Add authorization to your MCP server in under 5 minutes
+- 🔧 [Policy Configuration](policies.md): Create and manage authorization policies using our CLI tools
+- 👥 [Agent Authentication](authentication.md): Customize agent identification
+- 🏗️ [Advanced Setup](advanced.md): Production deployment, logging and monitoring, troubleshooting
 
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
+[fastmcp-eunomia-docs]: https://gofastmcp.com/integrations/eunomia-authorization

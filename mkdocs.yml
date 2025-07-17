@@ -93,13 +93,6 @@ nav:
           - Register an Entity: get_started/user_guide/register_entities.md
           - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
           - Check Permissions at Runtime: get_started/user_guide/check_permissions.md
-  - MCP Middleware:
-      - Introduction: mcp_middleware/index.md
-      - Quick Start: mcp_middleware/quickstart.md
-      - Configure Policies: mcp_middleware/policies.md
-      - Customize Authentication: mcp_middleware/authentication.md
-      - Monitor & Audit: mcp_middleware/monitoring.md
-      - Advanced Setup: mcp_middleware/advanced.md
   - Docs:
       - Documentation: api/index.md
       - Eunomia:
@@ -114,8 +107,14 @@ nav:
           - TypeScript SDK: api/sdks/typescript.md
       - Extensions:
           - Eunomia Extensions: api/extensions/index.md
-          - MCP Middleware: api/extensions/mcp.md
+          - MCP: api/extensions/mcp.md
           - LangChain: api/extensions/langchain.md
+  - MCP Middleware:
+      - Eunomia MCP Middleware: mcp_middleware/index.md
+      - Quickstart: mcp_middleware/quickstart.md
+      - Configure Policies: mcp_middleware/policies.md
+      - Agent Authentication: mcp_middleware/authentication.md
+      - Advanced Setup: mcp_middleware/advanced.md
   - Community:
       - Join the Community: community/index.md
       - How to Contribute: community/contribute.md

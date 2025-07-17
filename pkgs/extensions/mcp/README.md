@@ -1,6 +1,9 @@
 # Eunomia MCP Authorization Middleware
 
-Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [FastMCP][fastmcp-docs] with minimal code changes.
+Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [FastMCP][fastmcp-docs] with one line of code.
+
+> [!NOTE]
+> Eunomia is the [official authorization middleware][fastmcp-eunomia-docs] of FastMCP!
 
 ## Overview
 
@@ -138,7 +141,7 @@ eunomia-mcp init --policy-file my_policies.json
 eunomia-mcp init --sample
 ```
 
-You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][eunomia-github-policy-templates] for example policies and rules.
 
 #### Validate Policy Configuration
 
@@ -239,10 +242,14 @@ logger = logging.getLogger("eunomia_mcp")
 
 ### [WhatsApp MCP to Authorized Contacts][example-whatsapp-mcp]
 
+Explore the detailed [documentation][eunomia-docs-mcp-middleware] for more advanced configuration and scenarios.
+
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
+[eunomia-docs-mcp-middleware]: https://whataboutyou-ai.github.io/eunomia/mcp_middleware
 [example-planetary-weather-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_planetary_weather
 [example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp
-[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
+[eunomia-github-policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
+[fastmcp-eunomia-docs]: https://gofastmcp.com/integrations/eunomia-authorization
