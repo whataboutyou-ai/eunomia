@@ -3,10 +3,10 @@ from unittest.mock import Mock
 
 import pytest
 from eunomia_core import enums
+from eunomia_core.schemas.passport import PassportIssueRequest, PassportJWT
 from jose import jwt
 
 from eunomia.fetchers.passport import PassportFetcher, PassportFetcherConfig
-from eunomia.fetchers.passport.schemas import PassportIssueRequest, PassportJWT
 from eunomia.fetchers.registry import RegistryFetcher
 
 

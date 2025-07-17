@@ -3,11 +3,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+from eunomia_core.schemas.passport import PassportJWT
 from jose import jwt
 
 from eunomia.fetchers.base import BaseFetcher, BaseFetcherConfig
 from eunomia.fetchers.factory import FetcherFactory
-from eunomia.fetchers.passport.schemas import PassportJWT
 from eunomia.fetchers.registry import RegistryFetcher
 
 logger = logging.getLogger(__name__)

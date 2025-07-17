@@ -12,6 +12,11 @@ from .entity import (
     EntityInDb,
     EntityUpdate,
 )
+from .passport import (
+    PassportIssueRequest,
+    PassportIssueResponse,
+    PassportJWT,
+)
 from .policy import Condition, Policy, PolicyEvaluationResult, Rule
 
 __all__ = [
@@ -25,6 +30,9 @@ __all__ = [
     "EntityCreate",
     "EntityInDb",
     "EntityUpdate",
+    "PassportIssueRequest",
+    "PassportIssueResponse",
+    "PassportJWT",
     "Condition",
     "Policy",
     "PolicyEvaluationResult",
