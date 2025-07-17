@@ -44,7 +44,7 @@ def add(a: int, b: int) -> int:
 middleware = EunomiaMcpMiddleware()
 
 # Create ASGI app with authorization
-app = mcp.add_middleware(middleware)
+mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()

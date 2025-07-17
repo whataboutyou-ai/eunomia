@@ -61,7 +61,7 @@ sequenceDiagram
 pip install eunomia-mcp
 ```
 
-## Quick Start
+## Quickstart
 
 ### Create a MCP Server with Middleware
 
@@ -83,7 +83,7 @@ def add(a: int, b: int) -> int:
 middleware = EunomiaMcpMiddleware()
 
 # Create ASGI app with authorization
-app = mcp.add_middleware(middleware)
+mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
@@ -112,15 +112,13 @@ from eunomia_mcp import create_eunomia_middleware
 mcp = FastMCP("Secure MCP Server 🔒")
 
 # Configure middleware with custom options
-middleware = [
-    create_eunomia_middleware(
-        eunomia_endpoint="https://your-eunomia-server.com",
-        eunomia_api_key="your-api-key",
-        enable_audit_logging=True,
-    )
-]
+middleware = create_eunomia_middleware(
+    eunomia_endpoint="https://your-eunomia-server.com",
+    eunomia_api_key="your-api-key",
+    enable_audit_logging=True,
+)
 
-app = mcp.http_app(middleware=middleware)
+mcp.add_middleware(middleware)
 ```
 
 ### Policy Configuration
@@ -187,9 +185,9 @@ The middleware extracts contextual attributes from the MCP request and passes th
 | `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
 | `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
-### Authentication
+### Agent Authentication
 
-#### Agent Identification
+#### Default Identification
 
 Agents are identified through HTTP headers:
 
