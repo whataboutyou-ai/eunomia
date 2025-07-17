@@ -6,6 +6,8 @@ import {
   EntityInDb,
   EntityType,
   EntityUpdate,
+  PassportIssueRequest,
+  PassportIssueResponse,
   Policy,
 } from "./index";
 
@@ -307,6 +309,42 @@ export class EunomiaClient {
   async deletePolicy(name: string): Promise<boolean> {
     try {
       const response = await this.client.delete<boolean>(`/admin/policies/${name}`);
+      return this.handleResponse(response);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${error.response.data}`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Issue a passport JWT token for the given URI.
+   *
+   * @param options - Options for issuing the passport
+   * @param options.uri - The entity URI to issue the passport for. Usually the agent identifier.
+   * @param options.attributes - Additional attributes to include in the passport (optional)
+   * @param options.ttl - Time to live in seconds (optional, server default will be used if not provided)
+   * @returns A promise that resolves to the passport response containing the token, ID, and expiration
+   */
+  async issuePassport(options: {
+    uri: string;
+    attributes?: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    ttl?: number;
+  }): Promise<PassportIssueResponse> {
+    const request: PassportIssueRequest = {
+      uri: options.uri,
+      attributes: options.attributes || {},
+      ttl: options.ttl,
+    };
+
+    try {
+      const response = await this.client.post<PassportIssueResponse>(
+        "/admin/fetchers/passport/issue",
+        request,
+      );
       return this.handleResponse(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

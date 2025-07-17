@@ -129,3 +129,33 @@ export interface PolicyEvaluationResult {
   matched_rule?: Rule;
   policy_name: string;
 }
+
+/**
+ * Represents a JWT passport payload
+ */
+export interface PassportJWT {
+  jti: string;
+  iat: number;
+  exp: number;
+  iss: string;
+  sub: string;
+  attr: Record<string, any>;
+}
+
+/**
+ * Request body for issuing a passport
+ */
+export interface PassportIssueRequest {
+  uri: string;
+  attributes?: Record<string, any>;
+  ttl?: number;
+}
+
+/**
+ * Response from the server when a passport is issued
+ */
+export interface PassportIssueResponse {
+  passport: string;
+  passport_id: string;
+  expires_in: number;
+}

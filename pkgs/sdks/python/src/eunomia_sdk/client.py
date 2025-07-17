@@ -290,3 +290,35 @@ class EunomiaClient:
         response = self.client.delete(f"/admin/policies/{name}")
         self._handle_response(response)
         return response.json()
+
+    def issue_passport(
+        self, uri: str, attributes: dict = {}, ttl: int | None = None
+    ) -> schemas.PassportIssueResponse:
+        """
+        Issue a passport JWT token for the given URI.
+
+        Parameters
+        ----------
+        uri : str
+            The entity URI to issue the passport for. Usually the agent identifier.
+        attributes : dict, optional
+            Additional attributes to include in the passport. Defaults to {}.
+        ttl : int, optional
+            Time to live in seconds. If not provided, the server default will be used.
+
+        Returns
+        -------
+        schemas.PassportIssueResponse
+            The response containing the passport token, passport ID, and expiration time.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the HTTP request returns an unsuccessful status code.
+        """
+        request = schemas.PassportIssueRequest(uri=uri, attributes=attributes, ttl=ttl)
+        response = self.client.post(
+            "/admin/fetchers/passport/issue", json=request.model_dump()
+        )
+        self._handle_response(response)
+        return schemas.PassportIssueResponse.model_validate(response.json())
