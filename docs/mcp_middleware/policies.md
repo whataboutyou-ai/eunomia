@@ -37,7 +37,8 @@ eunomia-mcp push mcp_policies.json --overwrite
 ```
 
 !!! info
-You need the Eunomia server running for the push operation.
+
+    You need the Eunomia server running for the push operation.
 
 Workflow:
 

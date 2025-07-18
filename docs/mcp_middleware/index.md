@@ -1,6 +1,7 @@
 Add **policy-based authorization** to your [Model Context Protocol (MCP)][mcp-docs] servers built with [FastMCP][fastmcp-docs] with one line of code.
 
 !!! tip "Note"
+
     Eunomia is the [official authorization middleware][fastmcp-eunomia-docs] of FastMCP!
 
 ## What is Eunomia MCP Middleware?
@@ -65,6 +66,7 @@ pip install eunomia-mcp
 ```
 
 !!! info
+
     The middleware requires a running [Eunomia server](../get_started/user_guide/run_server.md) to make authorization decisions.
 
 ## User Workflows
