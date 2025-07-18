@@ -1,13 +1,12 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from pydantic import ValidationError
-
-from eunomia.fetchers.passport.schemas import (
+from eunomia_core.schemas.passport import (
     PassportIssueRequest,
     PassportIssueResponse,
     PassportJWT,
 )
+from pydantic import ValidationError
 
 
 class TestPassportJWT:

@@ -1,10 +1,7 @@
+from eunomia_core.schemas.passport import PassportIssueRequest, PassportIssueResponse
 from fastapi import APIRouter
 
 from eunomia.fetchers.passport import PassportFetcher
-from eunomia.fetchers.passport.schemas import (
-    PassportIssueRequest,
-    PassportIssueResponse,
-)
 
 
 def passport_router_factory(fetcher: PassportFetcher) -> APIRouter:

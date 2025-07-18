@@ -2,11 +2,11 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import pytest
+from eunomia_core.schemas.passport import PassportJWT
 from jose import JWTError, jwt
 
 from eunomia.fetchers.factory import FetcherFactory
 from eunomia.fetchers.passport import PassportFetcher, PassportFetcherConfig
-from eunomia.fetchers.passport.schemas import PassportJWT
 
 
 class TestPassportFetcherConfig:
