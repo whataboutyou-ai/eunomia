@@ -107,8 +107,14 @@ nav:
           - TypeScript SDK: api/sdks/typescript.md
       - Extensions:
           - Eunomia Extensions: api/extensions/index.md
-          - MCP Authz Middleware: api/extensions/mcp.md
+          - MCP: api/extensions/mcp.md
           - LangChain: api/extensions/langchain.md
+  - MCP Middleware:
+      - Eunomia MCP Middleware: mcp_middleware/index.md
+      - Quickstart: mcp_middleware/quickstart.md
+      - Configure Policies: mcp_middleware/policies.md
+      - Agent Authentication: mcp_middleware/authentication.md
+      - Advanced Setup: mcp_middleware/advanced.md
   - Community:
       - Join the Community: community/index.md
       - How to Contribute: community/contribute.md

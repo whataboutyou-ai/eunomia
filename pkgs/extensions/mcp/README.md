@@ -1,6 +1,9 @@
 # Eunomia MCP Authorization Middleware
 
-Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [FastMCP][fastmcp-docs] with minimal code changes.
+Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [FastMCP][fastmcp-docs] with one line of code.
+
+> [!NOTE]
+> Eunomia is the [official authorization middleware][fastmcp-eunomia-docs] of FastMCP!
 
 ## Overview
 
@@ -61,7 +64,7 @@ sequenceDiagram
 pip install eunomia-mcp
 ```
 
-## Quick Start
+## Quickstart
 
 ### Create a MCP Server with Middleware
 
@@ -83,7 +86,7 @@ def add(a: int, b: int) -> int:
 middleware = EunomiaMcpMiddleware()
 
 # Create ASGI app with authorization
-app = mcp.add_middleware(middleware)
+mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
@@ -112,15 +115,13 @@ from eunomia_mcp import create_eunomia_middleware
 mcp = FastMCP("Secure MCP Server 🔒")
 
 # Configure middleware with custom options
-middleware = [
-    create_eunomia_middleware(
-        eunomia_endpoint="https://your-eunomia-server.com",
-        eunomia_api_key="your-api-key",
-        enable_audit_logging=True,
-    )
-]
+middleware = create_eunomia_middleware(
+    eunomia_endpoint="https://your-eunomia-server.com",
+    eunomia_api_key="your-api-key",
+    enable_audit_logging=True,
+)
 
-app = mcp.http_app(middleware=middleware)
+mcp.add_middleware(middleware)
 ```
 
 ### Policy Configuration
@@ -140,7 +141,7 @@ eunomia-mcp init --policy-file my_policies.json
 eunomia-mcp init --sample
 ```
 
-You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][policy-templates] for example policies and rules.
+You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][eunomia-github-policy-templates] for example policies and rules.
 
 #### Validate Policy Configuration
 
@@ -187,9 +188,9 @@ The middleware extracts contextual attributes from the MCP request and passes th
 | `uri`            | `str`             | The MCP URI of the component                             | `mcp:tools:file_read`  |
 | `arguments`      | `dict` (Optional) | The arguments of the execution operation                 | `{"path": "file.txt"}` |
 
-### Authentication
+### Agent Authentication
 
-#### Agent Identification
+#### Default Identification
 
 Agents are identified through HTTP headers:
 
@@ -241,10 +242,14 @@ logger = logging.getLogger("eunomia_mcp")
 
 ### [WhatsApp MCP to Authorized Contacts][example-whatsapp-mcp]
 
+Explore the detailed [documentation][eunomia-docs-mcp-middleware] for more advanced configuration and scenarios.
+
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
+[eunomia-docs-mcp-middleware]: https://whataboutyou-ai.github.io/eunomia/mcp_middleware
 [example-planetary-weather-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_planetary_weather
 [example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp
-[policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
+[eunomia-github-policy-templates]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp/templates
+[fastmcp-eunomia-docs]: https://gofastmcp.com/integrations/eunomia-authorization
