@@ -5,37 +5,32 @@ Eunomia is a Python library that allows you to decouple the authorization logic 
 It is built and maintained by [What About You][whataboutyou-website], while contributions are welcome from the [community](../community/index.md).
 
 !!! warning
+
     Eunomia is currently under active development and therefore subject to change.
 
 ## Core Components
 
 <div class="grid cards" markdown>
 
--   :material-account-multiple:{ .lg .middle } __Principals__
+- :material-account-multiple:{ .lg .middle } **Principals**
 
     ---
 
     Principals are actors (human or AI) performing actions on resources.
 
-
--   :material-semantic-web:{ .lg .middle } __Resources__
+- :material-semantic-web:{ .lg .middle } **Resources**
 
     ---
 
     Resources are the targets of actions, including data, tools, and AI agents.
 
-    
-
-
--   :material-police-badge:{ .lg .middle } __Attributes__
+- :material-police-badge:{ .lg .middle } **Attributes**
 
     ---
 
     Metadata of Principals and Resources, used in authorization policies.
 
-
-
--   :material-note-edit:{ .lg .middle } __Policies__
+- :material-note-edit:{ .lg .middle } **Policies**
 
     ---
 
@@ -55,7 +50,6 @@ We aim to solve this with Eunomia, an open-source, developer-oriented authorizat
 - Enforces dynamic yet deterministic policies based on static and contextual attributes
 - Enables leaner agent architectures with decoupled authorization logic
 - Preserves agent decision-making while enforcing security
-
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
 [whataboutyou-website]: https://whataboutyou.ai

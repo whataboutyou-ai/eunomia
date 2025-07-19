@@ -34,7 +34,7 @@ This way the authorization logic is completely decoupled from the MCP server imp
 > The example includes a simple policy that restricts access to the image generation tool based on user email. This policy can easily be extended to include more complex access control scenarios.
 
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
-[eunomia-docs]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server/
+[eunomia-docs]: https://whataboutyou-ai.github.io/eunomia/server/pdp/run_server/
 [mcp-github]: https://github.com/modelcontextprotocol
 [cloudflare-worker-github]: https://github.com/cloudflare/workers-sdk
 [cloudflare-demo-github]: https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-github-oauth

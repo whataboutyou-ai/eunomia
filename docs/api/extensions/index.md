@@ -4,7 +4,7 @@ Each extension is built and distributed as a separate package that can be instal
 
 ## Available extensions
 
-| Extension name | Package name        | Jump to                                                                   |
-| -------------- | ------------------- | ------------------------------------------------------------------------- |
-| MCP Middleware | `eunomia-mcp`       | [:material-arrow-right: Dedicated Section](../../mcp_middleware/index.md) |
-| LangChain      | `eunomia-langchain` | [:material-arrow-right: Page](langchain.md)                               |
+| Extension name | Package name        | Jump to                                                         |
+| -------------- | ------------------- | --------------------------------------------------------------- |
+| MCP Middleware | `eunomia-mcp`       | [:material-arrow-right: Section](../../mcp_middleware/index.md) |
+| LangChain      | `eunomia-langchain` | [:material-arrow-right: Page](langchain.md)                     |

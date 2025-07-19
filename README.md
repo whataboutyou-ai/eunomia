@@ -196,7 +196,7 @@ curl -X POST "http://localhost:8421/check/bulk" \
 [whataboutyou-website]: https://whataboutyou.ai
 [mcp-website]: https://modelcontextprotocol.io/
 [docs]: https://whataboutyou-ai.github.io/eunomia/
-[docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/get_started/quickstart/
+[docs-quickstart]: https://whataboutyou-ai.github.io/eunomia/server/quickstart/
 [sdk-python-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/sdks/python
 [extension-mcp-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp
 [extension-langchain-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/langchain

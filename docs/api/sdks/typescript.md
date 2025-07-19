@@ -65,7 +65,7 @@ const principal = await client.registerEntity({
 });
 ```
 
-## Docs
+## API Reference
 
 ### EunomiaClient
 

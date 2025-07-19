@@ -29,6 +29,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
 ## Example Usage
 
 === "Python"
+
     ```python
     from eunomia_core import enums
     from eunomia_sdk import EunomiaClient
@@ -58,7 +59,8 @@ On success, the server responds with a JSON object that includes the **`uri`** o
     print("Principal:", principal)
     ```
 
-=== "Curl"
+=== "cURL"
+
     ```bash
     curl -X POST 'http://localhost:8421/admin/fetchers/registry/entities' \
          -H "Content-Type: application/json" \
@@ -84,7 +86,8 @@ On success, the server responds with a JSON object that includes the **`uri`** o
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     # Example JSON response for a resource
     {
       "uri": "generated-uri-123",

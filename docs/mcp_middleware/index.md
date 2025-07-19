@@ -67,7 +67,7 @@ pip install eunomia-mcp
 
 !!! info
 
-    The middleware requires a running [Eunomia server](../get_started/user_guide/run_server.md) to make authorization decisions.
+    The middleware requires a running [Eunomia server](../server/pdp/run_server.md) to make authorization decisions.
 
 ## User Workflows
 

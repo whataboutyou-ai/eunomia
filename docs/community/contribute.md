@@ -5,11 +5,13 @@
 First, [fork][github-fork] the `eunomia` repository and then clone your forked repository locally:
 
 === "HTTPS"
+
     ```bash
     git clone https://github.com/<YOUR_GITHUB_USERNAME>/eunomia.git
     ```
 
 === "SSH"
+
     ```bash
     git clone git@github.com:<YOUR_GITHUB_USERNAME>/eunomia.git
     ```

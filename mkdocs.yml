@@ -82,24 +82,37 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Welcome to Eunomia: get_started/index.md
-      - Installation: get_started/installation.md
-      - Quickstart: get_started/quickstart.md
-      - User Guide:
-          - How Eunomia works: get_started/user_guide/index.md
-          - Run the Eunomia Server: get_started/user_guide/run_server.md
-          - Create a Policy: get_started/user_guide/create_policies.md
-          - Register an Entity: get_started/user_guide/register_entities.md
-          - Update and Delete an Entity: get_started/user_guide/upd_del_entities.md
-          - Check Permissions at Runtime: get_started/user_guide/check_permissions.md
-  - Docs:
-      - Documentation: api/index.md
+  - Eunomia Server:
+      - Welcome to Eunomia: server/index.md
+      - Installation: server/installation.md
+      - Quickstart: server/quickstart.md
+      - Policy Decision Point:
+          - How Eunomia works: server/pdp/index.md
+          - Run the Eunomia Server: server/pdp/run_server.md
+          - Create a Policy: server/pdp/create_policies.md
+          - Check Permissions at Runtime: server/pdp/check_permissions.md
+      - Dynamic Fetchers:
+          - What are Dynamic Fetchers: server/fetchers/index.md
+          - Registry:
+              - Entity Registry: server/fetchers/registry/index.md
+              - Register an Entity: server/fetchers/registry/register_entities.md
+              - Update and Delete an Entity: server/fetchers/registry/update_delete_entities.md
+          - Passport:
+              - Agent Passport: server/fetchers/passport/index.md
+              - Issue a Passport: server/fetchers/passport/issue_passport.md
+  - MCP Middleware:
+      - Eunomia MCP Middleware: mcp_middleware/index.md
+      - Quickstart: mcp_middleware/quickstart.md
+      - Configure Policies: mcp_middleware/policies.md
+      - Agent Authentication: mcp_middleware/authentication.md
+      - Advanced Setup: mcp_middleware/advanced.md
+  - API Reference:
+      - API Reference: api/index.md
       - Eunomia:
-          - Eunomia Docs: api/main/index.md
-          - API: api/main/api.md
+          - Eunomia Server: api/main/index.md
+          - Server API: api/main/api.md
       - Eunomia Core:
-          - Eunomia Core Docs: api/core/index.md
+          - Eunomia Core: api/core/index.md
           - Schemas: api/core/schemas.md
       - SDKs:
           - Eunomia SDKs: api/sdks/index.md
@@ -109,12 +122,6 @@ nav:
           - Eunomia Extensions: api/extensions/index.md
           - MCP: api/extensions/mcp.md
           - LangChain: api/extensions/langchain.md
-  - MCP Middleware:
-      - Eunomia MCP Middleware: mcp_middleware/index.md
-      - Quickstart: mcp_middleware/quickstart.md
-      - Configure Policies: mcp_middleware/policies.md
-      - Agent Authentication: mcp_middleware/authentication.md
-      - Advanced Setup: mcp_middleware/advanced.md
   - Community:
       - Join the Community: community/index.md
       - How to Contribute: community/contribute.md
