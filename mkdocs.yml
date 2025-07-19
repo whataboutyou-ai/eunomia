@@ -92,9 +92,11 @@ nav:
           - Create a Policy: server/pdp/create_policies.md
           - Check Permissions at Runtime: server/pdp/check_permissions.md
       - Dynamic Fetchers:
+          - What are Dynamic Fetchers: server/fetchers/index.md
           - Registry:
-              - Register an Entity: server/registry/register_entities.md
-              - Update and Delete an Entity: server/registry/update_delete_entities.md
+              - Registry Fetcher: server/fetchers/registry/index.md
+              - Register an Entity: server/fetchers/registry/register_entities.md
+              - Update and Delete an Entity: server/fetchers/registry/update_delete_entities.md
   - MCP Middleware:
       - Eunomia MCP Middleware: mcp_middleware/index.md
       - Quickstart: mcp_middleware/quickstart.md

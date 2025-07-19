@@ -58,10 +58,8 @@ _Attributes_ can be registered at configuration time or shared at runtime. _Attr
 
 ## User Guides
 
-| Guide                        | Description                                       | Jump to                                                              |
-| ---------------------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
-| Run the Eunomia Server       | Learn how to configure and run the Eunomia server | [:material-arrow-right: Page](run_server.md)                         |
-| Create a Policy              | Learn how to create policies                      | [:material-arrow-right: Page](create_policies.md)                    |
-| Register an Entity           | Learn how to register entities                    | [:material-arrow-right: Page](../registry/register_entities.md)      |
-| Update and Delete an Entity  | Learn how to update or delete entities            | [:material-arrow-right: Page](../registry/update_delete_entities.md) |
-| Check Permissions at Runtime | Learn how to check permissions at runtime         | [:material-arrow-right: Page](check_permissions.md)                  |
+| Guide                        | Description                                       | Jump to                                             |
+| ---------------------------- | ------------------------------------------------- | --------------------------------------------------- |
+| Run the Eunomia Server       | Learn how to configure and run the Eunomia server | [:material-arrow-right: Page](run_server.md)        |
+| Create a Policy              | Learn how to create policies                      | [:material-arrow-right: Page](create_policies.md)   |
+| Check Permissions at Runtime | Learn how to check permissions at runtime         | [:material-arrow-right: Page](check_permissions.md) |
