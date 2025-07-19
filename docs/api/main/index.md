@@ -20,6 +20,6 @@ eunomia server
 
 Explore detailed reference of single components of Eunomia:
 
-| Component | Description                                                     | Jump to                               |
-| --------- | --------------------------------------------------------------- | ------------------------------------- |
-| **API**   | Exposes endpoints for applications to interact with the server. | [:material-arrow-right: Page](api.md) |
+| Component      | Description                                                     | Jump to                               |
+| -------------- | --------------------------------------------------------------- | ------------------------------------- |
+| **Server API** | Exposes endpoints for applications to interact with the server. | [:material-arrow-right: Page](api.md) |

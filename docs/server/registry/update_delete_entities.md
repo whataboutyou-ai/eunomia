@@ -18,6 +18,7 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
 ## Example Usage
 
 === "Python"
+
     ```python
     from eunomia_sdk import EunomiaClient
 
@@ -41,6 +42,7 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
     ```
 
 === "Curl"
+
     ```bash
     # Update an entity
     curl -X PUT 'http://localhost:8421/admin/fetchers/registry/entities/generated-uri-123' \
@@ -62,7 +64,8 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     # Example JSON response for an updated entity
     {
       "uri": "generated-uri-123",

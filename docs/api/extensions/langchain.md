@@ -15,7 +15,7 @@ Install the `eunomia-langchain` package via pip:
 pip install eunomia-langchain
 ```
 
-## Docs
+## API Reference
 
 ::: eunomia_langchain.document_loader.EunomiaLoader
 

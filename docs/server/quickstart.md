@@ -24,6 +24,7 @@ Now, you need to create a policy that will be used to enforce the access control
 You can use the `POST /admin/policies/simple` endpoint for this.
 
 === "Python"
+
     ```python
     from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
     from eunomia_sdk import EunomiaClient
@@ -53,6 +54,7 @@ You can use the `POST /admin/policies/simple` endpoint for this.
         To use the Python SDK, check out its [documentation](../api/sdks/python.md) for installation instructions.
 
 === "Curl"
+
     ```bash
     curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \
       -H "Content-Type: application/json" \
@@ -64,6 +66,7 @@ You can use the `POST /admin/policies/simple` endpoint for this.
     ```
 
 === "Output"
+
     ```json
     {
         "version": "1.0",
@@ -105,6 +108,7 @@ Now, you can enforce the policies in your application at runtime by checking the
 You can use the `POST /check` endpoint for this, passing the principal and resource identifiers and their attributes.
 
 === "Python"
+
     ```python
     # allowed access
     eunomia.check(
@@ -127,6 +131,7 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
     ```
 
 === "Curl"
+
     ```bash
     # allowed access
     curl -X POST 'http://localhost:8421/check' -H "Content-Type: application/json" -d '{"resource": {"attributes": {"agent-id": "it-desk-agent"}}, "principal": {"attributes": {"department": "it"}}}'
@@ -137,7 +142,8 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     # allowed access
     {"allowed":true, "reason":"Rule it-desk-policy allowed the action in policy it-desk-policy"}
     {"allowed":true, "reason":"Rule hr-policy allowed the action in policy hr-policy"}
@@ -148,4 +154,4 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
 
 Congratulations! You've just made your first steps with Eunomia.
 
-You can now explore the [user guide](user_guide/index.md) to learn more about Eunomia or explore the [API documentation](../api/index.md) for more details on how to use Eunomia in your application.
+You can now explore the [user guide](pdp/index.md) to learn more about Eunomia or explore the [API documentation](../api/index.md) for more details on how to use Eunomia in your application.

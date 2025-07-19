@@ -18,6 +18,7 @@ You have three options when calling this API:
 In this option, you provide only the **`uri`** for both the principal and resource. The server will fetch the corresponding attributes from the database.
 
 === "Python"
+
     ```python
     from eunomia_sdk import EunomiaClient
 
@@ -41,6 +42,7 @@ In this option, you provide only the **`uri`** for both the principal and resour
     ```
 
 === "Curl"
+
     ```bash
     # Option 1: Using identifiers only.
     # Allowed action
@@ -55,7 +57,8 @@ In this option, you provide only the **`uri`** for both the principal and resour
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     {"allowed": true, "reason": "..."}
     {"allowed": false, "reason": "..."}
     ```
@@ -67,6 +70,7 @@ In this option, you provide only the **`uri`** for both the principal and resour
 In this option, you do not provide registered identifiers for the entities. Instead, you supply the attributes directly in the request. The server uses these runtime attributes exclusively for the authorization check.
 
 === "Python"
+
     ```python
     # Option 2: Using new entities (attributes provided at runtime).
     # Allowed action
@@ -97,6 +101,7 @@ In this option, you do not provide registered identifiers for the entities. Inst
     ```
 
 === "Curl"
+
     ```bash
     # Option 2: Using new entities (attributes provided at runtime).
     # Allowed action
@@ -119,7 +124,8 @@ In this option, you do not provide registered identifiers for the entities. Inst
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     {"allowed": true, "reason": "..."}
     {"allowed": true, "reason": "..."}
     {"allowed": false, "reason": "..."}
@@ -133,6 +139,7 @@ In this option, you do not provide registered identifiers for the entities. Inst
 In this option, you provide both the registered **`uri`** and additional attributes in the request. The server merges the registered attributes with the runtime attributes, and the resulting set is used for the authorization check.
 
 === "Python"
+
     ```python
     # Option 3: Using both identifiers and additional runtime attributes.
     # Allowed action: The registered principal is enriched with runtime attributes.
@@ -163,6 +170,7 @@ In this option, you provide both the registered **`uri`** and additional attribu
     ```
 
 === "Curl"
+
     ```bash
     # Option 3: Using identifiers and additional runtime attributes.
     # Allowed action
@@ -181,7 +189,8 @@ In this option, you provide both the registered **`uri`** and additional attribu
     ```
 
 === "Output"
-    ```bash
+
+    ```json
     {"allowed": true, "reason": "..."}
     {"allowed": true, "reason": "..."}
     {"allowed": false, "reason": "..."}

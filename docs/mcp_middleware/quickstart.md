@@ -36,7 +36,7 @@ Run it in the background with Docker:
 docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
 ```
 
-Or refer to the [Eunomia server documentation](../get_started/user_guide/run_server.md) for additional configuration options.
+Or refer to the [Eunomia server documentation](../server/pdp/run_server.md) for additional configuration options.
 
 ## Step 4: Start Your Server
 
