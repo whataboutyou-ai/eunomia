@@ -32,7 +32,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 
         To use the Python SDK, check out its [documentation](../../api/sdks/python.md) for installation instructions.
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \

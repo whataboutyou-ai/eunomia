@@ -17,7 +17,8 @@ Configure the Registry fetcher in your Eunomia settings:
 ```python
 FETCHERS = {
     "registry": {
-        "sql_database_url": "sqlite:///./.db/eunomia_db.sqlite" # or any other SQL database URL
+        "sql_database_url": "sqlite:///./.db/eunomia_db.sqlite", # or any other SQL database URL
+        "entity_type": None  # optional
     }
 }
 ```

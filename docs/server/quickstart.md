@@ -53,7 +53,7 @@ You can use the `POST /admin/policies/simple` endpoint for this.
     !!! info
         To use the Python SDK, check out its [documentation](../api/sdks/python.md) for installation instructions.
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \
@@ -130,7 +130,7 @@ You can use the `POST /check` endpoint for this, passing the principal and resou
     )
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     # allowed access

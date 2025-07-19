@@ -94,9 +94,12 @@ nav:
       - Dynamic Fetchers:
           - What are Dynamic Fetchers: server/fetchers/index.md
           - Registry:
-              - Registry Fetcher: server/fetchers/registry/index.md
+              - Entity Registry: server/fetchers/registry/index.md
               - Register an Entity: server/fetchers/registry/register_entities.md
               - Update and Delete an Entity: server/fetchers/registry/update_delete_entities.md
+          - Passport:
+              - Agent Passport: server/fetchers/passport/index.md
+              - Issue a Passport: server/fetchers/passport/issue_passport.md
   - MCP Middleware:
       - Eunomia MCP Middleware: mcp_middleware/index.md
       - Quickstart: mcp_middleware/quickstart.md

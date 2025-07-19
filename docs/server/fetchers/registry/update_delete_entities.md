@@ -41,7 +41,7 @@ The **`DELETE /admin/fetchers/registry/entities/{uri}`** endpoint allows you to 
     print("Delete Response:", delete_response)
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     # Update an entity

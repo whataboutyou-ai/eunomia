@@ -41,7 +41,7 @@ In this option, you provide only the **`uri`** for both the principal and resour
     print("Allowed:", result2.allowed)  # Expected output: False
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     # Option 1: Using identifiers only.
@@ -100,7 +100,7 @@ In this option, you do not provide registered identifiers for the entities. Inst
     print("Allowed:", result4.allowed)  # Expected output: False
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     # Option 2: Using new entities (attributes provided at runtime).
@@ -169,7 +169,7 @@ In this option, you provide both the registered **`uri`** and additional attribu
     print("Allowed:", result3.allowed)  # Expected output: False
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     # Option 3: Using identifiers and additional runtime attributes.

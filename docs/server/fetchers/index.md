@@ -20,9 +20,10 @@ FETCHERS = {"registry": {...}, "passport": {...}}
 
 Eunomia comes with some built-in fetchers:
 
-| Fetcher    | Description                                              | Jump to                                          |
-| ---------- | -------------------------------------------------------- | ------------------------------------------------ |
-| `registry` | Stores and retrieves entity attributes in a SQL database | [:material-arrow-right: Page](registry/index.md) |
+| Fetcher         | Name       | Description                                               | Jump to                                          |
+| --------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------ |
+| Entity Registry | `registry` | Stores and retrieves entity attributes in a SQL database  | [:material-arrow-right: Page](registry/index.md) |
+| Agent Passport  | `passport` | Enables agent authentication through encrypted JWT tokens | [:material-arrow-right: Page](passport/index.md) |
 
 ## Creating a Custom Fetcher
 

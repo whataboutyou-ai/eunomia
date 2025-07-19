@@ -59,7 +59,7 @@ On success, the server responds with a JSON object that includes the **`uri`** o
     print("Principal:", principal)
     ```
 
-=== "Curl"
+=== "cURL"
 
     ```bash
     curl -X POST 'http://localhost:8421/admin/fetchers/registry/entities' \
