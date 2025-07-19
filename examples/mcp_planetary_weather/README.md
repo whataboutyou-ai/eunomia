@@ -90,4 +90,4 @@ The `mcp_policies.json` file defines three rules with different access patterns:
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
 [eunomia-mcp-github]: https://github.com/whataboutyou-ai/eunomia/tree/main/pkgs/extensions/mcp
-[eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
+[eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/server/pdp/run_server

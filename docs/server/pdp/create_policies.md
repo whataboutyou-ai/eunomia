@@ -11,6 +11,7 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
 - **`action`**: (Optional) The action that the principal is trying to perform on the resource.
 
 === "Python"
+
     ```python
     from eunomia_core.schemas import CheckRequest, PrincipalCheck, ResourceCheck
     from eunomia_sdk import EunomiaClient
@@ -28,16 +29,19 @@ Your request JSON payload should include a rule defined by the **`CheckRequest`*
     ```
 
     !!! info
+
         To use the Python SDK, check out its [documentation](../../api/sdks/python.md) for installation instructions.
 
-=== "Curl"
+=== "cURL"
+
     ```bash
     curl -X POST 'http://localhost:8421/admin/policies/simple?name=it-desk-policy' \
-    -H "Content-Type: application/json" \
-    -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
+        -H "Content-Type: application/json" \
+        -d '{"principal": {"attributes": {"department": "it"}}, "resource": {"attributes": {"agent-id": "it-desk-agent"}}, "action": "access"}'
     ```
 
 === "Output"
+
     ```json
     {
         "name":"it-desk-policy",

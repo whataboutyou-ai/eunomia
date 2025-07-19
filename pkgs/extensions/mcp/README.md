@@ -247,7 +247,7 @@ Explore the detailed [documentation][eunomia-docs-mcp-middleware] for more advan
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
 [eunomia-github]: https://github.com/whataboutyou-ai/eunomia
-[eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/get_started/user_guide/run_server
+[eunomia-docs-run-server]: https://whataboutyou-ai.github.io/eunomia/server/pdp/run_server
 [eunomia-docs-mcp-middleware]: https://whataboutyou-ai.github.io/eunomia/mcp_middleware
 [example-planetary-weather-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_planetary_weather
 [example-whatsapp-mcp]: https://github.com/whataboutyou-ai/eunomia/tree/main/examples/mcp_whatsapp

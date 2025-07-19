@@ -67,6 +67,6 @@ principal = client.register_entity(
 )
 ```
 
-## Docs
+## API Reference
 
 ::: eunomia_sdk.client.EunomiaClient
