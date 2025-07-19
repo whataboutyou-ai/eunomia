@@ -32,6 +32,8 @@ For advanced authentication scenarios, you can subclass the `EunomiaMcpMiddlewar
 ```python
 from eunomia_core import schemas
 from eunomia_mcp import EunomiaMcpMiddleware
+from fastmcp.server.dependencies import get_http_headers
+
 
 class CustomAuthMiddleware(EunomiaMcpMiddleware):
     def _extract_principal(self) -> schemas.PrincipalCheck:
@@ -51,9 +53,6 @@ class CustomAuthMiddleware(EunomiaMcpMiddleware):
 
         # Fallback to default
         return super()._extract_principal()
-
-# Use custom middleware
-middleware = CustomAuthMiddleware()
 ```
 
 ### Using Custom Authentication

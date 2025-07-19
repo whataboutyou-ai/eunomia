@@ -66,4 +66,5 @@ docker run -d -p 8421:8421 --name eunomia \
 ```
 
 !!! info
+
     The Docker image does not come with persistent storage on its own and will lose all data when the container is stopped. To persist the database, you need to mount a volume to the container or connect to an external database.
