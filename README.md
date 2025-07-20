@@ -34,6 +34,7 @@ Key features:
 
 - **Framework-agnostic**: Works with any AI agent architecture or framework
 - **Decoupled design**: Separates authorization concerns from business logic
+- **Agent Identity Governance**: Verified agent identities through cryptographically signed Agent Passport tokens
 - **MCP integration**: Native support for Model Context Protocol workflows
 - **Enterprise-ready**: Proven in production environments
 - **Developer-focused**: Simple APIs and comprehensive tooling
