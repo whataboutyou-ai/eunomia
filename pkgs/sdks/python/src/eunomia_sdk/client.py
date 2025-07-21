@@ -48,8 +48,8 @@ class EunomiaClient:
         self,
         principal_uri: str | None = None,
         resource_uri: str | None = None,
-        principal_attributes: dict = {},
-        resource_attributes: dict = {},
+        principal_attributes: dict | None = None,
+        resource_attributes: dict | None = None,
         action: str = "access",
     ) -> schemas.CheckResponse:
         """
@@ -78,6 +78,11 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
+        if principal_attributes is None:
+            principal_attributes = {}
+        if resource_attributes is None:
+            resource_attributes = {}
+            
         request = schemas.CheckRequest(
             principal=schemas.PrincipalCheck(
                 uri=principal_uri, attributes=principal_attributes
@@ -292,7 +297,7 @@ class EunomiaClient:
         return response.json()
 
     def issue_passport(
-        self, uri: str, attributes: dict = {}, ttl: int | None = None
+        self, uri: str, attributes: dict | None = None, ttl: int | None = None
     ) -> schemas.PassportIssueResponse:
         """
         Issue a passport JWT token for the given URI.
@@ -316,6 +321,9 @@ class EunomiaClient:
         httpx.HTTPStatusError
             If the HTTP request returns an unsuccessful status code.
         """
+        if attributes is None:
+            attributes = {}
+            
         request = schemas.PassportIssueRequest(uri=uri, attributes=attributes, ttl=ttl)
         response = self.client.post(
             "/admin/fetchers/passport/issue", json=request.model_dump()

@@ -61,7 +61,7 @@ class PassportFetcher(BaseFetcher):
         logger.info(message, extra={"audit_data": audit_data})
 
     def issue_passport(
-        self, uri: str, attributes: dict = {}, ttl: int | None = None
+        self, uri: str, attributes: dict | None = None, ttl: int | None = None
     ) -> tuple[str, str, int]:
         """
         Issue a passport JWT token for the given URI.
@@ -80,6 +80,9 @@ class PassportFetcher(BaseFetcher):
             tuple[str, str, int]
                 Tuple of (token, passport_id, ttl)
         """
+        if attributes is None:
+            attributes = {}
+            
         passport_id = None
         try:
             if self.config.requires_registry:
