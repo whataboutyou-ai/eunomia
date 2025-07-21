@@ -1,13 +1,15 @@
-The Agent Passport is a built-in [Dynamic Fetcher](../index.md) that enables agent authentication through encrypted JWT tokens. It allows agents to authenticate with Eunomia by presenting a passport token, which contains their attributes and authorization metadata.
+The Agent Passport enables **trusted agent governance** by providing cryptographically verified agent identities. Agents present signed JWT tokens that prove their identity and attributes, allowing Eunomia to make authorization decisions based on verified agent information rather than self-reported claims.
 
 ## What is the Agent Passport?
 
-The Agent Passport provides:
+Agent Passport provides **verified agent identity** for governance through:
 
-- **Agent authentication**: Secure JWT-based authentication for AI agents
-- **Attribute decryption**: Automatic verification and extraction of agent attributes from tokens
-- **Token-based authorization**: Agents present their passport token as their URI during permission checks
-- **Admin-controlled issuance**: Controlled passport generation through admin API endpoints
+- **Cryptographically Signed Identity**: JWT tokens prove agent authenticity through digital signatures
+- **Tamper-Proof Attributes**: Agent attributes are embedded in signed tokens, preventing false claims
+- **Verified Authorization Context**: Policies can trust agent identity and attributes for authorization decisions
+- **Admin-Controlled Identity**: Controlled token issuance ensures only authorized agents receive identity tokens
+
+Technically, Agent Passport implements this as a [Dynamic Fetcher](../index.md) that decodes JWT tokens to extract verified agent attributes during policy evaluation.
 
 ## How it Works
 
