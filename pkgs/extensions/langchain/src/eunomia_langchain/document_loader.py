@@ -41,8 +41,11 @@ class EunomiaLoader:
         self._client = EunomiaClient(endpoint=endpoint, api_key=api_key)
 
     def _process_document_sync(
-        self, doc: Document, additional_metadata: dict = {}
+        self, doc: Document, additional_metadata: dict | None = None
     ) -> Document:
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
         doc.metadata.update(additional_metadata)
@@ -54,8 +57,11 @@ class EunomiaLoader:
         return doc
 
     async def _process_document_async(
-        self, doc: Document, additional_metadata: dict = {}
+        self, doc: Document, additional_metadata: dict | None = None
     ) -> Document:
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         if not hasattr(doc, "metadata") or doc.metadata is None:
             doc.metadata = {}
         doc.metadata.update(additional_metadata)
@@ -71,7 +77,7 @@ class EunomiaLoader:
         return doc
 
     async def alazy_load(
-        self, additional_metadata: dict = {}
+        self, additional_metadata: dict | None = None
     ) -> AsyncIterator[Document]:
         """Load documents lazily and asynchronously, registering them with the Eunomia server.
 
@@ -99,11 +105,14 @@ class EunomiaLoader:
         >>>
         >>> asyncio.run(process_docs())
         """
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         async for doc in self._loader.alazy_load():
             processed_doc = await self._process_document_async(doc, additional_metadata)
             yield processed_doc
 
-    async def aload(self, additional_metadata: dict = {}) -> List[Document]:
+    async def aload(self, additional_metadata: dict | None = None) -> List[Document]:
         """Load documents asynchronously and register them with the Eunomia server.
 
         Parameters
@@ -125,6 +134,9 @@ class EunomiaLoader:
         >>> wrapped_loader = EunomiaLoader(loader)
         >>> docs = asyncio.run(wrapped_loader.aload(additional_metadata={"group": "financials"}))
         """
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         documents = await self._loader.aload()
         processed_docs = [
             await self._process_document_async(doc, additional_metadata)
@@ -132,7 +144,7 @@ class EunomiaLoader:
         ]
         return processed_docs
 
-    def lazy_load(self, additional_metadata: dict = {}) -> Iterator[Document]:
+    def lazy_load(self, additional_metadata: dict | None = None) -> Iterator[Document]:
         """Load documents lazily and synchronously, registering them with the Eunomia server.
 
         Parameters
@@ -154,11 +166,14 @@ class EunomiaLoader:
         >>> for doc in wrapped_loader.lazy_load(additional_metadata={"group": "financials"}):
         ...     process_document(doc)
         """
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         for doc in self._loader.lazy_load():
             processed_doc = self._process_document_sync(doc, additional_metadata)
             yield processed_doc
 
-    def load(self, additional_metadata: dict = {}) -> List[Document]:
+    def load(self, additional_metadata: dict | None = None) -> List[Document]:
         """Load documents synchronously and register them with the Eunomia server.
 
         Parameters
@@ -179,6 +194,9 @@ class EunomiaLoader:
         >>> wrapped_loader = EunomiaLoader(loader)
         >>> docs = wrapped_loader.load(additional_metadata={"group": "financials"})
         """
+        if additional_metadata is None:
+            additional_metadata = {}
+            
         documents = self._loader.load()
         processed_docs = [
             self._process_document_sync(doc, additional_metadata) for doc in documents
