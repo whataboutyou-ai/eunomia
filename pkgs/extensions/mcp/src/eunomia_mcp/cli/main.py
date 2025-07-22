@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 from typing import Optional
@@ -8,6 +9,8 @@ from eunomia_sdk.client import EunomiaClient
 from eunomia_mcp.cli.utils import (
     DEFAULT_POLICY,
     SAMPLE_SERVER_CODE,
+    generate_custom_policy_from_mcp,
+    load_mcp_instance,
     load_policy_config,
     push_policy_config,
 )
@@ -31,6 +34,11 @@ def init(
         "--force",
         help="Overwrite existing file",
     ),
+    custom_mcp: Optional[str] = typer.Option(
+        None,
+        "--custom-mcp",
+        help="Customize policy generation by providing the path to your FastMCP server instance (e.g. `app.server:mcp` or `app/server.py:mcp`)",
+    ),
     sample: bool = typer.Option(
         False,
         "--sample",
@@ -45,7 +53,8 @@ def init(
     """
     Initialize a new MCP project with Eunomia authorization.
 
-    This command generates a policy configuration file and, optionally, the code for a sample MCP server.
+    This command generates a policy configuration file, which can be customized
+    for your MCP server, and, optionally, the python code of a sample MCP server.
     """
 
     if os.path.exists(policy_file) and not force:
@@ -54,8 +63,19 @@ def init(
         )
         raise typer.Exit(1)
 
+    if custom_mcp:
+        try:
+            mcp_instance = load_mcp_instance(custom_mcp)
+            policy = asyncio.run(generate_custom_policy_from_mcp(mcp_instance))
+            typer.echo(f"Generated custom policy from MCP server: {mcp_instance.name}")
+        except Exception as e:
+            typer.echo(f"Error generating custom policy: {e}", err=True)
+            raise typer.Exit(1)
+    else:
+        policy = DEFAULT_POLICY
+
     with open(policy_file, "w") as f:
-        json.dump(DEFAULT_POLICY.model_dump(exclude_none=True), f, indent=2)
+        json.dump(policy.model_dump(exclude_none=True), f, indent=2)
     typer.echo(f"Generated policy configuration file: {policy_file}")
 
     if sample:
