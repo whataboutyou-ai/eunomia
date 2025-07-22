@@ -15,7 +15,7 @@ class Condition(BaseModel):
     operator: ConditionOperator = Field(..., description="Comparison operator")
     value: Any = Field(..., description="Value to compare against")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
 
     @field_validator("value", mode="before")
     @classmethod
@@ -30,6 +30,9 @@ class Condition(BaseModel):
 
 class Rule(BaseModel):
     name: str = Field(..., description="Name of the rule")
+    description: Optional[str] = Field(
+        None, description="Human-readable description of the rule"
+    )
     effect: PolicyEffect = Field(..., description="Effect when the rule matches")
     principal_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to principal"
@@ -39,7 +42,7 @@ class Rule(BaseModel):
     )
     actions: list[str] = Field(..., description="All actions evaluated by the rule")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
 
     @field_validator("actions", mode="before")
     @classmethod
