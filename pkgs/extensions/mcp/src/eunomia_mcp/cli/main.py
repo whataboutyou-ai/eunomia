@@ -55,7 +55,7 @@ def init(
         raise typer.Exit(1)
 
     with open(policy_file, "w") as f:
-        json.dump(DEFAULT_POLICY, f, indent=2)
+        json.dump(DEFAULT_POLICY.model_dump(exclude_none=True), f, indent=2)
     typer.echo(f"Generated policy configuration file: {policy_file}")
 
     if sample:

@@ -169,14 +169,14 @@ eunomia-mcp push mcp_policies.json --overwrite
 
 ### MCP Method Mappings
 
-| MCP Method       | Resource URI           | Action | Middleware behavior                       |
-| ---------------- | ---------------------- | ------ | ----------------------------------------- |
-| `tools/list`     | `mcp:tools:{name}`     | `list` | Filters the server's response             |
-| `resources/list` | `mcp:resources:{name}` | `list` | Filters the server's response             |
-| `prompts/list`   | `mcp:prompts:{name}`   | `list` | Filters the server's response             |
-| `tools/call`     | `mcp:tools:{name}`     | `call` | Blocks/forwards the request to the server |
-| `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
-| `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
+| MCP Method       | Resource URI           | Action    | Middleware behavior                       |
+| ---------------- | ---------------------- | --------- | ----------------------------------------- |
+| `tools/list`     | `mcp:tools:{name}`     | `list`    | Filters the server's response             |
+| `tools/call`     | `mcp:tools:{name}`     | `execute` | Blocks/forwards the request to the server |
+| `resources/list` | `mcp:resources:{name}` | `list`    | Filters the server's response             |
+| `resources/read` | `mcp:resources:{name}` | `execute` | Blocks/forwards the request to the server |
+| `prompts/list`   | `mcp:prompts:{name}`   | `list`    | Filters the server's response             |
+| `prompts/get`    | `mcp:prompts:{name}`   | `execute` | Blocks/forwards the request to the server |
 
 The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 

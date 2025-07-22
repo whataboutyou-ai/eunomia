@@ -36,7 +36,7 @@ class TestEunomiaCLI:
         """Create a sample policy file for testing."""
         policy_file = temp_dir / "test_policy.json"
         with open(policy_file, "w") as f:
-            json.dump(DEFAULT_POLICY, f, indent=2)
+            json.dump(DEFAULT_POLICY.model_dump(exclude_none=True), f, indent=2)
         return policy_file
 
     @pytest.fixture
@@ -71,7 +71,7 @@ class TestInitCommand(TestEunomiaCLI):
 
         with open("mcp_policies.json") as f:
             policy = json.load(f)
-        assert policy == DEFAULT_POLICY
+        assert policy == DEFAULT_POLICY.model_dump(exclude_none=True)
 
     def test_init_custom_policy_file(self, runner, temp_dir):
         """Test init command with custom policy file path."""
@@ -138,7 +138,7 @@ class TestInitCommand(TestEunomiaCLI):
 
         with open("existing_policy.json") as f:
             policy = json.load(f)
-        assert policy == DEFAULT_POLICY
+        assert policy == DEFAULT_POLICY.model_dump(exclude_none=True)
 
     def test_init_shows_next_steps(self, runner, temp_dir):
         """Test that init command shows next steps."""
@@ -162,7 +162,7 @@ class TestValidateCommand(TestEunomiaCLI):
 
         assert result.exit_code == 0
         assert f"Policy file {sample_policy_file} is valid" in result.stdout
-        assert "Found 2 rules" in result.stdout
+        assert "Found %d rules" % len(DEFAULT_POLICY.rules) in result.stdout
 
     def test_validate_invalid_policy(self, runner, invalid_policy_file):
         """Test validate command with invalid policy file."""
@@ -308,7 +308,7 @@ class TestCLIUtils:
         """Create a sample policy file for testing."""
         policy_file = temp_dir / "test_policy.json"
         with open(policy_file, "w") as f:
-            json.dump(DEFAULT_POLICY, f, indent=2)
+            json.dump(DEFAULT_POLICY.model_dump(exclude_none=True), f, indent=2)
         return policy_file
 
     @pytest.fixture
@@ -328,7 +328,7 @@ class TestCLIUtils:
         assert policy.name == "mcp-default-policy"
         assert policy.version == "1.0"
         assert policy.default_effect == enums.PolicyEffect.DENY
-        assert len(policy.rules) == 2
+        assert len(policy.rules) == len(DEFAULT_POLICY.rules)
 
     def test_load_policy_config_file_not_found(self):
         """Test policy loading with nonexistent file."""
@@ -456,22 +456,16 @@ class TestConstants:
 
     def test_default_policy_structure(self):
         """Test that DEFAULT_POLICY has correct structure."""
-        assert DEFAULT_POLICY["version"] == "1.0"
-        assert DEFAULT_POLICY["name"] == "mcp-default-policy"
-        assert DEFAULT_POLICY["default_effect"] == enums.PolicyEffect.DENY
-        assert len(DEFAULT_POLICY["rules"]) == 2
+        assert DEFAULT_POLICY.version == "1.0"
+        assert DEFAULT_POLICY.name == "mcp-default-policy"
+        assert DEFAULT_POLICY.default_effect == enums.PolicyEffect.DENY
+        assert len(DEFAULT_POLICY.rules) == 1
 
-        # Check first rule
-        listing_rule = DEFAULT_POLICY["rules"][0]
-        assert listing_rule["name"] == "unrestricted-listing"
-        assert listing_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert listing_rule["actions"] == ["list"]
-
-        # Check second rule
-        execution_rule = DEFAULT_POLICY["rules"][1]
-        assert execution_rule["name"] == "unrestricted-execution"
-        assert execution_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert execution_rule["actions"] == ["call", "read", "get"]
+        # Check rule
+        listing_rule = DEFAULT_POLICY.rules[0]
+        assert listing_rule.name == "unrestricted-access"
+        assert listing_rule.effect == enums.PolicyEffect.ALLOW
+        assert listing_rule.actions == ["list", "execute"]
 
     def test_sample_server_code_structure(self):
         """Test that SAMPLE_SERVER_CODE contains expected components."""

@@ -3,30 +3,22 @@ import os
 from eunomia_core import enums, schemas
 from eunomia_sdk import EunomiaClient
 
-DEFAULT_POLICY = {
-    "version": "1.0",
-    "name": "mcp-default-policy",
-    "description": "Default policy for a MCP server",
-    "default_effect": enums.PolicyEffect.DENY,
-    "rules": [
-        {
-            "name": "unrestricted-listing",
-            "description": "All principals can list tools, resources, and prompts",
-            "effect": enums.PolicyEffect.ALLOW,
-            "principal_conditions": [],
-            "resource_conditions": [],
-            "actions": ["list"],
-        },
-        {
-            "name": "unrestricted-execution",
-            "description": "All principals can call tools, read resources, and get prompts",
-            "effect": enums.PolicyEffect.ALLOW,
-            "principal_conditions": [],
-            "resource_conditions": [],
-            "actions": ["call", "read", "get"],
-        },
+DEFAULT_POLICY = schemas.Policy(
+    version="1.0",
+    name="mcp-default-policy",
+    description="Default policy for a MCP server",
+    default_effect=enums.PolicyEffect.DENY,
+    rules=[
+        schemas.Rule(
+            name="unrestricted-access",
+            description="All principals can list and execute tools, resources, and prompts",
+            effect=enums.PolicyEffect.ALLOW,
+            principal_conditions=[],
+            resource_conditions=[],
+            actions=["list", "execute"],
+        ),
     ],
-}
+)
 
 SAMPLE_SERVER_CODE = '''
 from fastmcp import FastMCP

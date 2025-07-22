@@ -4,8 +4,8 @@
   "default_effect": "deny",
   "rules": [
     {
-      "name": "list-and-call",
-      "description": "All principals can list and call the specified tools",
+      "name": "list-and-execute",
+      "description": "All principals can list and execute the specified tools",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -15,7 +15,7 @@
           "value": ["get_venus_weather", "get_mars_weather"]
         }
       ],
-      "actions": ["list", "call"]
+      "actions": ["list", "execute"]
     },
     {
       "name": "list-only",
@@ -32,8 +32,8 @@
       "actions": ["list"]
     },
     {
-      "name": "restricted-call",
-      "description": "All principals can call the specified tool with restricted arguments",
+      "name": "restricted-execute",
+      "description": "All principals can execute the specified tool with restricted arguments",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -48,7 +48,7 @@
           "value": "night"
         }
       ],
-      "actions": ["call"]
+      "actions": ["execute"]
     }
   ]
 }
