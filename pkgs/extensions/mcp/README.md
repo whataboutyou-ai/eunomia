@@ -134,10 +134,10 @@ Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization poli
 # Create a default policy configuration file
 eunomia-mcp init
 
-# Create policy configuration file with custom name
-eunomia-mcp init --policy-file my_policies.json
+# Create a custom policy configuration file from your FastMCP server instance
+eunomia-mcp init --custom-mcp "server.py:mcp"
 
-# Generate both policy configuration file and a sample MCP server
+# Generate both policy configuration file and a sample FastMCP server with Eunomia authorization
 eunomia-mcp init --sample
 ```
 
