@@ -4,6 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from eunomia_core.enums.policy import ConditionOperator, PolicyEffect
+from eunomia_core.utils import slugify
 
 
 class Condition(BaseModel):
@@ -47,6 +48,11 @@ class Rule(BaseModel):
             return json.loads(v)
         return v
 
+    @field_validator("name", mode="before")
+    @classmethod
+    def slugify(cls, v: str) -> str:
+        return slugify(v)
+
 
 class Policy(BaseModel):
     version: str = Field("1.0", description="Version of the policy")
@@ -58,6 +64,11 @@ class Policy(BaseModel):
     default_effect: PolicyEffect = Field(
         PolicyEffect.DENY, description="Default effect if no rules match"
     )
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def slugify(cls, v: str) -> str:
+        return slugify(v)
 
     model_config = ConfigDict(from_attributes=True, extra="forbid")
 
