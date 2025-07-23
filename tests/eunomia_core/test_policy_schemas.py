@@ -211,6 +211,22 @@ class TestRule:
         rule = Rule.model_validate(rule_data)
         assert rule.name == "allow-admin-access"
 
+    def test_invalid_name_slugification(self):
+        # Test that names that would result in empty slugs raise ValidationError
+        invalid_names = ["!!!", "---", "🚀🎉", "   "]
+
+        for invalid_name in invalid_names:
+            rule_data = {
+                "name": invalid_name,
+                "effect": PolicyEffect.ALLOW,
+                "actions": ["read"],
+            }
+            with pytest.raises(ValidationError) as exc_info:
+                Rule.model_validate(rule_data)
+
+            # Check that the error message contains the expected text
+            assert "Cannot create valid slug from:" in str(exc_info.value)
+
     def test_actions_json_parsing(self):
         # Test actions can be parsed from JSON string
         rule_data = {
@@ -346,6 +362,27 @@ class TestPolicy:
         }
         policy = Policy.model_validate(policy_data)
         assert policy.name == "my-super-complex-policy-name"
+
+    def test_invalid_name_slugification(self):
+        # Test that names that would result in empty slugs raise ValidationError
+        invalid_names = ["!!!", "---", "🚀🎉", "   "]
+
+        for invalid_name in invalid_names:
+            policy_data = {
+                "name": invalid_name,
+                "rules": [
+                    {
+                        "name": "test-rule",
+                        "effect": PolicyEffect.ALLOW,
+                        "actions": ["read"],
+                    }
+                ],
+            }
+            with pytest.raises(ValidationError) as exc_info:
+                Policy.model_validate(policy_data)
+
+            # Check that the error message contains the expected text
+            assert "Cannot create valid slug from:" in str(exc_info.value)
 
     def test_multiple_rules(self):
         # Test policy with multiple rules

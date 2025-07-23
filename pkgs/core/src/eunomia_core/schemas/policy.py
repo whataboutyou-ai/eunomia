@@ -53,8 +53,11 @@ class Rule(BaseModel):
 
     @field_validator("name", mode="before")
     @classmethod
-    def slugify(cls, v: str) -> str:
-        return slugify(v)
+    def slugify_name(cls, v: str) -> str:
+        result = slugify(v)
+        if not result:
+            raise ValueError(f"Cannot create valid slug from: {v}")
+        return result
 
 
 class Policy(BaseModel):
@@ -70,8 +73,11 @@ class Policy(BaseModel):
 
     @field_validator("name", mode="before")
     @classmethod
-    def slugify(cls, v: str) -> str:
-        return slugify(v)
+    def slugify_name(cls, v: str) -> str:
+        result = slugify(v)
+        if not result:
+            raise ValueError(f"Cannot create valid slug from: {v}")
+        return result
 
     model_config = ConfigDict(from_attributes=True, extra="forbid")
 
