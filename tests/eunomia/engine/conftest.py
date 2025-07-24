@@ -40,17 +40,23 @@ def fixture_db():
 
 
 @pytest.fixture
-def fixture_engine(monkeypatch):
-    """Create a PolicyEngine instance for testing with an in-memory database."""
-    # Set up a test database URL
+def engine_with_database(monkeypatch):
+    """Create a PolicyEngine instance with database persistence enabled."""
+    monkeypatch.setattr("eunomia.config.settings.ENGINE_SQL_DATABASE", True)
     monkeypatch.setattr(
         "eunomia.config.settings.ENGINE_SQL_DATABASE_URL", "sqlite:///:memory:"
     )
 
-    # Initialize the engine
     engine = PolicyEngine()
+    yield engine
 
-    # Return the engine for testing
+
+@pytest.fixture
+def engine_without_database(monkeypatch):
+    """Create a PolicyEngine instance with database persistence disabled."""
+    monkeypatch.setattr("eunomia.config.settings.ENGINE_SQL_DATABASE", False)
+
+    engine = PolicyEngine()
     yield engine
 
 

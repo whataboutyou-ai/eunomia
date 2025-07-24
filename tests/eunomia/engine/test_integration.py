@@ -4,7 +4,7 @@ from eunomia.engine import utils
 from eunomia.engine.engine import PolicyEngine
 
 
-def test_role_based_access(fixture_engine: PolicyEngine):
+def test_role_based_access(engine_with_database: PolicyEngine):
     """Test role-based access control policies."""
     admin_policy = utils.create_simple_policy(
         name="admin-access",
@@ -12,7 +12,7 @@ def test_role_based_access(fixture_engine: PolicyEngine):
         principal_attributes={"role": "admin"},
         effect=enums.PolicyEffect.ALLOW,
     )
-    fixture_engine.add_policy(admin_policy)
+    engine_with_database.add_policy(admin_policy)
 
     read_only_policy = schemas.Policy(
         version="1.0",
@@ -41,7 +41,7 @@ def test_role_based_access(fixture_engine: PolicyEngine):
         ],
         default_effect=enums.PolicyEffect.DENY,
     )
-    fixture_engine.add_policy(read_only_policy)
+    engine_with_database.add_policy(read_only_policy)
 
     admin_request = schemas.CheckRequest(
         principal=schemas.PrincipalCheck(
@@ -55,7 +55,7 @@ def test_role_based_access(fixture_engine: PolicyEngine):
         action="access",
     )
 
-    admin_result = fixture_engine.evaluate_all(admin_request)
+    admin_result = engine_with_database.evaluate_all(admin_request)
     assert admin_result.allowed is True
     assert "admin-access" in admin_result.reason
 
@@ -71,7 +71,7 @@ def test_role_based_access(fixture_engine: PolicyEngine):
         action="access",
     )
 
-    readonly_public_result = fixture_engine.evaluate_all(readonly_public_request)
+    readonly_public_result = engine_with_database.evaluate_all(readonly_public_request)
     assert readonly_public_result.allowed is True
     assert "read-only-access" in readonly_public_result.reason
 
@@ -87,5 +87,7 @@ def test_role_based_access(fixture_engine: PolicyEngine):
         action="access",
     )
 
-    readonly_private_result = fixture_engine.evaluate_all(readonly_private_request)
+    readonly_private_result = engine_with_database.evaluate_all(
+        readonly_private_request
+    )
     assert readonly_private_result.allowed is False

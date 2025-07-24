@@ -9,9 +9,12 @@ from eunomia.engine.evaluator import evaluate_policy
 
 class PolicyEngine:
     def __init__(self):
+        self._db_enabled = settings.ENGINE_SQL_DATABASE
         self.policies: list[schemas.Policy] = []
-        db.init_db(settings.ENGINE_SQL_DATABASE_URL)
-        self._load_policies()
+
+        if self._db_enabled:
+            db.init_db(settings.ENGINE_SQL_DATABASE_URL)
+            self._load_policies()
 
     def _load_policies(self) -> None:
         """Load policies from the database into memory."""
@@ -21,17 +24,26 @@ class PolicyEngine:
 
     def add_policy(self, policy: schemas.Policy) -> None:
         """Add a policy to the engine and persist it to the database."""
-        with db.SessionLocal() as db_session:
-            crud.create_policy(policy, db=db_session)
+        if self._db_enabled:
+            with db.SessionLocal() as db_session:
+                crud.create_policy(policy, db=db_session)
         self.policies.append(policy)
 
     def remove_policy(self, policy_name: str) -> bool:
         """Remove a policy by name from the engine and database."""
-        with db.SessionLocal() as db_session:
-            is_deleted = crud.delete_policy(policy_name, db=db_session)
-        if is_deleted:
-            self.policies = [p for p in self.policies if p.name != policy_name]
-        return is_deleted
+        is_deleted = False
+        if self._db_enabled:
+            with db.SessionLocal() as db_session:
+                is_deleted = crud.delete_policy(policy_name, db=db_session)
+
+        if not self._db_enabled or is_deleted:
+            # local policies are removed from memory if database persistence is disabled
+            # OR if their deletion from database was successful
+            updated_policies = [p for p in self.policies if p.name != policy_name]
+            if len(updated_policies) != len(self.policies):
+                self.policies = updated_policies
+                return True
+        return False
 
     def get_policies(self) -> list[schemas.Policy]:
         """Retrieve all policies from memory."""
