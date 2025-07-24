@@ -85,7 +85,7 @@ def add(a: int, b: int) -> int:
 # Add Eunomia authorization middleware
 middleware = EunomiaMcpMiddleware()
 
-# Create ASGI app with authorization
+# Apply middleware to MCP server
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
@@ -134,10 +134,10 @@ Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization poli
 # Create a default policy configuration file
 eunomia-mcp init
 
-# Create policy configuration file with custom name
-eunomia-mcp init --policy-file my_policies.json
+# Create a custom policy configuration file from your FastMCP server instance
+eunomia-mcp init --custom-mcp "server.py:mcp"
 
-# Generate both policy configuration file and a sample MCP server
+# Generate both policy configuration file and a sample FastMCP server with Eunomia authorization
 eunomia-mcp init --sample
 ```
 
@@ -169,14 +169,14 @@ eunomia-mcp push mcp_policies.json --overwrite
 
 ### MCP Method Mappings
 
-| MCP Method       | Resource URI           | Action | Middleware behavior                       |
-| ---------------- | ---------------------- | ------ | ----------------------------------------- |
-| `tools/list`     | `mcp:tools:{name}`     | `list` | Filters the server's response             |
-| `resources/list` | `mcp:resources:{name}` | `list` | Filters the server's response             |
-| `prompts/list`   | `mcp:prompts:{name}`   | `list` | Filters the server's response             |
-| `tools/call`     | `mcp:tools:{name}`     | `call` | Blocks/forwards the request to the server |
-| `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
-| `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
+| MCP Method       | Resource URI           | Action    | Middleware behavior                       |
+| ---------------- | ---------------------- | --------- | ----------------------------------------- |
+| `tools/list`     | `mcp:tools:{name}`     | `list`    | Filters the server's response             |
+| `tools/call`     | `mcp:tools:{name}`     | `execute` | Blocks/forwards the request to the server |
+| `resources/list` | `mcp:resources:{name}` | `list`    | Filters the server's response             |
+| `resources/read` | `mcp:resources:{name}` | `execute` | Blocks/forwards the request to the server |
+| `prompts/list`   | `mcp:prompts:{name}`   | `list`    | Filters the server's response             |
+| `prompts/get`    | `mcp:prompts:{name}`   | `execute` | Blocks/forwards the request to the server |
 
 The middleware extracts contextual attributes from the MCP request and passes them to the decision engine; these attributes can therefore be referenced inside policies to define dynamic rules.
 

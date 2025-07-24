@@ -29,6 +29,7 @@ class Rule(db.Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
+    description: Mapped[Optional[str]]
     policy_id: Mapped[int] = mapped_column(ForeignKey(Policy.id))
     effect: Mapped[enums.PolicyEffect]
     actions: Mapped[list[str]] = mapped_column(JSON)

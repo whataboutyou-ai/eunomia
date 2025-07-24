@@ -21,7 +21,10 @@ def create_policy(policy: schemas.Policy, db: Session) -> models.Policy:
     )
     for rule in policy.rules:
         db_rule = models.Rule(
-            name=rule.name, effect=rule.effect, actions=json.dumps(rule.actions)
+            name=rule.name,
+            description=rule.description,
+            effect=rule.effect,
+            actions=json.dumps(rule.actions),
         )
 
         for condition in rule.principal_conditions:

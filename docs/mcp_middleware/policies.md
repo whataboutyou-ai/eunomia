@@ -10,10 +10,10 @@ Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization poli
 # Create a default policy configuration file
 eunomia-mcp init
 
-# Create policy configuration file with custom name
-eunomia-mcp init --policy-file my_policies.json
+# Create a custom policy configuration file from your FastMCP server instance
+eunomia-mcp init --custom-mcp "server.py:mcp"
 
-# Generate both policy configuration file and a sample MCP server
+# Generate both policy configuration file and a sample FastMCP server with Eunomia authorization
 eunomia-mcp init --sample
 ```
 
@@ -42,12 +42,17 @@ eunomia-mcp push mcp_policies.json --overwrite
 
 Workflow:
 
-1. **Initialize**: `eunomia-mcp init`
-2. **Customize**: Edit generated policy file
-3. **Validate**: `eunomia-mcp validate mcp_policies.json`
-4. **Start Server**: `eunomia server`
-5. **Deploy**: `eunomia-mcp push mcp_policies.json`
-6. **Run**: Run your MCP server with middleware
+1.  **Initialize**: `eunomia-mcp init`
+
+    !!! tip
+
+        Use `--custom-mcp` for a policy customized for your MCP server!
+
+2.  **Customize**: Edit generated policy file
+3.  **Validate**: `eunomia-mcp validate mcp_policies.json`
+4.  **Start Server**: Start Eunomia server (with `eunomia server` or other methods)
+5.  **Deploy**: `eunomia-mcp push mcp_policies.json`
+6.  **Run**: Run your MCP server with middleware
 
 ## MCP Context Extraction
 
@@ -55,14 +60,14 @@ Workflow:
 
 The middleware automatically maps MCP methods to authorization checks:
 
-| MCP Method       | Resource URI           | Action | Middleware behavior                       |
-| ---------------- | ---------------------- | ------ | ----------------------------------------- |
-| `tools/list`     | `mcp:tools:{name}`     | `list` | Filters the server's response             |
-| `resources/list` | `mcp:resources:{name}` | `list` | Filters the server's response             |
-| `prompts/list`   | `mcp:prompts:{name}`   | `list` | Filters the server's response             |
-| `tools/call`     | `mcp:tools:{name}`     | `call` | Blocks/forwards the request to the server |
-| `resources/read` | `mcp:resources:{name}` | `read` | Blocks/forwards the request to the server |
-| `prompts/get`    | `mcp:prompts:{name}`   | `get`  | Blocks/forwards the request to the server |
+| MCP Method       | Resource URI           | Action    | Middleware behavior                       |
+| ---------------- | ---------------------- | --------- | ----------------------------------------- |
+| `tools/list`     | `mcp:tools:{name}`     | `list`    | Filters the server's response             |
+| `tools/call`     | `mcp:tools:{name}`     | `execute` | Blocks/forwards the request to the server |
+| `resources/list` | `mcp:resources:{name}` | `list`    | Filters the server's response             |
+| `resources/read` | `mcp:resources:{name}` | `execute` | Blocks/forwards the request to the server |
+| `prompts/list`   | `mcp:prompts:{name}`   | `list`    | Filters the server's response             |
+| `prompts/get`    | `mcp:prompts:{name}`   | `execute` | Blocks/forwards the request to the server |
 
 ### Contextual Attributes
 

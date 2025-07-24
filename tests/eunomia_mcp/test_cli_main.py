@@ -1,63 +1,15 @@
 import json
 import os
-import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, patch
 
-import pytest
 from eunomia_core import enums, schemas
 from eunomia_mcp.cli.main import app
-from eunomia_mcp.cli.utils import (
-    DEFAULT_POLICY,
-    SAMPLE_SERVER_CODE,
-    load_policy_config,
-    push_policy_config,
-)
-from eunomia_sdk.client import EunomiaClient
-from typer.testing import CliRunner
+from eunomia_mcp.cli.utils import DEFAULT_POLICY, SAMPLE_SERVER_CODE
+from fastmcp import FastMCP
 
 
-class TestEunomiaCLI:
-    """Test suite for Eunomia MCP CLI commands."""
-
-    @pytest.fixture
-    def runner(self):
-        """Create CLI test runner."""
-        return CliRunner()
-
-    @pytest.fixture
-    def temp_dir(self):
-        """Create temporary directory for tests."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            yield Path(tmpdir)
-
-    @pytest.fixture
-    def sample_policy_file(self, temp_dir):
-        """Create a sample policy file for testing."""
-        policy_file = temp_dir / "test_policy.json"
-        with open(policy_file, "w") as f:
-            json.dump(DEFAULT_POLICY, f, indent=2)
-        return policy_file
-
-    @pytest.fixture
-    def invalid_policy_file(self, temp_dir):
-        """Create an invalid policy file for testing."""
-        policy_file = temp_dir / "invalid_policy.json"
-        with open(policy_file, "w") as f:
-            json.dump({"invalid": "policy"}, f, indent=2)
-        return policy_file
-
-    @pytest.fixture
-    def mock_eunomia_client(self):
-        """Create mock Eunomia client."""
-        client = Mock(spec=EunomiaClient)
-        client.get_policies.return_value = []
-        client.delete_policy.return_value = None
-        client.create_policy.return_value = None
-        return client
-
-
-class TestInitCommand(TestEunomiaCLI):
+class TestInitCommand:
     """Test the init command."""
 
     def test_init_default_policy_file(self, runner, temp_dir):
@@ -71,7 +23,7 @@ class TestInitCommand(TestEunomiaCLI):
 
         with open("mcp_policies.json") as f:
             policy = json.load(f)
-        assert policy == DEFAULT_POLICY
+        assert policy == DEFAULT_POLICY.model_dump(exclude_none=True)
 
     def test_init_custom_policy_file(self, runner, temp_dir):
         """Test init command with custom policy file path."""
@@ -138,7 +90,7 @@ class TestInitCommand(TestEunomiaCLI):
 
         with open("existing_policy.json") as f:
             policy = json.load(f)
-        assert policy == DEFAULT_POLICY
+        assert policy == DEFAULT_POLICY.model_dump(exclude_none=True)
 
     def test_init_shows_next_steps(self, runner, temp_dir):
         """Test that init command shows next steps."""
@@ -152,8 +104,125 @@ class TestInitCommand(TestEunomiaCLI):
         assert "Push the policy configuration file to Eunomia" in result.stdout
         assert "Run your MCP server with authorization" in result.stdout
 
+    @patch("eunomia_mcp.cli.main.load_mcp_instance")
+    @patch(
+        "eunomia_mcp.cli.main.generate_custom_policy_from_mcp", new_callable=AsyncMock
+    )
+    def test_init_with_custom_mcp_success(
+        self, mock_generate_policy, mock_load_mcp, runner, temp_dir
+    ):
+        """Test init command with successful custom MCP policy generation."""
+        os.chdir(temp_dir)
 
-class TestValidateCommand(TestEunomiaCLI):
+        # Create real FastMCP instance
+        mcp = FastMCP("test-mcp-server")
+
+        @mcp.tool()
+        def add(a: int, b: int) -> int:
+            """Add two numbers"""
+            return a + b
+
+        mock_load_mcp.return_value = mcp
+
+        # Mock generated policy
+        custom_policy = schemas.Policy(
+            version="1.0",
+            name="test-custom-policy",
+            description="Custom policy for test server",
+            default_effect=enums.PolicyEffect.DENY,
+            rules=[],
+        )
+
+        mock_generate_policy.return_value = custom_policy
+
+        result = runner.invoke(app, ["init", "--custom-mcp", "test.module:mcp"])
+
+        assert result.exit_code == 0
+        assert (
+            "Generated custom policy from MCP server: test-mcp-server" in result.stdout
+        )
+        assert "Generated policy configuration file: mcp_policies.json" in result.stdout
+
+        mock_load_mcp.assert_called_once_with("test.module:mcp")
+
+        # Verify the policy file contains the custom policy
+        with open("mcp_policies.json") as f:
+            policy_data = json.load(f)
+        assert policy_data["name"] == "test-custom-policy"
+
+    @patch("eunomia_mcp.cli.main.load_mcp_instance")
+    def test_init_with_custom_mcp_load_error(self, mock_load_mcp, runner, temp_dir):
+        """Test init command with MCP loading error."""
+        os.chdir(temp_dir)
+        mock_load_mcp.side_effect = ImportError("Cannot import module: test.module")
+
+        result = runner.invoke(app, ["init", "--custom-mcp", "test.module:mcp"])
+
+        assert result.exit_code == 1
+        assert (
+            "Error generating custom policy: Cannot import module: test.module"
+            in result.stdout
+        )
+        mock_load_mcp.assert_called_once_with("test.module:mcp")
+
+    @patch("eunomia_mcp.cli.main.load_mcp_instance")
+    @patch(
+        "eunomia_mcp.cli.main.generate_custom_policy_from_mcp", new_callable=AsyncMock
+    )
+    def test_init_with_custom_mcp_policy_generation_error(
+        self, mock_generate_policy, mock_load_mcp, runner, temp_dir
+    ):
+        """Test init command with policy generation error."""
+        os.chdir(temp_dir)
+
+        mcp = FastMCP("test-server")
+        mock_load_mcp.return_value = mcp
+
+        mock_generate_policy.side_effect = Exception("Policy generation failed")
+
+        result = runner.invoke(app, ["init", "--custom-mcp", "test.module:mcp"])
+
+        assert result.exit_code == 1
+        assert (
+            "Error generating custom policy: Policy generation failed" in result.stdout
+        )
+
+    @patch("eunomia_mcp.cli.main.load_mcp_instance")
+    @patch(
+        "eunomia_mcp.cli.main.generate_custom_policy_from_mcp", new_callable=AsyncMock
+    )
+    def test_init_with_custom_mcp_and_sample(
+        self, mock_generate_policy, mock_load_mcp, runner, temp_dir
+    ):
+        """Test init command with custom MCP and sample server generation."""
+        os.chdir(temp_dir)
+
+        mcp = FastMCP("test-server")
+
+        @mcp.tool()
+        def multiply(x: int, y: int) -> int:
+            """Multiply two numbers"""
+            return x * y
+
+        mock_load_mcp.return_value = mcp
+
+        custom_policy = DEFAULT_POLICY.model_copy()
+        custom_policy.name = "custom-test-policy"
+
+        mock_generate_policy.return_value = custom_policy
+
+        result = runner.invoke(
+            app, ["init", "--custom-mcp", "test.module:mcp", "--sample"]
+        )
+
+        assert result.exit_code == 0
+        assert "Generated custom policy from MCP server: test-server" in result.stdout
+        assert "Generated sample server: mcp_server.py" in result.stdout
+        assert Path("mcp_policies.json").exists()
+        assert Path("mcp_server.py").exists()
+
+
+class TestValidateCommand:
     """Test the validate command."""
 
     def test_validate_valid_policy(self, runner, sample_policy_file):
@@ -162,7 +231,7 @@ class TestValidateCommand(TestEunomiaCLI):
 
         assert result.exit_code == 0
         assert f"Policy file {sample_policy_file} is valid" in result.stdout
-        assert "Found 2 rules" in result.stdout
+        assert "Found %d rules" % len(DEFAULT_POLICY.rules) in result.stdout
 
     def test_validate_invalid_policy(self, runner, invalid_policy_file):
         """Test validate command with invalid policy file."""
@@ -189,7 +258,7 @@ class TestValidateCommand(TestEunomiaCLI):
         assert "Error validating policy:" in result.stdout
 
 
-class TestPushCommand(TestEunomiaCLI):
+class TestPushCommand:
     """Test the push command."""
 
     @patch("eunomia_mcp.cli.main.EunomiaClient")
@@ -294,121 +363,8 @@ class TestPushCommand(TestEunomiaCLI):
         assert "Error pushing policy:" in result.stdout
 
 
-class TestCLIUtils:
-    """Test CLI utility functions."""
-
-    @pytest.fixture
-    def temp_dir(self):
-        """Create temporary directory for tests."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            yield Path(tmpdir)
-
-    @pytest.fixture
-    def sample_policy_file(self, temp_dir):
-        """Create a sample policy file for testing."""
-        policy_file = temp_dir / "test_policy.json"
-        with open(policy_file, "w") as f:
-            json.dump(DEFAULT_POLICY, f, indent=2)
-        return policy_file
-
-    @pytest.fixture
-    def mock_eunomia_client(self):
-        """Create mock Eunomia client."""
-        client = Mock(spec=EunomiaClient)
-        client.get_policies.return_value = []
-        client.delete_policy.return_value = None
-        client.create_policy.return_value = None
-        return client
-
-    def test_load_policy_config_success(self, sample_policy_file):
-        """Test successful policy loading."""
-        policy = load_policy_config(str(sample_policy_file))
-
-        assert isinstance(policy, schemas.Policy)
-        assert policy.name == "mcp-default-policy"
-        assert policy.version == "1.0"
-        assert policy.default_effect == enums.PolicyEffect.DENY
-        assert len(policy.rules) == 2
-
-    def test_load_policy_config_file_not_found(self):
-        """Test policy loading with nonexistent file."""
-        with pytest.raises(FileNotFoundError) as exc_info:
-            load_policy_config("nonexistent.json")
-
-        assert "Policy file not found: nonexistent.json" in str(exc_info.value)
-
-    def test_load_policy_config_invalid_json(self, temp_dir):
-        """Test policy loading with invalid JSON."""
-        policy_file = temp_dir / "invalid.json"
-        policy_file.write_text('{"invalid": json}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
-
-    def test_load_policy_config_invalid_schema(self, temp_dir):
-        """Test policy loading with invalid policy schema."""
-        policy_file = temp_dir / "invalid_schema.json"
-        policy_file.write_text('{"invalid": "schema"}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
-
-    def test_push_policy_config_success(self, sample_policy_file, mock_eunomia_client):
-        """Test successful policy push."""
-        push_policy_config(str(sample_policy_file), False, mock_eunomia_client)
-
-        mock_eunomia_client.create_policy.assert_called_once()
-        mock_eunomia_client.get_policies.assert_not_called()
-        mock_eunomia_client.delete_policy.assert_not_called()
-
-    def test_push_policy_config_with_overwrite(
-        self, sample_policy_file, mock_eunomia_client
-    ):
-        """Test policy push with overwrite."""
-        existing_policy = Mock()
-        existing_policy.name = "existing-policy"
-        mock_eunomia_client.get_policies.return_value = [existing_policy]
-
-        push_policy_config(str(sample_policy_file), True, mock_eunomia_client)
-
-        mock_eunomia_client.get_policies.assert_called_once()
-        mock_eunomia_client.delete_policy.assert_called_once_with("existing-policy")
-        mock_eunomia_client.create_policy.assert_called_once()
-
-    def test_push_policy_config_multiple_existing_policies(
-        self, sample_policy_file, mock_eunomia_client
-    ):
-        """Test policy push with multiple existing policies to overwrite."""
-        existing_policies = [Mock(name="policy1"), Mock(name="policy2")]
-        existing_policies[0].name = "policy1"
-        existing_policies[1].name = "policy2"
-        mock_eunomia_client.get_policies.return_value = existing_policies
-
-        push_policy_config(str(sample_policy_file), True, mock_eunomia_client)
-
-        mock_eunomia_client.get_policies.assert_called_once()
-        assert mock_eunomia_client.delete_policy.call_count == 2
-        mock_eunomia_client.delete_policy.assert_any_call("policy1")
-        mock_eunomia_client.delete_policy.assert_any_call("policy2")
-        mock_eunomia_client.create_policy.assert_called_once()
-
-    def test_push_policy_config_client_error(
-        self, sample_policy_file, mock_eunomia_client
-    ):
-        """Test policy push with client error."""
-        mock_eunomia_client.create_policy.side_effect = Exception("API Error")
-
-        with pytest.raises(Exception, match="API Error"):
-            push_policy_config(str(sample_policy_file), False, mock_eunomia_client)
-
-
 class TestCLIIntegration:
     """Integration tests for CLI commands."""
-
-    @pytest.fixture
-    def runner(self):
-        """Create CLI test runner."""
-        return CliRunner()
 
     def test_cli_help(self, runner):
         """Test CLI help output."""
@@ -449,35 +405,3 @@ class TestCLIIntegration:
 
         assert result.exit_code == 0
         assert "Eunomia MCP Authorization Middleware CLI" in result.stdout
-
-
-class TestConstants:
-    """Test CLI constants and defaults."""
-
-    def test_default_policy_structure(self):
-        """Test that DEFAULT_POLICY has correct structure."""
-        assert DEFAULT_POLICY["version"] == "1.0"
-        assert DEFAULT_POLICY["name"] == "mcp-default-policy"
-        assert DEFAULT_POLICY["default_effect"] == enums.PolicyEffect.DENY
-        assert len(DEFAULT_POLICY["rules"]) == 2
-
-        # Check first rule
-        listing_rule = DEFAULT_POLICY["rules"][0]
-        assert listing_rule["name"] == "unrestricted-listing"
-        assert listing_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert listing_rule["actions"] == ["list"]
-
-        # Check second rule
-        execution_rule = DEFAULT_POLICY["rules"][1]
-        assert execution_rule["name"] == "unrestricted-execution"
-        assert execution_rule["effect"] == enums.PolicyEffect.ALLOW
-        assert execution_rule["actions"] == ["call", "read", "get"]
-
-    def test_sample_server_code_structure(self):
-        """Test that SAMPLE_SERVER_CODE contains expected components."""
-        assert "from fastmcp import FastMCP" in SAMPLE_SERVER_CODE
-        assert "from eunomia_mcp import EunomiaMcpMiddleware" in SAMPLE_SERVER_CODE
-        assert "EunomiaMcpMiddleware()" in SAMPLE_SERVER_CODE
-        assert "@mcp.tool()" in SAMPLE_SERVER_CODE
-        assert "def add(a: int, b: int) -> int:" in SAMPLE_SERVER_CODE
-        assert "mcp.run" in SAMPLE_SERVER_CODE

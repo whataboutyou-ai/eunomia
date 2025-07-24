@@ -73,8 +73,8 @@ class EunomiaMcpMiddleware(Middleware):
         if not component.enabled:
             raise ToolError(f"Access denied: {component.name} is disabled")
 
+        action = "execute"
         principal = self._extract_principal()
-        action = context.method.split("/")[1]
         resource = self._extract_resource(context, component)
 
         result = self._eunomia_client.check(
@@ -101,8 +101,8 @@ class EunomiaMcpMiddleware(Middleware):
         self, context: MiddlewareContext, components: list[FastMCPComponent]
     ) -> list[FastMCPComponent]:
         if components:
+            action = "list"
             principal = self._extract_principal()
-            action = context.method.split("/")[1]
 
             # Construct requests for bulk check
             resources = [self._extract_resource(context, c) for c in components]

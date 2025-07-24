@@ -4,6 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from eunomia_core.enums.policy import ConditionOperator, PolicyEffect
+from eunomia_core.utils import slugify
 
 
 class Condition(BaseModel):
@@ -14,7 +15,7 @@ class Condition(BaseModel):
     operator: ConditionOperator = Field(..., description="Comparison operator")
     value: Any = Field(..., description="Value to compare against")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
 
     @field_validator("value", mode="before")
     @classmethod
@@ -29,6 +30,9 @@ class Condition(BaseModel):
 
 class Rule(BaseModel):
     name: str = Field(..., description="Name of the rule")
+    description: Optional[str] = Field(
+        None, description="Human-readable description of the rule"
+    )
     effect: PolicyEffect = Field(..., description="Effect when the rule matches")
     principal_conditions: list[Condition] = Field(
         default_factory=list, description="Conditions applied to principal"
@@ -38,7 +42,7 @@ class Rule(BaseModel):
     )
     actions: list[str] = Field(..., description="All actions evaluated by the rule")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="forbid")
 
     @field_validator("actions", mode="before")
     @classmethod
@@ -46,6 +50,14 @@ class Rule(BaseModel):
         if isinstance(v, str):
             return json.loads(v)
         return v
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def slugify_name(cls, v: str) -> str:
+        result = slugify(v)
+        if not result:
+            raise ValueError(f"Cannot create valid slug from: {v}")
+        return result
 
 
 class Policy(BaseModel):
@@ -58,6 +70,14 @@ class Policy(BaseModel):
     default_effect: PolicyEffect = Field(
         PolicyEffect.DENY, description="Default effect if no rules match"
     )
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def slugify_name(cls, v: str) -> str:
+        result = slugify(v)
+        if not result:
+            raise ValueError(f"Cannot create valid slug from: {v}")
+        return result
 
     model_config = ConfigDict(from_attributes=True, extra="forbid")
 

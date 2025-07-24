@@ -14,7 +14,7 @@
     },
     {
       "name": "allow-read-tools",
-      "description": "Allow Cursor to call read-only tools",
+      "description": "Allow Cursor to execute read-only tools",
       "effect": "allow",
       "principal_conditions": [
         {
@@ -30,11 +30,11 @@
           "value": ["send_message", "send_file", "send_audio_message"]
         }
       ],
-      "actions": ["call"]
+      "actions": ["execute"]
     },
     {
       "name": "restrict-send-tools",
-      "description": "Allow Cursor to call send-only tools to specific recipients only",
+      "description": "Allow Cursor to execute send-only tools to specific recipients only",
       "effect": "allow",
       "principal_conditions": [
         {
@@ -55,7 +55,7 @@
           "value": ["PHONE_NUMBER_1", "PHONE_NUMBER_2", "PHONE_NUMBER_3"]
         }
       ],
-      "actions": ["call"]
+      "actions": ["execute"]
     }
   ]
 }

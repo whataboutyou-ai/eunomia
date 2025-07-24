@@ -19,8 +19,8 @@
       "actions": ["list"]
     },
     {
-      "name": "call-read-tool",
-      "description": "Allow calling the read tool",
+      "name": "execute-read-tool",
+      "description": "Allow executing the read tool",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -30,11 +30,11 @@
           "value": "read_file"
         }
       ],
-      "actions": ["call"]
+      "actions": ["execute"]
     },
     {
-      "name": "call-write-tool-for-notes",
-      "description": "Allow calling the write tool only for files in the user's notes directory",
+      "name": "execute-write-tool-for-notes",
+      "description": "Allow executing the write tool for files in the user's notes directory only",
       "effect": "allow",
       "principal_conditions": [],
       "resource_conditions": [
@@ -49,7 +49,7 @@
           "value": "/home/user/notes/"
         }
       ],
-      "actions": ["call"]
+      "actions": ["execute"]
     }
   ]
 }
