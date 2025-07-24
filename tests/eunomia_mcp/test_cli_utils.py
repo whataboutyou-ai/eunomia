@@ -117,8 +117,8 @@ class TestConstants:
     def test_sample_server_code_structure(self):
         """Test that SAMPLE_SERVER_CODE contains expected components."""
         assert "from fastmcp import FastMCP" in SAMPLE_SERVER_CODE
-        assert "from eunomia_mcp import EunomiaMcpMiddleware" in SAMPLE_SERVER_CODE
-        assert "EunomiaMcpMiddleware()" in SAMPLE_SERVER_CODE
+        assert "from eunomia_mcp import create_eunomia_middleware" in SAMPLE_SERVER_CODE
+        assert "middleware = create_eunomia_middleware()" in SAMPLE_SERVER_CODE
         assert "@mcp.tool()" in SAMPLE_SERVER_CODE
         assert "def add(a: int, b: int) -> int:" in SAMPLE_SERVER_CODE
         assert "mcp.run" in SAMPLE_SERVER_CODE

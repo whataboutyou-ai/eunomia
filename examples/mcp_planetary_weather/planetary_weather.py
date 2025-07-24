@@ -1,6 +1,6 @@
 from typing import Literal
 
-from eunomia_mcp.middleware import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
@@ -41,7 +41,8 @@ def get_venus_weather(request: WeatherRequest) -> str:
     return f"The weather on Venus at {request.time} was extremely hot (462°C) with sulfuric acid rain"
 
 
-mcp.add_middleware(EunomiaMcpMiddleware())
+middleware = create_eunomia_middleware()
+mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()

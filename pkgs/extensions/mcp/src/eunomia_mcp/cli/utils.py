@@ -27,7 +27,7 @@ DEFAULT_POLICY = schemas.Policy(
 
 SAMPLE_SERVER_CODE = '''
 from fastmcp import FastMCP
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 
 # Create your FastMCP server
 mcp = FastMCP("Secure MCP Server 🔒")
@@ -37,10 +37,8 @@ def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
-# Add Eunomia authorization middleware
-middleware = EunomiaMcpMiddleware()
-
-# Apply middleware to MCP server
+# Add middleware to your server
+middleware = create_eunomia_middleware()
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":

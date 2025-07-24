@@ -1,45 +1,47 @@
-## Advanced Configuration
+## Centralize Policy Enforcement with a Remote Eunomia Server
 
-### Middleware Options
+The Eunomia MCP Middleware can be configured to use an **embedded Eunomia server** within the MCP server (default) or a **remote Eunomia server**.
 
-Configure the middleware with custom configuration (e.g., for production deployments):
+The remote option is useful if you want to have a centralized policy decision point for multiple MCP servers,
+which is especially relevant in enterprise scenarios.
+
+!!! info
+
+    You can run the Eunomia server in the background with Docker:
+
+    ```bash
+    docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
+    ```
+
+    Or refer to [this documentation](../server/pdp/run_server.md) for additional running options.
+
+Then, you can configure the middleware to use the remote Eunomia server:
 
 ```python
 from eunomia_mcp import create_eunomia_middleware
 
 middleware = create_eunomia_middleware(
-    eunomia_endpoint="https://your-eunomia-server.com",
-    eunomia_api_key="your-api-key",
-    enable_audit_logging=True,
+    use_remote_eunomia=True,
+    eunomia_endpoint="http://localhost:8421",
 )
 ```
 
-#### Parameters
+### Middleware Configuration
 
 | Parameter              | Type   | Default                 | Description                            |
 | ---------------------- | ------ | ----------------------- | -------------------------------------- |
-| `eunomia_endpoint`     | `str`  | `http://localhost:8421` | Eunomia server URL                     |
-| `eunomia_api_key`      | `str`  | `None`                  | API key (or set `WAY_API_KEY` env var) |
+| `use_remote_eunomia`   | `bool` | `False`                 | Whether to use a remote Eunomia server |
+| `eunomia_endpoint`     | `str`  | `http://localhost:8421` | Eunomia remote server URL              |
 | `enable_audit_logging` | `bool` | `True`                  | Enable request/violation logging       |
 
-#### Environment Variables
-
-```bash
-# Eunomia server configuration
-export WAY_API_KEY=your-secret-api-key
-
-# Logging level
-export PYTHONLOGLEVEL=INFO
-```
-
-### Connecting to Remote MCP Servers
+## Connect to Remote MCP Servers using a Proxy
 
 You can use the Eunomia MCP Middleware even if you are connecting to a remote MCP server that you don't control.
 
 To do so, you can use a proxy server that will forward the requests to the remote server and apply the Eunomia MCP Middleware to the proxy server.
 
 ```python
-from eunomia_mcp.middleware import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 from fastmcp import FastMCP
 
 config = {
@@ -52,7 +54,9 @@ config = {
 }
 
 proxy = FastMCP.as_proxy(config, name="Proxy with Eunomia Middleware")
-proxy.add_middleware(EunomiaMcpMiddleware())
+
+middleware = create_eunomia_middleware()
+proxy.add_middleware(middleware)
 
 if __name__ == "__main__":
     proxy.run()
@@ -83,31 +87,3 @@ logger = logging.getLogger("eunomia_mcp")
 - **INFO**: Successful authorization decisions
 - **WARNING**: Authorization violations
 - **ERROR**: System errors (Eunomia server issues, etc.)
-
-## Troubleshooting
-
-### Common Issues
-
-**Eunomia server not running**
-
-```
-ERROR: Authorization check failed: Connection refused
-```
-
-Solution: Start Eunomia server with `eunomia server`
-
-**Missing policies**
-
-```
-WARNING: Authorization violation: No matching policy found
-```
-
-Solution: Push policies with `eunomia-mcp push policies.json`
-
-**Invalid JSON-RPC**
-
-```
-ERROR: Invalid Request: Invalid JSON-RPC 2.0 format
-```
-
-Solution: Ensure MCP client sends valid JSON-RPC 2.0 requests

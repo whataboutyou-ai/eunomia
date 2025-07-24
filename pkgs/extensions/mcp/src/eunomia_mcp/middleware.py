@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from eunomia_core import schemas
 from eunomia_sdk import EunomiaClient
@@ -12,6 +11,8 @@ from fastmcp.tools.tool import Tool
 from fastmcp.utilities.components import FastMCPComponent
 from mcp import types
 
+from eunomia.server import EunomiaServer
+from eunomia_mcp.bridge import EunomiaBridge, EunomiaMode
 from eunomia_mcp.schemas import McpAttributes
 
 logger = logging.getLogger(__name__)
@@ -24,10 +25,12 @@ class EunomiaMcpMiddleware(Middleware):
 
     def __init__(
         self,
-        eunomia_client: Optional[EunomiaClient] = None,
+        mode: EunomiaMode = EunomiaMode.SERVER,
+        eunomia_client: EunomiaClient | None = None,
+        eunomia_server: EunomiaServer | None = None,
         enable_audit_logging: bool = True,
     ):
-        self._eunomia_client = eunomia_client or EunomiaClient()
+        self._eunomia = EunomiaBridge(mode, eunomia_client, eunomia_server)
         self._enable_audit_logging = enable_audit_logging
 
     def _extract_principal(self) -> schemas.PrincipalCheck:
@@ -67,7 +70,7 @@ class EunomiaMcpMiddleware(Middleware):
             uri=uri, attributes=mcp_attributes.model_dump(exclude_none=True)
         )
 
-    def _authorize_execution(
+    async def _authorize_execution(
         self, context: MiddlewareContext, component: FastMCPComponent
     ) -> None:
         if not component.enabled:
@@ -77,12 +80,8 @@ class EunomiaMcpMiddleware(Middleware):
         principal = self._extract_principal()
         resource = self._extract_resource(context, component)
 
-        result = self._eunomia_client.check(
-            principal_uri=principal.uri,
-            principal_attributes=principal.attributes,
-            resource_uri=resource.uri,
-            resource_attributes=resource.attributes,
-            action=action,
+        result = await self._eunomia.check(
+            schemas.CheckRequest(principal=principal, resource=resource, action=action)
         )
 
         if self._enable_audit_logging:
@@ -97,7 +96,7 @@ class EunomiaMcpMiddleware(Middleware):
         if not result.allowed:
             raise ToolError(f"Access denied: {result.reason}")
 
-    def _authorize_listing(
+    async def _authorize_listing(
         self, context: MiddlewareContext, components: list[FastMCPComponent]
     ) -> list[FastMCPComponent]:
         if components:
@@ -108,14 +107,14 @@ class EunomiaMcpMiddleware(Middleware):
             resources = [self._extract_resource(context, c) for c in components]
 
             # Perform all checks in bulk
-            results = self._eunomia_client.bulk_check(
+            results = await self._eunomia.bulk_check(
                 [
                     schemas.CheckRequest(principal=principal, resource=r, action=action)
                     for r in resources
                 ]
             )
 
-            # Disable components based on its authorization result
+            # Filter components based on authorization results
             filtered_components = []
             for result, component, resource in zip(results, components, resources):
                 if result.allowed:
@@ -158,7 +157,7 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.CallToolRequestParams, types.CallToolResult],
     ) -> types.CallToolResult:
         tool = await context.fastmcp_context.fastmcp.get_tool(context.message.name)
-        self._authorize_execution(context, tool)
+        await self._authorize_execution(context, tool)
         return await call_next(context)
 
     async def on_read_resource(
@@ -169,7 +168,7 @@ class EunomiaMcpMiddleware(Middleware):
         resource = await context.fastmcp_context.fastmcp.get_resource(
             context.message.uri
         )
-        self._authorize_execution(context, resource)
+        await self._authorize_execution(context, resource)
         return await call_next(context)
 
     async def on_get_prompt(
@@ -178,7 +177,7 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.GetPromptRequestParams, types.GetPromptResult],
     ) -> types.GetPromptResult:
         prompt = await context.fastmcp_context.fastmcp.get_prompt(context.message.name)
-        self._authorize_execution(context, prompt)
+        await self._authorize_execution(context, prompt)
         return await call_next(context)
 
     async def on_list_tools(
@@ -187,7 +186,7 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.ListToolsRequest, list[Tool]],
     ) -> list[Tool]:
         tools = await call_next(context)
-        return self._authorize_listing(context, tools)
+        return await self._authorize_listing(context, tools)
 
     async def on_list_resources(
         self,
@@ -195,7 +194,7 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.ListResourcesRequest, list[Resource]],
     ) -> list[Resource]:
         resources = await call_next(context)
-        return self._authorize_listing(context, resources)
+        return await self._authorize_listing(context, resources)
 
     async def on_list_prompts(
         self,
@@ -203,4 +202,4 @@ class EunomiaMcpMiddleware(Middleware):
         call_next: CallNext[types.ListPromptsRequest, list[Prompt]],
     ) -> list[Prompt]:
         prompts = await call_next(context)
-        return self._authorize_listing(context, prompts)
+        return await self._authorize_listing(context, prompts)

@@ -12,9 +12,9 @@ With the Eunomia MCP Middleware, you can control which tools, resources and prom
 
 - 🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
 - 📊 **Audit Logging**: Track all authorization decisions and violations
+- 🔄 **Centralized Policy Enforcement**: Optionally use a remote Eunomia server for centralized policy enforcement
 - ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
 - 🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
-- 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
 ## How It Works
 
@@ -64,10 +64,6 @@ sequenceDiagram
 ```bash
 pip install eunomia-mcp
 ```
-
-!!! info
-
-    The middleware requires a running [Eunomia server](../server/pdp/run_server.md) to make authorization decisions.
 
 ## User Workflows
 
