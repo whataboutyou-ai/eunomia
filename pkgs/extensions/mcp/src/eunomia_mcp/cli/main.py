@@ -11,9 +11,9 @@ from eunomia_mcp.cli.utils import (
     SAMPLE_SERVER_CODE,
     generate_custom_policy_from_mcp,
     load_mcp_instance,
-    load_policy_config,
     push_policy_config,
 )
+from eunomia_mcp.utils import load_policy_config
 
 app = typer.Typer(
     name="eunomia-mcp",
@@ -122,7 +122,7 @@ def push(
         help="Eunomia server API key",
     ),
 ):
-    """Push a policy configuration file to Eunomia."""
+    """Push a policy configuration file to a remote Eunomia server."""
     if overwrite:
         if not typer.confirm(
             "Are you sure you want to push this policy to Eunomia "
@@ -134,7 +134,7 @@ def push(
     try:
         client = EunomiaClient(endpoint=eunomia_endpoint, api_key=eunomia_api_key)
         push_policy_config(policy_file, overwrite, client)
-        typer.echo(f"Policy file {policy_file} pushed to Eunomia")
+        typer.echo(f"Policy file {policy_file} pushed to Eunomia at {client._endpoint}")
 
     except Exception as e:
         typer.echo(f"Error pushing policy: {e}", err=True)

@@ -8,6 +8,8 @@ from eunomia_sdk import EunomiaClient
 from fastmcp import FastMCP
 from fastmcp.utilities.components import FastMCPComponent
 
+from eunomia_mcp.utils import load_policy_config
+
 DEFAULT_POLICY = schemas.Policy(
     version="1.0",
     name="mcp-default-policy",
@@ -38,29 +40,12 @@ def add(a: int, b: int) -> int:
     return a + b
 
 # Add middleware to your server
-middleware = create_eunomia_middleware()
+middleware = create_eunomia_middleware(policy_file="mcp_policies.json")
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
 '''
-
-
-def load_policy_config(policy_file: str) -> schemas.Policy:
-    """
-    Load policy configuration from a JSON file.
-
-    Args:
-        policy_file: Path to policy configuration JSON file
-
-    Returns:
-        Policy configuration dictionary
-    """
-    if not os.path.exists(policy_file):
-        raise FileNotFoundError(f"Policy file not found: {policy_file}")
-
-    with open(policy_file, "r") as f:
-        return schemas.Policy.model_validate_json(f.read())
 
 
 def push_policy_config(

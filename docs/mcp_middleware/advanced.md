@@ -28,11 +28,12 @@ middleware = create_eunomia_middleware(
 
 ### Middleware Configuration
 
-| Parameter              | Type   | Default                 | Description                            |
-| ---------------------- | ------ | ----------------------- | -------------------------------------- |
-| `use_remote_eunomia`   | `bool` | `False`                 | Whether to use a remote Eunomia server |
-| `eunomia_endpoint`     | `str`  | `http://localhost:8421` | Eunomia remote server URL              |
-| `enable_audit_logging` | `bool` | `True`                  | Enable request/violation logging       |
+| Parameter              | Type   | Default                 | Description                                                                  |
+| ---------------------- | ------ | ----------------------- | ---------------------------------------------------------------------------- |
+| `policy_file`          | `str`  | `mcp_policies.json`     | Path to policy configuration JSON file, for **embedded** Eunomia server only |
+| `use_remote_eunomia`   | `bool` | `False`                 | Whether to use a remote Eunomia server                                       |
+| `eunomia_endpoint`     | `str`  | `http://localhost:8421` | Eunomia server URL, for **remote** Eunomia server only                       |
+| `enable_audit_logging` | `bool` | `True`                  | Enable request/violation logging                                             |
 
 ## Connect to Remote MCP Servers using a Proxy
 

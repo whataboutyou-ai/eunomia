@@ -7,7 +7,6 @@ from eunomia_mcp.cli.utils import (
     SAMPLE_SERVER_CODE,
     generate_custom_policy_from_mcp,
     load_mcp_instance,
-    load_policy_config,
     push_policy_config,
 )
 from fastmcp import FastMCP
@@ -15,39 +14,6 @@ from fastmcp import FastMCP
 
 class TestCLIUtils:
     """Test CLI utility functions."""
-
-    def test_load_policy_config_success(self, sample_policy_file):
-        """Test successful policy loading."""
-        policy = load_policy_config(str(sample_policy_file))
-
-        assert isinstance(policy, schemas.Policy)
-        assert policy.name == "mcp-default-policy"
-        assert policy.version == "1.0"
-        assert policy.default_effect == enums.PolicyEffect.DENY
-        assert len(policy.rules) == len(DEFAULT_POLICY.rules)
-
-    def test_load_policy_config_file_not_found(self):
-        """Test policy loading with nonexistent file."""
-        with pytest.raises(FileNotFoundError) as exc_info:
-            load_policy_config("nonexistent.json")
-
-        assert "Policy file not found: nonexistent.json" in str(exc_info.value)
-
-    def test_load_policy_config_invalid_json(self, temp_dir):
-        """Test policy loading with invalid JSON."""
-        policy_file = temp_dir / "invalid.json"
-        policy_file.write_text('{"invalid": json}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
-
-    def test_load_policy_config_invalid_schema(self, temp_dir):
-        """Test policy loading with invalid policy schema."""
-        policy_file = temp_dir / "invalid_schema.json"
-        policy_file.write_text('{"invalid": "schema"}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
 
     def test_push_policy_config_success(self, sample_policy_file, mock_eunomia_client):
         """Test successful policy push."""
@@ -118,7 +84,10 @@ class TestConstants:
         """Test that SAMPLE_SERVER_CODE contains expected components."""
         assert "from fastmcp import FastMCP" in SAMPLE_SERVER_CODE
         assert "from eunomia_mcp import create_eunomia_middleware" in SAMPLE_SERVER_CODE
-        assert "middleware = create_eunomia_middleware()" in SAMPLE_SERVER_CODE
+        assert (
+            'middleware = create_eunomia_middleware(policy_file="mcp_policies.json")'
+            in SAMPLE_SERVER_CODE
+        )
         assert "@mcp.tool()" in SAMPLE_SERVER_CODE
         assert "def add(a: int, b: int) -> int:" in SAMPLE_SERVER_CODE
         assert "mcp.run" in SAMPLE_SERVER_CODE

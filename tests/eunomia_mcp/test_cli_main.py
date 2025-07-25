@@ -397,7 +397,10 @@ class TestCLIIntegration:
         result = runner.invoke(app, ["push", "--help"])
 
         assert result.exit_code == 0
-        assert "Push a policy configuration file to Eunomia" in result.stdout
+        assert (
+            "Push a policy configuration file to a remote Eunomia server"
+            in result.stdout
+        )
 
     def test_no_args_shows_help(self, runner):
         """Test that CLI shows help when no arguments provided."""
