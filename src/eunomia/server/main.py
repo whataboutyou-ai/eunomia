@@ -27,7 +27,7 @@ class EunomiaServer:
         if entity.attributes is None:
             entity.attributes = {}
 
-        if entity.uri is not None:
+        if entity.uri and self._fetchers:
             # run all fetchers concurrently
             fetched_results = await asyncio.gather(
                 *[
