@@ -7,8 +7,8 @@ from eunomia_core import schemas
 from eunomia_mcp.middleware import EunomiaMcpMiddleware
 from eunomia_mcp.utils import (
     _get_external_caller_directory,
-    _get_filepath,
     create_eunomia_middleware,
+    get_filepath,
     load_policy_config,
 )
 from pydantic import ValidationError
@@ -30,7 +30,7 @@ class TestLoadPolicyConfig:
         valid_policy_data = {"name": "Test Policy", "version": "1.0.0", "rules": []}
 
         with patch("builtins.open", mock_open(read_data=json.dumps(valid_policy_data))):
-            with patch("eunomia_mcp.utils._get_filepath") as mock_get_filepath:
+            with patch("eunomia_mcp.utils.get_filepath") as mock_get_filepath:
                 mock_get_filepath.return_value = Path("/mock/path/policy.json")
 
                 policy = load_policy_config("mock_policy.json")
@@ -41,7 +41,7 @@ class TestLoadPolicyConfig:
 
     def test_load_policy_config_file_not_found(self):
         """Test loading policy config when file doesn't exist."""
-        with patch("eunomia_mcp.utils._get_filepath") as mock_get_filepath:
+        with patch("eunomia_mcp.utils.get_filepath") as mock_get_filepath:
             mock_get_filepath.side_effect = FileNotFoundError("Policy file not found")
 
             with pytest.raises(FileNotFoundError, match="Policy file not found"):
@@ -52,7 +52,7 @@ class TestLoadPolicyConfig:
         invalid_json = "{ invalid json content"
 
         with patch("builtins.open", mock_open(read_data=invalid_json)):
-            with patch("eunomia_mcp.utils._get_filepath") as mock_get_filepath:
+            with patch("eunomia_mcp.utils.get_filepath") as mock_get_filepath:
                 mock_get_filepath.return_value = Path("/mock/path/policy.json")
 
                 with pytest.raises(
@@ -67,7 +67,7 @@ class TestLoadPolicyConfig:
         with patch(
             "builtins.open", mock_open(read_data=json.dumps(invalid_policy_data))
         ):
-            with patch("eunomia_mcp.utils._get_filepath") as mock_get_filepath:
+            with patch("eunomia_mcp.utils.get_filepath") as mock_get_filepath:
                 mock_get_filepath.return_value = Path("/mock/path/policy.json")
 
                 with pytest.raises(ValidationError):
@@ -75,14 +75,14 @@ class TestLoadPolicyConfig:
 
 
 class TestGetFilepath:
-    """Test suite for _get_filepath function."""
+    """Test suite for get_filepath function."""
 
     def test_strategy_1_absolute_path_exists(self, temp_dir):
         """Test strategy 1: absolute path that exists."""
         test_file = temp_dir / "test.json"
         test_file.write_text('{"test": "data"}')
 
-        result = _get_filepath(str(test_file))
+        result = get_filepath(str(test_file))
 
         assert result == test_file.resolve()
 
@@ -109,7 +109,7 @@ class TestGetFilepath:
                 return super().resolve()
 
         with patch("eunomia_mcp.utils.Path", MockPath):
-            result = _get_filepath("test.json")
+            result = get_filepath("test.json")
             assert result == test_file.resolve()
 
     @patch("pathlib.Path.cwd")
@@ -121,7 +121,7 @@ class TestGetFilepath:
 
         # Use a different working directory for the test
         with patch("os.getcwd", return_value="/different/directory"):
-            result = _get_filepath("test.json")
+            result = get_filepath("test.json")
             assert result == test_file.resolve()
 
     @patch("pathlib.Path.cwd")
@@ -150,7 +150,7 @@ class TestGetFilepath:
                     return str(self) == str(temp_dir / "test.json")
 
             with patch("eunomia_mcp.utils.Path", MockPath):
-                result = _get_filepath("test.json")
+                result = get_filepath("test.json")
                 assert result == test_file.resolve()
 
     def test_strategy_3_relative_to_caller(self, temp_dir):
@@ -186,7 +186,7 @@ class TestGetFilepath:
                 with patch("pathlib.Path.cwd") as mock_cwd:
                     mock_cwd.return_value = Path("/different/directory")
 
-                    result = _get_filepath("test.json")
+                    result = get_filepath("test.json")
                     assert result == test_file.resolve()
 
     def test_strategy_4_file_not_found_anywhere(self, temp_dir):
@@ -220,7 +220,7 @@ class TestGetFilepath:
                     mock_cwd.return_value = Path("/different/directory")
 
                     with pytest.raises(FileNotFoundError) as exc_info:
-                        _get_filepath("nonexistent.json")
+                        get_filepath("nonexistent.json")
 
                     error_message = str(exc_info.value)
                     assert "Policy file not found. Tried:" in error_message
@@ -258,7 +258,7 @@ class TestGetFilepath:
                     mock_cwd.side_effect = OSError("Directory not available")
 
                     with pytest.raises(FileNotFoundError) as exc_info:
-                        _get_filepath("nonexistent.json")
+                        get_filepath("nonexistent.json")
 
                     error_message = str(exc_info.value)
                     assert "current directory not available" in error_message
@@ -442,22 +442,22 @@ class TestUtilsIntegration:
         assert hasattr(policy, "version")
 
     def test_get_filepath_integration_with_temp_file(self, temp_dir):
-        """Test _get_filepath integration with real temporary file."""
+        """Test get_filepath integration with real temporary file."""
         test_file = temp_dir / "integration_test.json"
         test_file.write_text('{"test": "integration"}')
 
         # Test with absolute path
-        result = _get_filepath(str(test_file))
+        result = get_filepath(str(test_file))
         assert result.exists()
         assert result.name == "integration_test.json"
 
     def test_get_filepath_strategies_isolated(self, temp_dir):
-        """Test _get_filepath strategies with controlled environment."""
+        """Test get_filepath strategies with controlled environment."""
         test_file = temp_dir / "strategy_test.json"
         test_file.write_text('{"test": "strategies"}')
 
         # Test strategy 1 (absolute path)
-        result = _get_filepath(str(test_file))
+        result = get_filepath(str(test_file))
         assert result == test_file.resolve()
 
         # Test strategy 2 (relative to CWD) with mocking instead of changing directory
@@ -485,6 +485,6 @@ class TestUtilsIntegration:
             with patch("pathlib.Path.cwd") as mock_cwd:
                 mock_cwd.return_value = temp_dir
 
-                result = _get_filepath("strategy_test.json")
+                result = get_filepath("strategy_test.json")
                 assert result.exists()
                 assert result.name == "strategy_test.json"

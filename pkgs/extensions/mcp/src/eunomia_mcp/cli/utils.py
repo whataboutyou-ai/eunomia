@@ -1,6 +1,5 @@
 import asyncio
 import importlib.util
-import os
 import sys
 
 from eunomia_core import enums, schemas
@@ -8,7 +7,7 @@ from eunomia_sdk import EunomiaClient
 from fastmcp import FastMCP
 from fastmcp.utilities.components import FastMCPComponent
 
-from eunomia_mcp.utils import load_policy_config
+from eunomia_mcp.utils import get_filepath, load_policy_config
 
 DEFAULT_POLICY = schemas.Policy(
     version="1.0",
@@ -99,8 +98,14 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
         module = importlib.import_module(module_path)
     except ImportError:
         # If direct import fails, try loading as file path
-        full_path = module_path if module_path.endswith(".py") else module_path + ".py"
-        if os.path.exists(full_path):
+        try:
+            full_path = get_filepath(
+                module_path if module_path.endswith(".py") else module_path + ".py"
+            )
+        except FileNotFoundError:
+            raise ImportError(f"Cannot import module: {module_path}")
+
+        if full_path.exists():
             spec = importlib.util.spec_from_file_location("custom_mcp", full_path)
             if spec is None or spec.loader is None:
                 raise ImportError(f"Cannot load module from {full_path}")

@@ -21,13 +21,13 @@ def load_policy_config(policy_file: str) -> schemas.Policy:
     Returns:
         Policy configuration dictionary
     """
-    policy_path = _get_filepath(policy_file)
+    policy_path = get_filepath(policy_file)
 
     with open(policy_path, "r") as f:
         return schemas.Policy.model_validate_json(f.read())
 
 
-def _get_filepath(path_str: str) -> Path:
+def get_filepath(path_str: str) -> Path:
     path = Path(path_str)
 
     # Strategy 1: Try the provided path as-is (works for absolute paths and correct relative paths)
