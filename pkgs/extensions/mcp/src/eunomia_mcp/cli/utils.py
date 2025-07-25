@@ -117,6 +117,14 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
     mcp_instance = getattr(module, variable_name)
 
     if not isinstance(mcp_instance, FastMCP):
+        from mcp.server.fastmcp import FastMCP as FastMCPv1
+
+        if isinstance(mcp_instance, FastMCPv1):
+            raise TypeError(
+                f"Object at {mcp_path} is not a FastMCP v2 instance. "
+                f"Got a FastMCP v1 instance instead. "
+                "Please upgrade your MCP server to FastMCP v2."
+            )
         raise TypeError(
             f"Object at {mcp_path} is not a FastMCP instance. "
             f"Got {type(mcp_instance).__name__}"
@@ -125,7 +133,7 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
     return mcp_instance
 
 
-def custom_list_rule(component_type: str, component_names: list[str]) -> schemas.Rule:
+def _custom_list_rule(component_type: str, component_names: list[str]) -> schemas.Rule:
     return schemas.Rule(
         name=f"list-{component_type}",
         description=f"List all {component_type} (tip: exclude from `attributes.name`'s values the ones that you want to hide from the MCP client)",
@@ -147,7 +155,7 @@ def custom_list_rule(component_type: str, component_names: list[str]) -> schemas
     )
 
 
-def custom_execute_rules(
+def _custom_execute_rules(
     component_type: str, components: list[FastMCPComponent]
 ) -> list[schemas.Rule]:
     rules = []
@@ -194,18 +202,18 @@ async def generate_custom_policy_from_mcp(mcp: FastMCP) -> schemas.Policy:
 
     if tools:
         rules.extend(
-            [custom_list_rule("tools", list(tools.keys()))]
-            + custom_execute_rules("tools", list(tools.values()))
+            [_custom_list_rule("tools", list(tools.keys()))]
+            + _custom_execute_rules("tools", list(tools.values()))
         )
     if resources:
         rules.extend(
-            [custom_list_rule("resources", list(resources.keys()))]
-            + custom_execute_rules("resources", list(resources.values()))
+            [_custom_list_rule("resources", list(resources.keys()))]
+            + _custom_execute_rules("resources", list(resources.values()))
         )
     if prompts:
         rules.extend(
-            [custom_list_rule("prompts", list(prompts.keys()))]
-            + custom_execute_rules("prompts", list(prompts.values()))
+            [_custom_list_rule("prompts", list(prompts.keys()))]
+            + _custom_execute_rules("prompts", list(prompts.values()))
         )
 
     return schemas.Policy(

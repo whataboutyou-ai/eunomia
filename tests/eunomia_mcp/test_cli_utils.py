@@ -10,6 +10,7 @@ from eunomia_mcp.cli.utils import (
     push_policy_config,
 )
 from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP as FastMCPv1
 
 
 class TestCLIUtils:
@@ -254,6 +255,22 @@ class TestLoadMcpInstance:
             exc_info.value
         )
         assert "Got str" in str(exc_info.value)
+
+    @patch("eunomia_mcp.cli.utils.importlib.import_module")
+    def test_load_mcp_instance_fastmcp_v1_instance(self, mock_import_module):
+        """Test load_mcp_instance with object that's a FastMCP v1 instance."""
+        # Create a simple mock module without any async attributes
+        mock_module = type("MockModule", (), {})()
+        mock_module.mcp = FastMCPv1("test-server")
+        mock_import_module.return_value = mock_module
+
+        with pytest.raises(TypeError) as exc_info:
+            load_mcp_instance("test.module:mcp")
+
+        assert "Object at test.module:mcp is not a FastMCP v2 instance" in str(
+            exc_info.value
+        )
+        assert "Got a FastMCP v1 instance instead" in str(exc_info.value)
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
     @patch("eunomia_mcp.cli.utils.os.path.exists")
