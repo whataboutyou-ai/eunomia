@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Engine config
+    ENGINE_SQL_DATABASE: bool = True
     ENGINE_SQL_DATABASE_URL: str = "sqlite:///./.db/eunomia_db.sqlite"
 
     # Fetcher config

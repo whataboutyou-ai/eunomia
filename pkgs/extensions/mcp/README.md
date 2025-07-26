@@ -11,9 +11,9 @@ Add **policy-based authorization** to your [MCP][mcp-docs] servers built on [Fas
 
 - 🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
 - 📊 **Audit Logging**: Track all authorization decisions and violations
+- 🔄 **Centralized Policy Enforcement**: Optionally use a remote Eunomia server for centralized policy enforcement
 - ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
 - 🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
-- 🎯 **MCP-Aware**: Built-in understanding of MCP protocol (tools, resources, prompts)
 
 ### Architecture
 
@@ -68,11 +68,11 @@ pip install eunomia-mcp
 
 ### Create a MCP Server with Middleware
 
-#### Basic Integration
+#### Basic Integration with embedded Eunomia server
 
 ```python
 from fastmcp import FastMCP
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 
 # Create your FastMCP server
 mcp = FastMCP("Secure MCP Server 🔒")
@@ -82,29 +82,15 @@ def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
-# Add Eunomia authorization middleware
-middleware = EunomiaMcpMiddleware()
-
-# Apply middleware to MCP server
+# Add middleware to your server
+middleware = create_eunomia_middleware(policy_file="mcp_policies.json")
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
 ```
 
-> [!IMPORTANT]
->
-> [Eunomia][eunomia-github] is a standalone server that handles the policy decisions, you must have it running alongside the MCP server.
->
-> Run it in the background with Docker:
->
-> ```bash
-> docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
-> ```
->
-> Or refer to the [Eunomia documentation][eunomia-docs-run-server] for more options.
-
-#### Advanced Integration
+#### Advanced Integration with remote Eunomia server
 
 Configure the middleware with custom options for production deployments:
 
@@ -116,13 +102,26 @@ mcp = FastMCP("Secure MCP Server 🔒")
 
 # Configure middleware with custom options
 middleware = create_eunomia_middleware(
+    use_remote_eunomia=True,
     eunomia_endpoint="https://your-eunomia-server.com",
-    eunomia_api_key="your-api-key",
     enable_audit_logging=True,
 )
 
 mcp.add_middleware(middleware)
 ```
+
+> [!IMPORTANT]
+>
+> You can use [Eunomia][eunomia-github] as a centralized policy decision point for multiple MCP servers,
+> which is especially relevant in enterprise scenarios.
+>
+> You can run the Eunomia server in the background with Docker:
+>
+> ```bash
+> docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
+> ```
+>
+> Or refer to [Eunomia documentation][eunomia-docs-run-server] for additional running options.
 
 ### Policy Configuration
 
@@ -207,7 +206,7 @@ You can customize principal extraction by subclassing the middleware:
 
 ```python
 from eunomia_core import schemas
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp.middleware import EunomiaMcpMiddleware
 
 class CustomAuthMiddleware(EunomiaMcpMiddleware):
     def _extract_principal(self) -> schemas.PrincipalCheck:
@@ -241,6 +240,8 @@ logger = logging.getLogger("eunomia_mcp")
 ### [(Sample) Planetary Weather MCP][example-planetary-weather-mcp]
 
 ### [WhatsApp MCP to Authorized Contacts][example-whatsapp-mcp]
+
+## Documentation
 
 Explore the detailed [documentation][eunomia-docs-mcp-middleware] for more advanced configuration and scenarios.
 

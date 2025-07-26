@@ -5,6 +5,7 @@ from eunomia_core import schemas
 from eunomia.config import settings
 from eunomia.engine import PolicyEngine
 from eunomia.fetchers import FetcherFactory
+from eunomia.utils.batch_processor import BatchProcessor
 
 
 class EunomiaServer:
@@ -18,12 +19,15 @@ class EunomiaServer:
         self.engine = PolicyEngine()
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
+        self._batch_processor = BatchProcessor(
+            batch_size=settings.BULK_CHECK_BATCH_SIZE
+        )
 
     async def _fetch_all_attributes(self, entity: schemas.EntityCheck) -> None:
         if entity.attributes is None:
             entity.attributes = {}
 
-        if entity.uri is not None:
+        if entity.uri and self._fetchers:
             # run all fetchers concurrently
             fetched_results = await asyncio.gather(
                 *[
@@ -73,3 +77,16 @@ class EunomiaServer:
             self._fetch_all_attributes(request.resource),
         )
         return self.engine.evaluate_all(request)
+
+    async def bulk_check(
+        self, requests: list[schemas.CheckRequest]
+    ) -> list[schemas.CheckResponse]:
+        if not requests:
+            raise ValueError("Empty request list")
+
+        if len(requests) > settings.BULK_CHECK_MAX_REQUESTS:
+            raise ValueError(
+                f"Too many requests. Maximum allowed: {settings.BULK_CHECK_MAX_REQUESTS}",
+            )
+
+        return await self._batch_processor.run(requests, self.check)

@@ -1,12 +1,13 @@
 import asyncio
 import importlib.util
-import os
 import sys
 
 from eunomia_core import enums, schemas
 from eunomia_sdk import EunomiaClient
 from fastmcp import FastMCP
 from fastmcp.utilities.components import FastMCPComponent
+
+from eunomia_mcp.utils import get_filepath, load_policy_config
 
 DEFAULT_POLICY = schemas.Policy(
     version="1.0",
@@ -27,7 +28,7 @@ DEFAULT_POLICY = schemas.Policy(
 
 SAMPLE_SERVER_CODE = '''
 from fastmcp import FastMCP
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 
 # Create your FastMCP server
 mcp = FastMCP("Secure MCP Server 🔒")
@@ -37,32 +38,13 @@ def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
-# Add Eunomia authorization middleware
-middleware = EunomiaMcpMiddleware()
-
-# Apply middleware to MCP server
+# Add middleware to your server
+middleware = create_eunomia_middleware(policy_file="mcp_policies.json")
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
 '''
-
-
-def load_policy_config(policy_file: str) -> schemas.Policy:
-    """
-    Load policy configuration from a JSON file.
-
-    Args:
-        policy_file: Path to policy configuration JSON file
-
-    Returns:
-        Policy configuration dictionary
-    """
-    if not os.path.exists(policy_file):
-        raise FileNotFoundError(f"Policy file not found: {policy_file}")
-
-    with open(policy_file, "r") as f:
-        return schemas.Policy.model_validate_json(f.read())
 
 
 def push_policy_config(
@@ -116,8 +98,14 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
         module = importlib.import_module(module_path)
     except ImportError:
         # If direct import fails, try loading as file path
-        full_path = module_path if module_path.endswith(".py") else module_path + ".py"
-        if os.path.exists(full_path):
+        try:
+            full_path = get_filepath(
+                module_path if module_path.endswith(".py") else module_path + ".py"
+            )
+        except FileNotFoundError:
+            raise ImportError(f"Cannot import module: {module_path}")
+
+        if full_path.exists():
             spec = importlib.util.spec_from_file_location("custom_mcp", full_path)
             if spec is None or spec.loader is None:
                 raise ImportError(f"Cannot load module from {full_path}")
@@ -134,6 +122,14 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
     mcp_instance = getattr(module, variable_name)
 
     if not isinstance(mcp_instance, FastMCP):
+        from mcp.server.fastmcp import FastMCP as FastMCPv1
+
+        if isinstance(mcp_instance, FastMCPv1):
+            raise TypeError(
+                f"Object at {mcp_path} is not a FastMCP v2 instance. "
+                f"Got a FastMCP v1 instance instead. "
+                "Please upgrade your MCP server to FastMCP v2."
+            )
         raise TypeError(
             f"Object at {mcp_path} is not a FastMCP instance. "
             f"Got {type(mcp_instance).__name__}"
@@ -142,7 +138,7 @@ def load_mcp_instance(mcp_path: str) -> FastMCP:
     return mcp_instance
 
 
-def custom_list_rule(component_type: str, component_names: list[str]) -> schemas.Rule:
+def _custom_list_rule(component_type: str, component_names: list[str]) -> schemas.Rule:
     return schemas.Rule(
         name=f"list-{component_type}",
         description=f"List all {component_type} (tip: exclude from `attributes.name`'s values the ones that you want to hide from the MCP client)",
@@ -164,7 +160,7 @@ def custom_list_rule(component_type: str, component_names: list[str]) -> schemas
     )
 
 
-def custom_execute_rules(
+def _custom_execute_rules(
     component_type: str, components: list[FastMCPComponent]
 ) -> list[schemas.Rule]:
     rules = []
@@ -211,18 +207,18 @@ async def generate_custom_policy_from_mcp(mcp: FastMCP) -> schemas.Policy:
 
     if tools:
         rules.extend(
-            [custom_list_rule("tools", list(tools.keys()))]
-            + custom_execute_rules("tools", list(tools.values()))
+            [_custom_list_rule("tools", list(tools.keys()))]
+            + _custom_execute_rules("tools", list(tools.values()))
         )
     if resources:
         rules.extend(
-            [custom_list_rule("resources", list(resources.keys()))]
-            + custom_execute_rules("resources", list(resources.values()))
+            [_custom_list_rule("resources", list(resources.keys()))]
+            + _custom_execute_rules("resources", list(resources.values()))
         )
     if prompts:
         rules.extend(
-            [custom_list_rule("prompts", list(prompts.keys()))]
-            + custom_execute_rules("prompts", list(prompts.values()))
+            [_custom_list_rule("prompts", list(prompts.keys()))]
+            + _custom_execute_rules("prompts", list(prompts.values()))
         )
 
     return schemas.Policy(

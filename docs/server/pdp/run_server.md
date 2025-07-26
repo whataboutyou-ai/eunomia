@@ -10,6 +10,7 @@ To run the Eunomia server, you must configure the following parameters:
 | ------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------- |
 | `PROJECT_NAME`            | Name of the project                                         | `Eunomia Server`                                                        |
 | `DEBUG`                   | Flag to enable debug mode                                   | `False`                                                                 |
+| `ENGINE_SQL_DATABASE`     | Flag to enable persistence of policies in a database        | `True`                                                                  |
 | `ENGINE_SQL_DATABASE_URL` | Path to the policy database file                            | `sqlite:///.db/eunomia_db.sqlite`                                       |
 | `FETCHERS`                | Dictionary of fetchers to use                               | `{"registry": {"sql_database_url": "sqlite:///.db/eunomia_db.sqlite"}}` |
 | `ADMIN_API_KEY`           | Optional pre-shared key for Admin API authentication        | `None`                                                                  |

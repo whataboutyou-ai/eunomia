@@ -47,4 +47,5 @@ def mock_eunomia_client():
     client.get_policies.return_value = []
     client.delete_policy.return_value = None
     client.create_policy.return_value = None
+    client._endpoint = "http://localhost:8421"
     return client

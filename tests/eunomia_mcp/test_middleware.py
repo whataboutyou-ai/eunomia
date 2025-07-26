@@ -2,6 +2,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from eunomia_core.schemas import CheckResponse
+from eunomia_mcp.bridge import EunomiaMode
 from eunomia_mcp.middleware import EunomiaMcpMiddleware
 from fastmcp.exceptions import ToolError
 from fastmcp.prompts.prompt import Prompt
@@ -28,8 +29,9 @@ class TestEunomiaMcpMiddleware:
 
     @pytest.fixture
     def middleware(self, mock_eunomia_client):
-        """Create middleware instance."""
+        """Create middleware instance using CLIENT mode."""
         return EunomiaMcpMiddleware(
+            mode=EunomiaMode.CLIENT,
             eunomia_client=mock_eunomia_client,
             enable_audit_logging=True,
         )
@@ -145,44 +147,48 @@ class TestEunomiaMcpMiddleware:
         assert resource.attributes["name"] == "test_prompt"
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_execution_success(
+    @pytest.mark.asyncio
+    async def test_authorize_execution_success(
         self, mock_get_headers, middleware, mock_context, mock_tool
     ):
         """Test successful authorization for component call."""
         mock_get_headers.return_value = {"x-agent-id": "test-agent"}
-        middleware._eunomia_client.check.return_value = CheckResponse(
+        middleware._eunomia._client.check.return_value = CheckResponse(
             allowed=True, reason="Authorized"
         )
 
         # Should not raise any exception
-        middleware._authorize_execution(mock_context, mock_tool)
+        await middleware._authorize_execution(mock_context, mock_tool)
 
-        middleware._eunomia_client.check.assert_called_once()
+        middleware._eunomia._client.check.assert_called_once()
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_execution_failure(
+    @pytest.mark.asyncio
+    async def test_authorize_execution_failure(
         self, mock_get_headers, middleware, mock_context, mock_tool
     ):
         """Test authorization failure for component call."""
         mock_get_headers.return_value = {"x-agent-id": "test-agent"}
-        middleware._eunomia_client.check.return_value = CheckResponse(
+        middleware._eunomia._client.check.return_value = CheckResponse(
             allowed=False, reason="Access denied"
         )
 
         with pytest.raises(ToolError, match="Access denied"):
-            middleware._authorize_execution(mock_context, mock_tool)
+            await middleware._authorize_execution(mock_context, mock_tool)
 
-    def test_authorize_execution_disabled_component(
+    @pytest.mark.asyncio
+    async def test_authorize_execution_disabled_component(
         self, middleware, mock_context, mock_tool
     ):
         """Test authorization failure for disabled component."""
         mock_tool.enabled = False
 
         with pytest.raises(ToolError, match="Access denied: test_tool is disabled"):
-            middleware._authorize_execution(mock_context, mock_tool)
+            await middleware._authorize_execution(mock_context, mock_tool)
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_listing_success(
+    @pytest.mark.asyncio
+    async def test_authorize_listing_success(
         self, mock_get_headers, middleware, mock_context
     ):
         """Test successful authorization for list operation."""
@@ -200,19 +206,20 @@ class TestEunomiaMcpMiddleware:
 
         components = [tool1, tool2]
 
-        middleware._eunomia_client.bulk_check.return_value = [
+        middleware._eunomia._client.bulk_check.return_value = [
             CheckResponse(allowed=True, reason="Authorized"),
             CheckResponse(allowed=True, reason="Authorized"),
         ]
 
-        result = middleware._authorize_listing(mock_context, components)
+        result = await middleware._authorize_listing(mock_context, components)
 
         assert len(result) == 2
         assert result == components
-        middleware._eunomia_client.bulk_check.assert_called_once()
+        middleware._eunomia._client.bulk_check.assert_called_once()
 
     @patch("eunomia_mcp.middleware.get_http_headers")
-    def test_authorize_listing_partial_filtering(
+    @pytest.mark.asyncio
+    async def test_authorize_listing_partial_filtering(
         self, mock_get_headers, middleware, mock_context
     ):
         """Test partial filtering in list operation."""
@@ -230,19 +237,20 @@ class TestEunomiaMcpMiddleware:
 
         components = [tool1, tool2]
 
-        middleware._eunomia_client.bulk_check.return_value = [
+        middleware._eunomia._client.bulk_check.return_value = [
             CheckResponse(allowed=True, reason="Authorized"),
             CheckResponse(allowed=False, reason="Access denied"),
         ]
 
-        result = middleware._authorize_listing(mock_context, components)
+        result = await middleware._authorize_listing(mock_context, components)
 
         assert len(result) == 1
         assert result[0] == tool1
 
-    def test_authorize_listing_empty_components(self, middleware, mock_context):
+    @pytest.mark.asyncio
+    async def test_authorize_listing_empty_components(self, middleware, mock_context):
         """Test authorization with empty components list."""
-        result = middleware._authorize_listing(mock_context, [])
+        result = await middleware._authorize_listing(mock_context, [])
         assert result == []
 
     @patch("eunomia_mcp.middleware.logger")
@@ -441,15 +449,21 @@ class TestEunomiaMcpMiddleware:
 
     def test_middleware_initialization(self):
         """Test middleware initialization with different parameters."""
-        # Test with default client
-        middleware = EunomiaMcpMiddleware()
-        assert middleware._eunomia_client is not None
+        # Test SERVER mode
+        custom_server = Mock()
+        middleware = EunomiaMcpMiddleware(eunomia_server=custom_server)
+        assert middleware._eunomia is not None
+        assert middleware._eunomia._server is custom_server
+        assert middleware._eunomia._client is None
         assert middleware._enable_audit_logging is True
 
-        # Test with custom client
+        # Test CLIENT mode
         custom_client = Mock()
         middleware = EunomiaMcpMiddleware(
-            eunomia_client=custom_client, enable_audit_logging=False
+            mode=EunomiaMode.CLIENT,
+            eunomia_client=custom_client,
+            enable_audit_logging=False,
         )
-        assert middleware._eunomia_client is custom_client
+        assert middleware._eunomia._client is custom_client
+        assert middleware._eunomia._server is None
         assert middleware._enable_audit_logging is False

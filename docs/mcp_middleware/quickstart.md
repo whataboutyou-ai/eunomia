@@ -10,35 +10,25 @@ pip install eunomia-mcp
 
 ```python title="server.py"
 from fastmcp import FastMCP
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp import create_eunomia_middleware
 
-mcp = FastMCP("Secure FastMCP Server 🔒")
+# Create your FastMCP server
+mcp = FastMCP("Secure MCP Server 🔒")
 
 @mcp.tool()
 def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
-middleware = EunomiaMcpMiddleware()
+# Add middleware to your server
+middleware = create_eunomia_middleware(policy_file="mcp_policies.json")
 mcp.add_middleware(middleware)
 
 if __name__ == "__main__":
     mcp.run()
 ```
 
-## Step 3: Start Eunomia Server
-
-The middleware requires a running Eunomia server to make policy decisions.
-
-Run it in the background with Docker:
-
-```bash
-docker run -d -p 8421:8421 --name eunomia ttommitt/eunomia-server:latest
-```
-
-Or refer to the [Eunomia server documentation](../server/pdp/run_server.md) for additional configuration options.
-
-## Step 4: Start Your Server
+## Step 3: Use Your Server
 
 You can now run your MCP server normally:
 

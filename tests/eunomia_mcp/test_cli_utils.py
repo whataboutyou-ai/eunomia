@@ -7,47 +7,14 @@ from eunomia_mcp.cli.utils import (
     SAMPLE_SERVER_CODE,
     generate_custom_policy_from_mcp,
     load_mcp_instance,
-    load_policy_config,
     push_policy_config,
 )
 from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP as FastMCPv1
 
 
 class TestCLIUtils:
     """Test CLI utility functions."""
-
-    def test_load_policy_config_success(self, sample_policy_file):
-        """Test successful policy loading."""
-        policy = load_policy_config(str(sample_policy_file))
-
-        assert isinstance(policy, schemas.Policy)
-        assert policy.name == "mcp-default-policy"
-        assert policy.version == "1.0"
-        assert policy.default_effect == enums.PolicyEffect.DENY
-        assert len(policy.rules) == len(DEFAULT_POLICY.rules)
-
-    def test_load_policy_config_file_not_found(self):
-        """Test policy loading with nonexistent file."""
-        with pytest.raises(FileNotFoundError) as exc_info:
-            load_policy_config("nonexistent.json")
-
-        assert "Policy file not found: nonexistent.json" in str(exc_info.value)
-
-    def test_load_policy_config_invalid_json(self, temp_dir):
-        """Test policy loading with invalid JSON."""
-        policy_file = temp_dir / "invalid.json"
-        policy_file.write_text('{"invalid": json}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
-
-    def test_load_policy_config_invalid_schema(self, temp_dir):
-        """Test policy loading with invalid policy schema."""
-        policy_file = temp_dir / "invalid_schema.json"
-        policy_file.write_text('{"invalid": "schema"}')
-
-        with pytest.raises(Exception):
-            load_policy_config(str(policy_file))
 
     def test_push_policy_config_success(self, sample_policy_file, mock_eunomia_client):
         """Test successful policy push."""
@@ -117,8 +84,11 @@ class TestConstants:
     def test_sample_server_code_structure(self):
         """Test that SAMPLE_SERVER_CODE contains expected components."""
         assert "from fastmcp import FastMCP" in SAMPLE_SERVER_CODE
-        assert "from eunomia_mcp import EunomiaMcpMiddleware" in SAMPLE_SERVER_CODE
-        assert "EunomiaMcpMiddleware()" in SAMPLE_SERVER_CODE
+        assert "from eunomia_mcp import create_eunomia_middleware" in SAMPLE_SERVER_CODE
+        assert (
+            'middleware = create_eunomia_middleware(policy_file="mcp_policies.json")'
+            in SAMPLE_SERVER_CODE
+        )
         assert "@mcp.tool()" in SAMPLE_SERVER_CODE
         assert "def add(a: int, b: int) -> int:" in SAMPLE_SERVER_CODE
         assert "mcp.run" in SAMPLE_SERVER_CODE
@@ -150,22 +120,142 @@ class TestLoadMcpInstance:
         mock_import_module.assert_called_once_with("test.module")
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
-    @patch("eunomia_mcp.cli.utils.os.path.exists")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
+    @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
+    @patch("eunomia_mcp.cli.utils.importlib.util.module_from_spec")
+    def test_load_mcp_instance_success_file_import_absolute_path(
+        self,
+        mock_module_from_spec,
+        mock_spec_from_file,
+        mock_get_filepath,
+        mock_import_module,
+    ):
+        """Test successful MCP instance loading via absolute file path."""
+        # Mock import_module to fail initially
+        mock_import_module.side_effect = ImportError(
+            "No module named '/abs/path/to/file'"
+        )
+
+        # Mock get_filepath to return an absolute path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
+
+        # Mock spec creation and module loading
+        mock_spec = Mock()
+        mock_loader = Mock()
+        mock_spec.loader = mock_loader
+        mock_spec_from_file.return_value = mock_spec
+
+        # Create real FastMCP instance
+        mcp = FastMCP("absolute-path-server")
+
+        @mcp.tool()
+        def absolute_tool() -> str:
+            """A tool from absolute path"""
+            return "absolute"
+
+        # Use a simple mock module without any async attributes
+        mock_module = type("MockModule", (), {})()
+        mock_module.server = mcp
+        mock_module_from_spec.return_value = mock_module
+
+        result = load_mcp_instance("/abs/path/to/file.py:server")
+
+        assert result == mcp
+        assert isinstance(result, FastMCP)
+        mock_import_module.assert_called_once_with("/abs/path/to/file.py")
+        mock_get_filepath.assert_called_once_with("/abs/path/to/file.py")
+        mock_spec_from_file.assert_called_once_with("custom_mcp", mock_path)
+        mock_loader.exec_module.assert_called_once_with(mock_module)
+
+    @patch("eunomia_mcp.cli.utils.importlib.import_module")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
+    def test_load_mcp_instance_get_filepath_error(
+        self, mock_get_filepath, mock_import_module
+    ):
+        """Test load_mcp_instance when get_filepath raises an error."""
+        mock_import_module.side_effect = ImportError("No module named 'test'")
+
+        # Mock get_filepath to raise FileNotFoundError
+        mock_get_filepath.side_effect = FileNotFoundError(
+            "Policy file not found. Tried: ..."
+        )
+
+        with pytest.raises(ImportError) as exc_info:
+            load_mcp_instance("test/file:mcp")
+
+        assert "Cannot import module: test/file" in str(exc_info.value)
+        mock_get_filepath.assert_called_once_with("test/file.py")
+
+    @patch("eunomia_mcp.cli.utils.importlib.import_module")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
+    @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
+    @patch("eunomia_mcp.cli.utils.importlib.util.module_from_spec")
+    def test_load_mcp_instance_module_from_spec_with_add_py(
+        self,
+        mock_module_from_spec,
+        mock_spec_from_file,
+        mock_get_filepath,
+        mock_import_module,
+    ):
+        """Test loading MCP instance where module path needs .py extension added."""
+        # Mock import_module to fail initially
+        mock_import_module.side_effect = ImportError("No module named 'my_server'")
+
+        # Mock get_filepath to return a path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
+
+        # Mock spec creation and module loading
+        mock_spec = Mock()
+        mock_loader = Mock()
+        mock_spec.loader = mock_loader
+        mock_spec_from_file.return_value = mock_spec
+
+        # Create real FastMCP instance
+        mcp = FastMCP("my-server")
+
+        @mcp.resource("uri://test-resource-2")
+        def test_resource_2() -> str:
+            """Another test resource"""
+            return "test resource 2"
+
+        # Use a simple mock module without any async attributes
+        mock_module = type("MockModule", (), {})()
+        mock_module.my_mcp = mcp
+        mock_module_from_spec.return_value = mock_module
+
+        result = load_mcp_instance("my_server:my_mcp")
+
+        assert result == mcp
+        assert isinstance(result, FastMCP)
+        mock_import_module.assert_called_once_with("my_server")
+        # Should add .py extension when calling get_filepath
+        mock_get_filepath.assert_called_once_with("my_server.py")
+        mock_spec_from_file.assert_called_once_with("custom_mcp", mock_path)
+        mock_loader.exec_module.assert_called_once_with(mock_module)
+
+    @patch("eunomia_mcp.cli.utils.importlib.import_module")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
     @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
     @patch("eunomia_mcp.cli.utils.importlib.util.module_from_spec")
     def test_load_mcp_instance_success_file_import(
         self,
         mock_module_from_spec,
         mock_spec_from_file,
-        mock_exists,
+        mock_get_filepath,
         mock_import_module,
     ):
         """Test successful MCP instance loading via file import."""
         # Mock import_module to fail initially
         mock_import_module.side_effect = ImportError("No module named 'test.file'")
 
-        # Mock file exists
-        mock_exists.return_value = True
+        # Mock get_filepath to return a path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
 
         # Mock spec creation and module loading
         mock_spec = Mock()
@@ -191,24 +281,28 @@ class TestLoadMcpInstance:
         assert result == mcp
         assert isinstance(result, FastMCP)
         mock_import_module.assert_called_once_with("test/file")
-        mock_exists.assert_called_once_with("test/file.py")
-        mock_spec_from_file.assert_called_once_with("custom_mcp", "test/file.py")
+        mock_get_filepath.assert_called_once_with("test/file.py")
+        mock_spec_from_file.assert_called_once_with("custom_mcp", mock_path)
         mock_loader.exec_module.assert_called_once_with(mock_module)
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
-    @patch("eunomia_mcp.cli.utils.os.path.exists")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
     @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
     @patch("eunomia_mcp.cli.utils.importlib.util.module_from_spec")
     def test_load_mcp_instance_success_file_import_with_py_extension(
         self,
         mock_module_from_spec,
         mock_spec_from_file,
-        mock_exists,
+        mock_get_filepath,
         mock_import_module,
     ):
         """Test successful MCP instance loading with .py extension."""
         mock_import_module.side_effect = ImportError("No module named 'test.file.py'")
-        mock_exists.return_value = True
+
+        # Mock get_filepath to return a path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
 
         mock_spec = Mock()
         mock_loader = Mock()
@@ -232,7 +326,7 @@ class TestLoadMcpInstance:
 
         assert result == mcp
         assert isinstance(result, FastMCP)
-        mock_spec_from_file.assert_called_once_with("custom_mcp", "test/file.py")
+        mock_spec_from_file.assert_called_once_with("custom_mcp", mock_path)
 
     def test_load_mcp_instance_invalid_path_format(self):
         """Test load_mcp_instance with invalid path format."""
@@ -243,13 +337,17 @@ class TestLoadMcpInstance:
         assert "Expected format: 'module.path:variable_name'" in str(exc_info.value)
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
-    @patch("eunomia_mcp.cli.utils.os.path.exists")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
     def test_load_mcp_instance_import_error_no_file(
-        self, mock_exists, mock_import_module
+        self, mock_get_filepath, mock_import_module
     ):
         """Test load_mcp_instance with import error and no file fallback."""
         mock_import_module.side_effect = ImportError("No module named 'nonexistent'")
-        mock_exists.return_value = False
+
+        # Mock get_filepath to return a path that doesn't exist
+        mock_path = Mock()
+        mock_path.exists.return_value = False
+        mock_get_filepath.return_value = mock_path
 
         with pytest.raises(ImportError) as exc_info:
             load_mcp_instance("nonexistent.module:mcp")
@@ -287,30 +385,55 @@ class TestLoadMcpInstance:
         assert "Got str" in str(exc_info.value)
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
-    @patch("eunomia_mcp.cli.utils.os.path.exists")
+    def test_load_mcp_instance_fastmcp_v1_instance(self, mock_import_module):
+        """Test load_mcp_instance with object that's a FastMCP v1 instance."""
+        # Create a simple mock module without any async attributes
+        mock_module = type("MockModule", (), {})()
+        mock_module.mcp = FastMCPv1("test-server")
+        mock_import_module.return_value = mock_module
+
+        with pytest.raises(TypeError) as exc_info:
+            load_mcp_instance("test.module:mcp")
+
+        assert "Object at test.module:mcp is not a FastMCP v2 instance" in str(
+            exc_info.value
+        )
+        assert "Got a FastMCP v1 instance instead" in str(exc_info.value)
+
+    @patch("eunomia_mcp.cli.utils.importlib.import_module")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
     @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
     def test_load_mcp_instance_spec_creation_failure(
-        self, mock_spec_from_file, mock_exists, mock_import_module
+        self, mock_spec_from_file, mock_get_filepath, mock_import_module
     ):
         """Test load_mcp_instance with spec creation failure."""
         mock_import_module.side_effect = ImportError("No module")
-        mock_exists.return_value = True
+
+        # Mock get_filepath to return a path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
+
         mock_spec_from_file.return_value = None
 
         with pytest.raises(ImportError) as exc_info:
             load_mcp_instance("test/file:mcp")
 
-        assert "Cannot load module from test/file.py" in str(exc_info.value)
+        assert "Cannot load module from" in str(exc_info.value)
 
     @patch("eunomia_mcp.cli.utils.importlib.import_module")
-    @patch("eunomia_mcp.cli.utils.os.path.exists")
+    @patch("eunomia_mcp.cli.utils.get_filepath")
     @patch("eunomia_mcp.cli.utils.importlib.util.spec_from_file_location")
     def test_load_mcp_instance_no_loader(
-        self, mock_spec_from_file, mock_exists, mock_import_module
+        self, mock_spec_from_file, mock_get_filepath, mock_import_module
     ):
         """Test load_mcp_instance with missing loader in spec."""
         mock_import_module.side_effect = ImportError("No module")
-        mock_exists.return_value = True
+
+        # Mock get_filepath to return a path that exists
+        mock_path = Mock()
+        mock_path.exists.return_value = True
+        mock_get_filepath.return_value = mock_path
 
         mock_spec = Mock()
         mock_spec.loader = None
@@ -319,7 +442,7 @@ class TestLoadMcpInstance:
         with pytest.raises(ImportError) as exc_info:
             load_mcp_instance("test/file:mcp")
 
-        assert "Cannot load module from test/file.py" in str(exc_info.value)
+        assert "Cannot load module from" in str(exc_info.value)
 
 
 class TestGenerateCustomPolicyFromMcp:

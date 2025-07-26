@@ -31,7 +31,7 @@ For advanced authentication scenarios, you can subclass the `EunomiaMcpMiddlewar
 
 ```python
 from eunomia_core import schemas
-from eunomia_mcp import EunomiaMcpMiddleware
+from eunomia_mcp.middleware import EunomiaMcpMiddleware
 from fastmcp.server.dependencies import get_http_headers
 
 
