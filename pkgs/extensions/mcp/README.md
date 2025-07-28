@@ -127,14 +127,14 @@ mcp.add_middleware(middleware)
 
 Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization policies:
 
-#### Initialize a New Project
+#### Creating Your First Policy
 
 ```bash
 # Create a default policy configuration file
 eunomia-mcp init
 
 # Create a custom policy configuration file from your FastMCP server instance
-eunomia-mcp init --custom-mcp "server.py:mcp"
+eunomia-mcp init --custom-mcp "app.server:mcp"
 
 # Generate both policy configuration file and a sample FastMCP server with Eunomia authorization
 eunomia-mcp init --sample
@@ -142,14 +142,18 @@ eunomia-mcp init --sample
 
 You can edit the created `mcp_policies.json` policy configuration file to your liking. Refer to the [templates][eunomia-github-policy-templates] for example policies and rules.
 
-#### Validate Policy Configuration
+#### Validating Policies
 
 ```bash
 # Validate your policy file
 eunomia-mcp validate mcp_policies.json
 ```
 
-#### Push Policies to Eunomia
+#### Deploying Policies
+
+> [!NOTE]
+>
+> This operation is needed only if you are using a remote Eunomia server, otherwise you can skip this step.
 
 ```bash
 # Push your policy to Eunomia server
@@ -158,11 +162,6 @@ eunomia-mcp push mcp_policies.json
 # Push your policy and overwrite existing ones
 eunomia-mcp push mcp_policies.json --overwrite
 ```
-
-> [!IMPORTANT]
-> You need the Eunomia server running for the push operation.
-
-**Workflow**: Initialize → Customize policies → Validate → Run Eunomia server → Push to Eunomia → Run MCP server
 
 ## Further Reading
 
