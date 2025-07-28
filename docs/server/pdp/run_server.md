@@ -13,7 +13,8 @@ To run the Eunomia server, you must configure the following parameters:
 | `ENGINE_SQL_DATABASE`     | Flag to enable persistence of policies in a database        | `True`                                                                  |
 | `ENGINE_SQL_DATABASE_URL` | Path to the policy database file                            | `sqlite:///.db/eunomia_db.sqlite`                                       |
 | `FETCHERS`                | Dictionary of fetchers to use                               | `{"registry": {"sql_database_url": "sqlite:///.db/eunomia_db.sqlite"}}` |
-| `ADMIN_API_KEY`           | Optional pre-shared key for Admin API authentication        | `None`                                                                  |
+| `ADMIN_AUTHN_REQUIRED`    | Flag to enable Admin API authentication via PSK             | `False`                                                                 |
+| `ADMIN_API_KEY`           | Pre-shared key for Admin API authentication                 | `""`                                                                    |
 | `BULK_CHECK_MAX_REQUESTS` | Maximum number of requests allowed in bulk check operations | `100`                                                                   |
 | `BULK_CHECK_BATCH_SIZE`   | Batch size for processing bulk check requests               | `10`                                                                    |
 

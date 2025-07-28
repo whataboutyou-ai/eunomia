@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,7 +27,8 @@ class Settings(BaseSettings):
     }
 
     # Server config
-    ADMIN_API_KEY: Optional[str] = None
+    ADMIN_AUTHN_REQUIRED: bool = False
+    ADMIN_API_KEY: str = ""
     BULK_CHECK_MAX_REQUESTS: int = 100
     BULK_CHECK_BATCH_SIZE: int = 10
 
