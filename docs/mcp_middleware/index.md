@@ -10,11 +10,11 @@ With the Eunomia MCP Middleware, you can control which tools, resources and prom
 
 ### Key Features
 
-- 🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
-- 📊 **Audit Logging**: Track all authorization decisions and violations
-- 🔄 **Centralized Policy Enforcement**: Optionally use a remote Eunomia server for centralized policy enforcement
-- ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
-- 🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
+-   🔒 **Policy-Based Authorization**: Control which agents can access which MCP tools, resources, and prompts
+-   📊 **Audit Logging**: Track all authorization decisions and violations
+-   🔄 **Centralized Policy Enforcement**: Optionally use a remote Eunomia server for centralized policy enforcement
+-   ⚡ **FastMCP Integration**: One-line middleware integration with FastMCP servers
+-   🔧 **Flexible Configuration**: JSON-based policies for complex dynamic rules with CLI tooling
 
 ## How It Works
 
@@ -69,10 +69,14 @@ pip install eunomia-mcp
 
 Choose your path based on what you want to accomplish:
 
-- 🚀 [Quickstart Guide](quickstart.md): Add authorization to your MCP server in under 5 minutes
-- 🔧 [Policy Configuration](policies.md): Create and manage authorization policies using our CLI tools
-- 👥 [Agent Authentication](authentication.md): Customize agent identification
-- 🏗️ [Advanced Setup](advanced.md): Production deployment, logging and monitoring, troubleshooting
+-   🚀 [Quickstart Guide](quickstart.md): Add authorization to your MCP server in under 5 minutes
+-   🔧 [Policy Configuration](policies.md): Create and manage authorization policies using our CLI tools
+-   👥 [Agent Authentication](authentication.md): Customize agent identification
+-   🏗️ Advanced Features:
+
+    -   [Centralized PDP](advanced/centralized-pdp.md): Use a remote Eunomia server for centralized policy enforcement
+    -   [Use as Proxy Server](advanced/as-proxy.md): Use a proxy to add authorization to any remote MCP server
+    -   [Logging and monitoring](advanced/logging.md): Enable audit logging and monitoring
 
 [mcp-docs]: https://modelcontextprotocol.io
 [fastmcp-docs]: https://gofastmcp.com/
