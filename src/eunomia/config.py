@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from dotenv import load_dotenv
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv(override=True)
@@ -35,6 +36,14 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=True, extra="ignore"
     )
+
+    @model_validator(mode="after")
+    def validate_api_key_when_required(self) -> "Settings":
+        if self.ADMIN_AUTHN_REQUIRED and not self.ADMIN_API_KEY:
+            raise ValueError(
+                "ADMIN_API_KEY is required when ADMIN_AUTHN_REQUIRED is true"
+            )
+        return self
 
 
 @lru_cache()
