@@ -105,7 +105,10 @@ nav:
       - Quickstart: mcp_middleware/quickstart.md
       - Configure Policies: mcp_middleware/policies.md
       - Agent Authentication: mcp_middleware/authentication.md
-      - Advanced Setup: mcp_middleware/advanced.md
+      - Advanced Features:
+          - Centralized Policy Enforcement: mcp_middleware/advanced/centralized-pdp.md
+          - Use as Proxy Server: mcp_middleware/advanced/as-proxy.md
+          - Logging & Monitoring: mcp_middleware/advanced/logging.md
   - API Reference:
       - API Reference: api/index.md
       - Eunomia:

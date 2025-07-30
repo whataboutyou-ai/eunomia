@@ -39,6 +39,7 @@ If the `registry` fetcher is enabled (which is by default), the following endpoi
 To enable Admin API authentication, configure the following environment variable for the Eunomia server:
 
 ```bash
+ADMIN_AUTHN_REQUIRED=true
 ADMIN_API_KEY=your-secure-admin-key-here
 ```
 

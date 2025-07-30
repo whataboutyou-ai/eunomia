@@ -11,7 +11,7 @@ Use the `eunomia-mcp` CLI in your terminal to manage your MCP authorization poli
 eunomia-mcp init
 
 # Create a custom policy configuration file from your FastMCP server instance
-eunomia-mcp init --custom-mcp "server.py:mcp"
+eunomia-mcp init --custom-mcp "app.server:mcp"
 
 # Generate both policy configuration file and a sample FastMCP server with Eunomia authorization
 eunomia-mcp init --sample
@@ -30,7 +30,7 @@ eunomia-mcp validate mcp_policies.json
 
 !!! info
 
-    This operation is needed only if you are using a [remote Eunomia server](advanced.md#centralize-policy-enforcement-with-a-remote-eunomia-server), otherwise you can skip this step.
+    This operation is needed only if you are using a [remote Eunomia server](advanced/centralized-pdp.md), otherwise you can skip this step.
 
 ```bash
 # Push your policy to Eunomia server
@@ -52,9 +52,9 @@ eunomia-mcp push mcp_policies.json --overwrite
 3.  **Validate**: `eunomia-mcp validate mcp_policies.json`
 4.  **Run**: Run your MCP server with middleware
 
-When using a [remote Eunomia server](advanced.md#centralize-policy-enforcement-with-a-remote-eunomia-server), you need to deploy the policy to it:
+When using a [remote Eunomia server](advanced/centralized-pdp.md), you need to deploy the policy to it:
 
--> **Deploy**: `eunomia-mcp push mcp_policies.json` -> **Run**
+→ **Deploy**: `eunomia-mcp push mcp_policies.json` → **Run**
 
 ## MCP Context Extraction
 
