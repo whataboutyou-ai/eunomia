@@ -3,7 +3,7 @@ import asyncio
 from eunomia_core import schemas
 
 from eunomia.config import settings
-from eunomia.engine import PolicyEngine
+from eunomia.engine.opa_engine import OPAPolicyEngine
 from eunomia.fetchers import FetcherFactory
 from eunomia.utils.batch_processor import BatchProcessor
 
@@ -16,7 +16,11 @@ class EunomiaServer:
     """
 
     def __init__(self) -> None:
-        self.engine = PolicyEngine()
+        self.engine = OPAPolicyEngine(
+            base_url=settings.OPA_BASE_URL,
+            policy_path=settings.OPA_POLICY_PATH,
+            timeout=settings.OPA_TIMEOUT,
+        )
         FetcherFactory.initialize_fetchers(settings.FETCHERS)
         self._fetchers = FetcherFactory.get_all_fetchers()
         self._batch_processor = BatchProcessor(
@@ -76,7 +80,7 @@ class EunomiaServer:
             self._fetch_all_attributes(request.principal),
             self._fetch_all_attributes(request.resource),
         )
-        return self.engine.evaluate_all(request)
+        return await self.engine.evaluate_all(request)
 
     async def bulk_check(
         self, requests: list[schemas.CheckRequest]
@@ -90,3 +94,7 @@ class EunomiaServer:
             )
 
         return await self._batch_processor.run(requests, self.check)
+
+    async def close(self) -> None:
+        """Clean up resources when shutting down the server."""
+        await self.engine.close()

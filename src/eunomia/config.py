@@ -27,6 +27,11 @@ class Settings(BaseSettings):
         "registry": {"sql_database_url": "sqlite:///./.db/eunomia_db.sqlite"}
     }
 
+    # OPA config
+    OPA_BASE_URL: str = "http://localhost:8181"
+    OPA_POLICY_PATH: str = "eunomia/allow"
+    OPA_TIMEOUT: int = 30
+
     # Server config
     ADMIN_AUTHN_REQUIRED: bool = False
     ADMIN_API_KEY: str = ""
