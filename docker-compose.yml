@@ -1,0 +1,34 @@
+services:
+  eunomia:
+    build: .
+    ports:
+      - "8421:8421"
+    environment:
+      - OPA_BASE_URL=http://opa:8181
+      - ENGINE_SQL_DATABASE=False
+      - FETCHERS={}
+    depends_on:
+      - opa
+    networks:
+      - eunomia-network
+    restart: unless-stopped
+
+  opa:
+    image: openpolicyagent/opa:latest
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=debug"
+      - "/policies"
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./opa-policies:/policies
+    networks:
+      - eunomia-network
+    restart: unless-stopped
+
+networks:
+  eunomia-network:
+    driver: bridge
