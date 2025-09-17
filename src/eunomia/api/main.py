@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 
@@ -5,8 +7,16 @@ from eunomia.api.routers import admin_router_factory, public_router_factory
 from eunomia.config import settings
 from eunomia.server import EunomiaServer
 
-app = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG)
 server = EunomiaServer()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await server.close()
+
+
+app = FastAPI(title=settings.PROJECT_NAME, debug=settings.DEBUG, lifespan=lifespan)
 
 
 @app.get("/health")
