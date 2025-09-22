@@ -40,7 +40,7 @@ class OPAClient:
         Evaluate a policy in OPA by sending input data to the specified policy path.
 
         Args:
-            policy_path: The policy path (e.g., "eunomia/allow")
+            policy_path: The policy path (e.g., "eunomia/authz")
             input_data: The input data to send to OPA
 
         Returns:

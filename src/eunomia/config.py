@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
     # OPA config
     OPA_BASE_URL: str = "http://localhost:8181"
-    OPA_POLICY_PATH: str = "eunomia/allow"
+    OPA_POLICY_PATH: str = "eunomia/authz"
     OPA_TIMEOUT: int = 30
 
     # Server config

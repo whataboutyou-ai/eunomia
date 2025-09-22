@@ -28,7 +28,7 @@ def sample_check_request():
 def opa_engine():
     """Create an OPA engine instance for testing."""
     return OPAPolicyEngine(
-        base_url="http://localhost:8181", policy_path="eunomia/allow", timeout=30
+        base_url="http://localhost:8181", policy_path="eunomia/authz", timeout=30
     )
 
 
@@ -57,7 +57,7 @@ class TestOPAClient:
             mock_post.return_value.__aexit__ = AsyncMock(return_value=None)
 
             result = await opa_client.evaluate_policy(
-                "eunomia/allow", {"principal": {"role": "admin"}}
+                "eunomia/authz", {"principal": {"role": "admin"}}
             )
 
             assert result == {"result": {"allow": True, "reason": "Test allow"}}
@@ -76,9 +76,9 @@ class TestOPAClient:
             mock_post.return_value.__aexit__ = AsyncMock(return_value=None)
 
             with pytest.raises(
-                OPAException, match="Policy path 'eunomia/allow' not found"
+                OPAException, match="Policy path 'eunomia/authz' not found"
             ):
-                await opa_client.evaluate_policy("eunomia/allow", {})
+                await opa_client.evaluate_policy("eunomia/authz", {})
 
     @pytest.mark.asyncio
     async def test_evaluate_policy_server_error(self, opa_client):
@@ -96,7 +96,7 @@ class TestOPAClient:
             with pytest.raises(
                 OPAException, match="OPA request failed with status 500"
             ):
-                await opa_client.evaluate_policy("eunomia/allow", {})
+                await opa_client.evaluate_policy("eunomia/authz", {})
 
 
 class TestOPAPolicyEngine:
@@ -169,7 +169,7 @@ class TestOPAPolicyEngine:
 
             # Verify the input was prepared correctly
             mock_evaluate.assert_called_once_with(
-                policy_path="eunomia/allow",
+                policy_path="eunomia/authz",
                 input_data={
                     "principal": {
                         "uri": "user://john.doe",
