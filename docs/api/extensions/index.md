@@ -8,3 +8,4 @@ Each extension is built and distributed as a separate package that can be instal
 | -------------- | ------------------- | --------------------------------------------------------------- |
 | MCP Middleware | `eunomia-mcp`       | [:material-arrow-right: Section](../../mcp_middleware/index.md) |
 | LangChain      | `eunomia-langchain` | [:material-arrow-right: Page](langchain.md)                     |
+| SharePoint     | `eunomia-sharepoint` | [:material-arrow-right: Page](sharepoint.md)                   |

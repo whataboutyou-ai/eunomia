@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": false,
+    "nodeVersion": "22.20.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "sharepoint-button",
+    "libraryId": "870ebe35-7e12-4dc9-8111-07789c41cd36",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "sharepoint-button",
+    "solutionShortDescription": "sharepoint-button description",
+    "skipFeatureDeployment": "false",
+    "isDomainIsolated": "false",
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "ButtonFilters",
+    "componentDescription": "Filters multiple existing buttons based on PDP authorization"
+  }
+}
