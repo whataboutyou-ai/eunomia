@@ -10,6 +10,7 @@ from fastmcp.resources.resource import Resource
 from fastmcp.server.middleware import MiddlewareContext
 from fastmcp.tools.tool import Tool
 from mcp import types
+from pydantic import AnyUrl
 
 
 class TestEunomiaMcpMiddleware:
@@ -341,6 +342,7 @@ class TestEunomiaMcpMiddleware:
         self, middleware, mock_context, mock_resource
     ):
         """Test on_read_resource method with successful authorization."""
+        mock_context.message.uri = "file://test.txt"
         mock_context.fastmcp_context.fastmcp.get_resource = AsyncMock(
             return_value=mock_resource
         )
@@ -361,6 +363,40 @@ class TestEunomiaMcpMiddleware:
             mock_authorize.assert_called_once_with(mock_context, mock_resource)
             call_next.assert_called_once_with(mock_context)
             assert result.contents[0].text == "content"
+            # Verify get_resource was called with string URI
+            mock_context.fastmcp_context.fastmcp.get_resource.assert_called_once_with(
+                "file://test.txt"
+            )
+
+    @pytest.mark.asyncio
+    async def test_on_read_resource_with_anyurl_success(
+        self, middleware, mock_context, mock_resource
+    ):
+        mock_context.message.uri = AnyUrl("file://test.txt")
+        mock_context.fastmcp_context.fastmcp.get_resource = AsyncMock(
+            return_value=mock_resource
+        )
+
+        call_next = AsyncMock(
+            return_value=types.ReadResourceResult(
+                contents=[
+                    types.TextResourceContents(
+                        uri="file://test.txt", mimeType="text/plain", text="content"
+                    )
+                ]
+            )
+        )
+
+        with patch.object(middleware, "_authorize_execution") as mock_authorize:
+            result = await middleware.on_read_resource(mock_context, call_next)
+
+            mock_authorize.assert_called_once_with(mock_context, mock_resource)
+            call_next.assert_called_once_with(mock_context)
+            assert result.contents[0].text == "content"
+            # Verify get_resource was called with string (converted from AnyUrl)
+            mock_context.fastmcp_context.fastmcp.get_resource.assert_called_once_with(
+                "file://test.txt/"
+            )
 
     @pytest.mark.asyncio
     async def test_on_get_prompt_success(self, middleware, mock_context, mock_prompt):
