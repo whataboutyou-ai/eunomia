@@ -165,9 +165,9 @@ class EunomiaMcpMiddleware(Middleware):
         context: MiddlewareContext[types.ReadResourceRequestParams],
         call_next: CallNext[types.ReadResourceRequestParams, types.ReadResourceResult],
     ) -> types.ReadResourceResult:
-        resource = await context.fastmcp_context.fastmcp.get_resource(
-            context.message.uri
-        )
+        # Convert AnyUrl to string if necessary
+        uri = str(context.message.uri)
+        resource = await context.fastmcp_context.fastmcp.get_resource(uri)
         await self._authorize_execution(context, resource)
         return await call_next(context)
 
