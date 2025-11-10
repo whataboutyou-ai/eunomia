@@ -1,0 +1,22 @@
+@import '~@fluentui/react/dist/sass/References.scss';
+
+.container {
+  padding: 0.5em;
+  font-size: 12px;
+}
+
+.statusMessage {
+  color: #605e5c;
+  padding: 0.25em 0.5em;
+  background-color: #f3f2f1;
+  border-left: 3px solid #605e5c;
+  border-radius: 2px;
+}
+
+.errorMessage {
+  color: #a4262c;
+  padding: 0.25em 0.5em;
+  background-color: #fde7e9;
+  border-left: 3px solid #a4262c;
+  border-radius: 2px;
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "button-filters-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/buttonFilters/ButtonFiltersWebPart.js",
+          "manifest": "./src/webparts/buttonFilters/ButtonFiltersWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "ButtonFiltersWebPartStrings": "lib/webparts/buttonFilters/loc/{locale}.js"
+  }
+}
