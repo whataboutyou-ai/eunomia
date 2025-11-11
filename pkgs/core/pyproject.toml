@@ -1,6 +1,6 @@
 [project]
 name = "eunomia-core"
-version = "0.3.9"
+version = "0.3.10"
 description = "Shared functionalities for Eunomia packages"
 authors = [
     { name="What About You team", email="info@whataboutyou.ai" }
