@@ -24,3 +24,5 @@ class ConditionOperator(str, Enum):
     NOT_IN = "not_in"
     SUBSET = "subset"
     NOT_SUBSET = "not_subset"
+    SUPERSET = "superset"
+    NOT_SUPERSET = "not_superset"

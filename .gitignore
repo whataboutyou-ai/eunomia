@@ -8,3 +8,5 @@
 dist/
 policies/
 node_modules/
+htmlcov/
+.coverage

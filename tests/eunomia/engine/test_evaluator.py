@@ -124,6 +124,21 @@ def test_apply_operator():
     assert apply_operator(enums.ConditionOperator.SUBSET, "admin", ["admin", "user"]) is False
     assert apply_operator(enums.ConditionOperator.SUBSET, ["admin"], "not_a_list") is False
 
+    # SUPERSET operator requires target to be a superset of the policy value
+    assert apply_operator(enums.ConditionOperator.SUPERSET, "admin", ["admin", "user"]) is False
+    assert apply_operator(enums.ConditionOperator.SUPERSET, ["admin", "user"], "admin") is True
+    assert apply_operator(enums.ConditionOperator.SUPERSET, "admin", "user") is False
+    assert apply_operator(enums.ConditionOperator.SUPERSET, ["admin", "user"], ["admin"]) is True
+    assert apply_operator(enums.ConditionOperator.SUPERSET, 1, 1) is False  # Raises TypeError
+
+    assert apply_operator(enums.ConditionOperator.NOT_SUPERSET, ["admin", "user"], "power_user") is True
+    assert apply_operator(enums.ConditionOperator.NOT_SUPERSET, ["admin", "user"], "user") is False
+
+    # Invalid / Empty operator returns False
+    assert apply_operator(None, "admin", "user") is False
+
+    # Assert that TypeErrors are caught and returned as False
+    assert apply_operator(enums.ConditionOperator.IN, [1, 2, 3], 4) is False
 
 def test_evaluate_condition():
     condition = schemas.Condition(
