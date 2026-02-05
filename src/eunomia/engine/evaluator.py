@@ -1,7 +1,8 @@
 from typing import Any
-
+from logging import getLogger
 from eunomia_core import enums, schemas
 
+LOGGER = getLogger("eunomia_engine")
 
 def get_attribute_value(obj: Any, path: str) -> Any:
     """Extract a value from an object using dot notation path."""
@@ -27,6 +28,14 @@ def get_attribute_value(obj: Any, path: str) -> Any:
 
     return current
 
+def _to_set(arg: Any) -> set:
+    """Helper function for converting diverse data types to sets"""
+    if isinstance(arg, list):
+        return set(tuple(arg))
+    if isinstance(arg, str):
+        return {arg}
+    return set(arg)
+
 
 def apply_operator(
     operator_type: enums.ConditionOperator, value: Any, target: Any
@@ -34,47 +43,53 @@ def apply_operator(
     """Apply the specified operator with the value against the target."""
     if value is None or target is None:
         return False
+    try:
 
-    if operator_type == enums.ConditionOperator.EQUALS:
-        return value == target
-    elif operator_type == enums.ConditionOperator.NOT_EQUALS:
-        return value != target
+        match operator_type:
+            # Equivalency checks
+            case enums.ConditionOperator.EQUALS:
+                return value == target
+            case enums.ConditionOperator.NOT_EQUALS:
+                return value != target
+            # String checks
+            case enums.ConditionOperator.STARTS_WITH:
+                return target.startswith(value)
+            case enums.ConditionOperator.ENDS_WITH:
+                return target.endswith(value)
+            # Math checks
+            case enums.ConditionOperator.GREATER:
+                return value > target
+            case enums.ConditionOperator.GREATER_OR_EQUAL:
+                return value >= target
+            case enums.ConditionOperator.LESS:
+                return value < target
+            case enums.ConditionOperator.LESS_OR_EQUAL:
+                return value <= target
 
-    if isinstance(value, str) and isinstance(target, str):
-        if operator_type == enums.ConditionOperator.CONTAINS:
-            return value in target
-        elif operator_type == enums.ConditionOperator.NOT_CONTAINS:
-            return value not in target
-        elif operator_type == enums.ConditionOperator.STARTS_WITH:
-            return target.startswith(value)
-        elif operator_type == enums.ConditionOperator.ENDS_WITH:
-            return target.endswith(value)
+            # Contains and IN checks
+            case enums.ConditionOperator.CONTAINS | enums.ConditionOperator.IN:
+                return value in target
+            case enums.ConditionOperator.NOT_CONTAINS | enums.ConditionOperator.NOT_IN:
+                return value not in target
 
-    elif isinstance(value, (int, float)) and isinstance(target, (int, float)):
-        if operator_type == enums.ConditionOperator.GREATER:
-            return value > target
-        elif operator_type == enums.ConditionOperator.GREATER_OR_EQUAL:
-            return value >= target
-        elif operator_type == enums.ConditionOperator.LESS:
-            return value < target
-        elif operator_type == enums.ConditionOperator.LESS_OR_EQUAL:
-            return value <= target
-    
-    # Subset operators: check if all items in value (list) are in target (list)
-    elif isinstance(value, list) and isinstance(target, list):
-        if operator_type == enums.ConditionOperator.SUBSET:
-            return all(item in target for item in value)
-        elif operator_type == enums.ConditionOperator.NOT_SUBSET:
-            return all(item not in target for item in value)
+            # Subset operators: check if all items in value (set) are in target (set)
+            case enums.ConditionOperator.SUBSET:
+                return all(item in target for item in value)
+            case enums.ConditionOperator.NOT_SUBSET:
+                return all(item not in target for item in value)
+            # Superset operators: check to see if the target resource is a superset of the value(s)
+            case enums.ConditionOperator.SUPERSET:
+                return _to_set(value).issuperset(_to_set(target))
+            case enums.ConditionOperator.NOT_SUPERSET:
+                return not _to_set(value).issuperset(_to_set(target))
 
-    # IN/NOT_IN operators: target must be a collection (list)
-    elif isinstance(target, list):
-        if operator_type == enums.ConditionOperator.IN:
-            return value in target
-        elif operator_type == enums.ConditionOperator.NOT_IN:
-            return value not in target
+            # Default case
+            case _:
+                return False
 
-    return False
+    except TypeError as err:
+        LOGGER.warning(f"Unexpected target/value variable types, {err}")
+        return False
 
 
 def evaluate_condition(condition: schemas.Condition, obj: Any) -> bool:
